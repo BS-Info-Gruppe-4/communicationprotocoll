@@ -224,7 +224,7 @@ class ServerTest {
 	@Test
 	@DisplayName("Ablesung kann erfolgreich via PUT aktualisiert werden")
 	void t10_updateExistingAblesung() {
-		final int newZaehlerstand = ablesung_crudTest.getZaehlerstand().intValue() + 100;
+		final int newZaehlerstand = ablesung_crudTest.getZaehlerstand() + 100;
 		ablesung_crudTest.setZaehlerstand(newZaehlerstand);
 		Response re = target.path(endpointAblesungen).request(MediaType.APPLICATION_JSON).accept(MediaType.TEXT_PLAIN)
 				.put(Entity.entity(ablesung_crudTest, MediaType.APPLICATION_JSON));
