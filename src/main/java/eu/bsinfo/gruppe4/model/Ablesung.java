@@ -1,11 +1,13 @@
 package eu.bsinfo.gruppe4.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
+@NoArgsConstructor
 public class Ablesung {
     private UUID id;
     private String zaehlernummer;
