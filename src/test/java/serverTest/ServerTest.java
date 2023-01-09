@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import eu.bsinfo.gruppe4.model.Ablesung;
 import eu.bsinfo.gruppe4.model.Kunde;
+import eu.bsinfo.gruppe4.server.Server;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,8 +38,6 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import server.Server;
-
 @TestMethodOrder(MethodOrderer.MethodName.class)
 class ServerTest {
 
@@ -53,7 +52,6 @@ class ServerTest {
 
 	private static final Kunde k1_crudTest = new Kunde("C", "c");
 	private static final Kunde k2_RangeTest = new Kunde("A", "a");
-	private static final Kunde k3_RangeTest = new Kunde("B", "b");
 	private static final Kunde k3_RangeTest = new Kunde("B", "b");
 
 	private static final int lastYear = LocalDate.now().getYear() - 1;
@@ -226,7 +224,7 @@ class ServerTest {
 	@Test
 	@DisplayName("Ablesung kann erfolgreich via PUT aktualisiert werden")
 	void t10_updateExistingAblesung() {
-		final int newZaehlerstand = ablesung_crudTest.getZaehlerstand().intValue() + 100;
+		final int newZaehlerstand = ablesung_crudTest.getZaehlerstand() + 100;
 		ablesung_crudTest.setZaehlerstand(newZaehlerstand);
 		Response re = target.path(endpointAblesungen).request(MediaType.APPLICATION_JSON).accept(MediaType.TEXT_PLAIN)
 				.put(Entity.entity(ablesung_crudTest, MediaType.APPLICATION_JSON));
