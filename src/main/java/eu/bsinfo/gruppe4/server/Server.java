@@ -42,5 +42,7 @@ public class Server {
         // TODO: Implement check if data should be persisted
 
         server.stop(0);
+
+        serverIsOnline = false;
     }
 }
