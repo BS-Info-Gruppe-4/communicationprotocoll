@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import eu.bsinfo.gruppe4.model.Ablesung;
 import eu.bsinfo.gruppe4.model.Kunde;
+import eu.bsinfo.gruppe4.server.Server;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;

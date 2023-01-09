@@ -8,7 +8,9 @@ import java.net.URI;
 
 public class Server {
 
-    static boolean serverIsOnline = false;
+    public static final String PATH_TO_ENDPOINTS = "eu.bsinfo.gruppe4.endpoints";
+    private static HttpServer server;
+    private static boolean serverIsOnline = false;
 
     public static void startServer(String url, boolean loadFromFile) {
 
@@ -17,16 +19,28 @@ public class Server {
             return;
         }
 
-        final String pack = "eu.bsinfo.gruppe4.endpoints";
+        // TODO: Implement check if persisted data should be loaded
 
         System.out.println("Trying to start server");
         System.out.println(url);
 
-        final ResourceConfig rc = new ResourceConfig().packages(pack);
-        final HttpServer server = JdkHttpServerFactory.createHttpServer(URI.create(url), rc);
+        final ResourceConfig rc = new ResourceConfig().packages(PATH_TO_ENDPOINTS);
+        server = JdkHttpServerFactory.createHttpServer(URI.create(url), rc);
 
         System.out.println("Ready for Requests....");
 
         serverIsOnline = true;
+    }
+
+    public static void stopServer(boolean saveToFile) {
+
+        if (!serverIsOnline) {
+            System.out.println("Konnte Server nicht stoppen. Es wurde noch kein Server gestartet");
+            return;
+        }
+
+        // TODO: Implement check if data should be persisted
+
+        server.stop(0);
     }
 }
