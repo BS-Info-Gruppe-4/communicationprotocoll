@@ -37,8 +37,6 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import server.Server;
-
 @TestMethodOrder(MethodOrderer.MethodName.class)
 class ServerTest {
 
@@ -53,7 +51,6 @@ class ServerTest {
 
 	private static final Kunde k1_crudTest = new Kunde("C", "c");
 	private static final Kunde k2_RangeTest = new Kunde("A", "a");
-	private static final Kunde k3_RangeTest = new Kunde("B", "b");
 	private static final Kunde k3_RangeTest = new Kunde("B", "b");
 
 	private static final int lastYear = LocalDate.now().getYear() - 1;
