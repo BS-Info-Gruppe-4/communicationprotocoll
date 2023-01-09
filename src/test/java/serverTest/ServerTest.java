@@ -1,3 +1,5 @@
+package serverTest;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -18,8 +20,10 @@ import java.util.stream.Collectors;
 import eu.bsinfo.gruppe4.model.Ablesung;
 import eu.bsinfo.gruppe4.model.Kunde;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -32,9 +36,10 @@ import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
 import server.Server;
 
-@TestMethodOrder(MethodOrderer.Alphanumeric.class)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 class ServerTest {
 
 	private static final String url = "http://localhost:8080/test";
@@ -46,11 +51,15 @@ class ServerTest {
 	private static final String endpointAblesungen = "ablesungen";
 	private static final String endpointAblesungClientStart = "ablesungenVorZweiJahrenHeute";
 
-	private static final Kunde k1 = new Kunde("C", "c");
+	private static final Kunde k1_crudTest = new Kunde("C", "c");
 	private static final Kunde k2_RangeTest = new Kunde("A", "a");
 	private static final Kunde k3_RangeTest = new Kunde("B", "b");
-	
-	private static final Ablesung crudTest = new Ablesung("1", LocalDate.of(2022, 8, 25), k2_RangeTest, "test", false, 100);
+	private static final Kunde k3_RangeTest = new Kunde("B", "b");
+
+	private static final int lastYear = LocalDate.now().getYear() - 1;
+	private static final Ablesung ablesung_crudTest = new Ablesung("1", LocalDate.of(lastYear, 8, 25), k2_RangeTest, "test", false,
+			100);
+	private static final Ablesung ablesung_kundeDeletedDuringTest = new Ablesung("1", LocalDate.of(lastYear, 12, 1), k1_crudTest, "test", false, 0);;
 
 	private static List<Kunde> kunden;
 	private static HashMap<Kunde, List<Ablesung>> ablesungen;
@@ -61,13 +70,12 @@ class ServerTest {
 		setUpKundenList();
 		Server.startServer(url, false);
 	}
-	
+
 	private static void setUpKundenList() {
 		kunden = new ArrayList<>();
-		kunden.add(k1);
+		kunden.add(k1_crudTest);
 		kunden.add(k2_RangeTest);
 		kunden.add(k3_RangeTest);
-		
 	}
 
 	@AfterAll
@@ -75,13 +83,13 @@ class ServerTest {
 		Server.stopServer(false);
 	}
 
-
 	@BeforeEach
 	void resetClient() {
 		target = client.target(url.concat(endpointHasuverwaltung));
 	}
 
 	@Test
+	@DisplayName("Kunden werden erfolgreich via POST an den Server gesendet")
 	void t01_createNewKunden() {
 		for (Kunde k : kunden) {
 			Response response = postNeuerKunde(k);
@@ -123,102 +131,61 @@ class ServerTest {
 		ablesungen.get(k3_RangeTest).add(a7);
 		ablesungen.get(k3_RangeTest).add(a8);
 		ablesungen.get(k2_RangeTest).add(notAtClientStart);
+		ablesungen.get(k1_crudTest).add(ablesung_crudTest);
+		ablesungen.get(k1_crudTest).add(ablesung_kundeDeletedDuringTest);
 	}
 
 	@Test
+	@DisplayName("Senden eines nicht gültigen Kunden-Objekts via POST führt zu Bad-Request")
 	void t02_createNewKundeFailsIfKundeIsNull() {
 		Response re = postNeuerKunde(null);
 		assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), re.getStatus());
 		assertFalse(re.readEntity(String.class).isBlank());
 	}
-	
-	@Test
-	void t03_updateExistingKunde() {
-		String newName = "Aa";
-		k1.setName(newName);
-		Response re = target.path(endpointKunden).request(MediaType.APPLICATION_JSON).accept(MediaType.TEXT_PLAIN)
-				.put(Entity.entity(k1, MediaType.APPLICATION_JSON));
-		assertEquals(Response.Status.OK.getStatusCode(), re.getStatus());
-		resetClient();
-		String path = endpointKunden.concat("/").concat(k1.getId().toString());
-		re = target.path(path).request().accept(MediaType.APPLICATION_JSON).get();
-		Kunde responseKunde = re.readEntity(Kunde.class);
-		assertEquals(newName, responseKunde.getName());
-	}
 
 	@Test
+	@DisplayName("Daten eines bestehenden Kunde können erfolgreich via PUT geändert werden")
+	void t03_updateExistingKunde() {
+		String newName = "Aa";
+		k1_crudTest.setName(newName);
+		Response re = target.path(endpointKunden).request(MediaType.APPLICATION_JSON).accept(MediaType.TEXT_PLAIN)
+				.put(Entity.entity(k1_crudTest, MediaType.APPLICATION_JSON));
+		assertEquals(Response.Status.OK.getStatusCode(), re.getStatus());
+		assertFalse(re.readEntity(String.class).isBlank());
+	}
+
+
+	@Test
+	@DisplayName("Senden eines nicht bestehenden Kunden-Objekts via PUT führt zu Not-Found")
 	void t04_updateNonExisitngKundeFails() {
-		Kunde notInServer = new Kunde("No", "No");
+		Kunde notInServer = new Kunde("Not", "Found");
 		Response re = target.path(endpointKunden).request(MediaType.APPLICATION_JSON).accept(MediaType.TEXT_PLAIN)
 				.put(Entity.entity(notInServer, MediaType.APPLICATION_JSON));
 		assertEquals(Response.Status.NOT_FOUND.getStatusCode(), re.getStatus());
 	}
-	
-	@Test
-	void t05_deleteKunde() {
-		String k1ID = k1.getId().toString();
-		kunden.remove(k1);
-		Response re = target.path(endpointKunden.concat("/").concat(k1ID)).request().accept(MediaType.APPLICATION_JSON)
-				.delete();
-		assertEquals(Response.Status.OK.getStatusCode(), re.getStatus());
-		Map<Kunde, List<Ablesung>> result = re.readEntity(new GenericType<Map<Kunde, List<Ablesung>>>() {
-		});
-		assertEquals(1, result.keySet().size());
-		assertTrue(result.keySet().contains(k1));
-
-		List<Ablesung> ablesungenExpected = ablesungen.get(k1);
-		List<Ablesung> ablesungenResult = result.get(k1);
-		assertEquals(ablesungenExpected.size(), ablesungenResult.size());
-
-		for (Ablesung a : ablesungenResult) {
-			assertTrue(ablesungenExpected.contains(a));
-			assertNull(a.getKunde());
-		}
-	}
 
 	@Test
-	void t06_deleteKundeFailsForNonExisitingKunde() {
-		Response re = target.path(endpointKunden.concat("/null")).request().accept(MediaType.APPLICATION_JSON).delete();
-		assertEquals(Response.Status.NOT_FOUND.getStatusCode(), re.getStatus());
-		assertFalse(re.readEntity(String.class).isBlank());
-	}
-
-	@Test
-	void t07_getEveryKunde() {
-		Response re = target.path(endpointKunden).request().accept(MediaType.APPLICATION_JSON).get();
-		assertEquals(Response.Status.OK.getStatusCode(), re.getStatus());
-		List<Kunde> resopnseKunden = re.readEntity(new GenericType<List<Kunde>>() {
-		});
-		assertTrue(resopnseKunden.size() == kunden.size());
-//		List<Kunde> sortedKunden = kunden.stream().sorted((k1, k2) -> k1.getName().compareTo(k2.getName()))
-//				.collect(Collectors.toList());
-		for (Kunde k : kunden) {
-			assertTrue(resopnseKunden.contains(k));
-//			assertEquals(k, resopnseKunden.get(sortedKunden.indexOf(k)));
-		}
-	}
-
-	@Test
-	void t08_getSingleKunde() {
-		Response re = target.path(endpointKunden.concat("/").concat(k2_RangeTest.getId().toString()))
+	@DisplayName("Einzelner Kunde kann vom Server via GET empfangen werden")
+	void t05_getSingleKunde() {
+		Response re = target.path(endpointKunden.concat("/").concat(k1_crudTest.getId().toString()))
 				.request(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).get();
 		assertEquals(Response.Status.OK.getStatusCode(), re.getStatus());
 		Kunde result = re.readEntity(Kunde.class);
-		assertEquals(k2_RangeTest, result);
+		assertEquals(k1_crudTest, result);
+		assertEquals(k1_crudTest.getName(), result.getName());
 	}
 
 	@Test
-	void t09_getSingleKundeFailsForNonExistingKunde() {
+	@DisplayName("Wird ein nicht existierender Kunde via GET angefordert, wird mit Not Found geantwortet")
+	void t06_getSingleKundeFailsForNonExistingKunde() {
 		Response re = target.path(endpointKunden.concat("/null")).request().accept(MediaType.APPLICATION_JSON).get();
 		assertEquals(Response.Status.NOT_FOUND.getStatusCode(), re.getStatus());
 		assertFalse(re.readEntity(String.class).isBlank());
 	}
 
-	
-
 	@Test
-	void t10_createAblesungForKunden() {
-		ablesungen.get(k2_RangeTest).add(crudTest);
+	@DisplayName("Ablesungen können erfolgreich via POST an den Server gesendet werden")
+	void t07_createAblesungForKunden() {
 		Collection<List<Ablesung>> lists = ablesungen.values();
 		for (List<Ablesung> l : lists) {
 			for (Ablesung a : l) {
@@ -238,7 +205,8 @@ class ServerTest {
 	}
 
 	@Test
-	void t11_createAblesungForNonExistingKundeFails() {
+	@DisplayName("Senden einer Ablesung mit einem nicht existierenden Kunden via POST führt zu Not Found")
+	void t08_createAblesungForNonExistingKundeFails() {
 		LocalDate now = LocalDate.now();
 		Ablesung a = new Ablesung("1", now, null, "test", false, 0);
 		Response re = postNeueAblesung(a);
@@ -246,30 +214,29 @@ class ServerTest {
 		String response = re.readEntity(String.class);
 		assertFalse(response.isBlank());
 	}
-	
+
 	@Test
-	void t12_createAblesungFailsIfAblesungIsNull() {
+	@DisplayName("Senden eines nicht gültigen Ablesungsobjekt führt zu Bad Request")
+	void t09_createAblesungFailsIfAblesungIsNull() {
 		Response re = postNeueAblesung(null);
 		assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), re.getStatus());
 		assertFalse(re.readEntity(String.class).isBlank());
 	}
 
 	@Test
-	void t13_updateExistingAblesung() {
-		final int newZaehlerstand = crudTest.getZaehlerstand().intValue() + 100;
-		crudTest.setZaehlerstand(newZaehlerstand);
+	@DisplayName("Ablesung kann erfolgreich via PUT aktualisiert werden")
+	void t10_updateExistingAblesung() {
+		final int newZaehlerstand = ablesung_crudTest.getZaehlerstand().intValue() + 100;
+		ablesung_crudTest.setZaehlerstand(newZaehlerstand);
 		Response re = target.path(endpointAblesungen).request(MediaType.APPLICATION_JSON).accept(MediaType.TEXT_PLAIN)
-				.put(Entity.entity(crudTest, MediaType.APPLICATION_JSON));
+				.put(Entity.entity(ablesung_crudTest, MediaType.APPLICATION_JSON));
 		assertEquals(Response.Status.OK.getStatusCode(), re.getStatus());
-		resetClient();
-		Response re2 = target.path(endpointAblesungen.concat("/").concat(crudTest.getId().toString())).request()
-				.accept(MediaType.APPLICATION_JSON).get();
-		Ablesung result = re2.readEntity(Ablesung.class);
-		assertEquals(crudTest.getZaehlerstand(), result.getZaehlerstand());
+		assertFalse(re.readEntity(String.class).isBlank());
 	}
 
 	@Test
-	void t14_updateNonExistingAblesungFails() {
+	@DisplayName("Senden einer nicht existierenden Ablesung via PUT führt zu Not Found")
+	void t11_updateNonExistingAblesungFails() {
 		Ablesung a = new Ablesung();
 		a.setId(null);
 		Response re = target.path(endpointAblesungen).request(MediaType.APPLICATION_JSON).accept(MediaType.TEXT_PLAIN)
@@ -278,46 +245,50 @@ class ServerTest {
 		assertFalse(re.readEntity(String.class).isBlank());
 	}
 
-	
+	@Test
+	@DisplayName("Einzelne Ablesung kann via GET vom Server empfangen werde")
+	void t12_getSingleAblesung() {
+		Response re = target.path(endpointAblesungen.concat("/").concat(ablesung_crudTest.getId().toString())).request()
+				.accept(MediaType.APPLICATION_JSON).get();
+		assertEquals(Response.Status.OK.getStatusCode(), re.getStatus());
+		Ablesung result = re.readEntity(Ablesung.class);
+		assertEquals(ablesung_crudTest, result);
+		assertEquals(ablesung_crudTest.getZaehlerstand(), result.getZaehlerstand());
+	}
 
 	@Test
-	void t15_deleteAblesung() {
-		ablesungen.get(k2_RangeTest).remove(crudTest);
-		crudTest.setKunde(null);
-		String aid = crudTest.getId().toString();
+	@DisplayName("Anfordern einer nicht existierenden Ablesung via GET führt zu Not Found")
+	void t13_getSingleAblesungFailsForNonExistingAblesung() {
+		Response re = target.path(endpointAblesungen.concat("/null")).request()
+				.accept(MediaType.APPLICATION_JSON).get();
+		assertEquals(Response.Status.NOT_FOUND.getStatusCode(), re.getStatus());
+		assertFalse(re.readEntity(String.class).isBlank());
+	}
+
+	@Test
+	@DisplayName("Ablesung kann erfolgreich gelöscht werden")
+	void t14_deleteAblesung() {
+		ablesungen.get(k1_crudTest).remove(ablesung_crudTest);
+		String aid = ablesung_crudTest.getId().toString();
 		Response re = target.path(endpointAblesungen.concat("/").concat(aid)).request()
 				.accept(MediaType.APPLICATION_JSON).delete();
 		assertEquals(Response.Status.OK.getStatusCode(), re.getStatus());
 		Ablesung result = re.readEntity(Ablesung.class);
-		assertEquals(crudTest, result);
+		assertEquals(ablesung_crudTest, result);
 	}
 
 	@Test
-	void t16_deleteAblesungFailsForNonExistingAblesung() {
+	@DisplayName("Wird eine nicht existierende Ablesng versucht zu löschen, wird mit Not Found geantwortet")
+	void t15_deleteAblesungFailsForNonExistingAblesung() {
 		Response re = target.path(endpointAblesungen.concat("/null")).request().accept(MediaType.APPLICATION_JSON)
 				.delete();
 		assertEquals(Response.Status.NOT_FOUND.getStatusCode(), re.getStatus());
 		assertFalse(re.readEntity(String.class).isBlank());
 	}
-	
-	@Test
-	void t17_getSingleAblesung() {
-		Ablesung toSearch = ablesungen.get(k2_RangeTest).get(0);
-		Response re = target.path(endpointAblesungen.concat("/").concat(toSearch.getId().toString())).request().accept(MediaType.APPLICATION_JSON).get();
-		assertEquals(Response.Status.OK.getStatusCode(), re.getStatus());
-		Ablesung result = re.readEntity(Ablesung.class);
-		assertEquals(toSearch, result);
-	}
-	
-	@Test
-	void t18_getSingleAblesungFailsForNonExistingAblesung() {
-		Response re = target.path(endpointAblesungen.concat("/").concat(crudTest.getId().toString())).request().accept(MediaType.APPLICATION_JSON).get();
-		assertEquals(Response.Status.NOT_FOUND.getStatusCode(), re.getStatus());
-		assertFalse(re.readEntity(String.class).isBlank());
-	}
 
 	@Test
-	void t19_getAblesungenForClientStart() {
+	@DisplayName("Alle entsprechenden Ablesungen für den Start des Clients können vom Server empfangen werden")
+	void t16_getAblesungenForClientStart() {
 		Response re = target.path(endpointAblesungClientStart).request().accept(MediaType.APPLICATION_JSON).get();
 		List<Ablesung> ablesungenResult = re.readEntity(new GenericType<List<Ablesung>>() {
 		});
@@ -328,8 +299,68 @@ class ServerTest {
 		}
 	}
 
+
 	@Test
-	void t20_getAblesungenFailsWithWrongDateFormat() {
+	@DisplayName("Ein bestehender Kunde kann erfolgreich gelöscht werden")
+	void t17_deleteKunde() {
+		String k1ID = k1_crudTest.getId().toString();
+		kunden.remove(k1_crudTest);
+		ablesungen.get(k1_crudTest).forEach(a -> a.setKunde(null));
+		Response re = target.path(endpointKunden.concat("/").concat(k1ID)).request().accept(MediaType.APPLICATION_JSON)
+				.delete();
+		assertEquals(Response.Status.OK.getStatusCode(), re.getStatus());
+		Map<Kunde, List<Ablesung>> result = re.readEntity(new GenericType<Map<Kunde, List<Ablesung>>>() {
+		});
+		assertEquals(1, result.keySet().size());
+		assertTrue(result.keySet().contains(k1_crudTest));
+
+		List<Ablesung> ablesungenExpected = ablesungen.get(k1_crudTest);
+		List<Ablesung> ablesungenResult = result.get(k1_crudTest);
+		assertEquals(ablesungenExpected.size(), ablesungenResult.size());
+
+		for (Ablesung a : ablesungenResult) {
+			assertTrue(ablesungenExpected.contains(a));
+		}
+	}
+
+	@Test
+	@DisplayName("Löschen eines nicht existierenden Kunden führt zu Not-Found")
+	void t18_deleteKundeFailsForNonExisitingKunde() {
+		Response re = target.path(endpointKunden.concat("/null")).request().accept(MediaType.APPLICATION_JSON).delete();
+		assertEquals(Response.Status.NOT_FOUND.getStatusCode(), re.getStatus());
+		assertFalse(re.readEntity(String.class).isBlank());
+	}
+
+	@Test
+	@DisplayName("Ablesung eines gelöschten Kunden ist auf dem Server noch vorhanden")
+	void t19_ablesungFromDeletedKundeStillOnServer(){
+		Response re = target.path(endpointAblesungen.concat("/").concat(ablesung_kundeDeletedDuringTest.getId().toString())).request().accept(MediaType.APPLICATION_JSON).get();
+		assertEquals(Response.Status.OK.getStatusCode(), re.getStatus());
+		Ablesung result = re.readEntity(Ablesung.class);
+		assertEquals(ablesung_kundeDeletedDuringTest, result);
+		assertNull(result.getKunde());
+	}
+
+	@Test
+	@DisplayName("Liste aller Kunden vom Server enthält alle gesendeten Kunden")
+	void t20_getEveryKunde() {
+		Response re = target.path(endpointKunden).request().accept(MediaType.APPLICATION_JSON).get();
+		assertEquals(Response.Status.OK.getStatusCode(), re.getStatus());
+		List<Kunde> resopnseKunden = re.readEntity(new GenericType<List<Kunde>>() {
+		});
+		assertTrue(resopnseKunden.size() == kunden.size());
+//		List<Kunde> sortedKunden = kunden.stream().sorted((k1, k2) -> k1.getName().compareTo(k2.getName()))
+//				.collect(Collectors.toList());
+		for (Kunde k : kunden) {
+			assertTrue(resopnseKunden.contains(k));
+//			assertEquals(k, resopnseKunden.get(sortedKunden.indexOf(k)));
+		}
+	}
+
+
+	@Test
+	@DisplayName("Anfordern von bestimmten Ablesungen mit einem üngültigen Datumsformat führt zu Bad Request")
+	void t21_getAblesungenFailsWithWrongDateFormat() {
 		String wrongDate = "26.09.2022";
 		Response re = target.path(endpointAblesungen).queryParam("beginn", wrongDate).request()
 				.accept(MediaType.APPLICATION_JSON).get();
@@ -338,7 +369,8 @@ class ServerTest {
 	}
 
 	@Test
-	void t21_getEveryAblesungInRangeForSpecificKunde() {
+	@DisplayName("Alle Ablesungen zwischen zwei Datumsvorgaben können erfolgreich vom Server empfangen werden")
+	void t22_getEveryAblesungInRangeForSpecificKunde() {
 		LocalDate beginn = LocalDate.of(2021, 2, 1);
 		LocalDate ende = LocalDate.of(2021, 9, 1);
 		List<Ablesung> filter = ablesungen.get(k2_RangeTest).stream()
@@ -358,7 +390,8 @@ class ServerTest {
 	}
 
 	@Test
-	void t22_getEveryAblesungSinceSpecificDate() {
+	@DisplayName("Alle Ablesungen ab einem bestimmten Ablesungsdatum können erfolgreich empfangen werden")
+	void t23_getEveryAblesungSinceSpecificDate() {
 		LocalDate beginn = LocalDate.of(2021, 2, 1);
 		List<Ablesung> result = new ArrayList<>();
 		for (List<Ablesung> toFilter : ablesungen.values()) {
@@ -381,8 +414,9 @@ class ServerTest {
 	}
 
 	@Test
-	void t23_getEveryAblesungUntilSpecificDate() {
-		LocalDate ende = LocalDate.of(2021, 7, 1);
+	@DisplayName("Alle Ablesungen bis zu einem bestimmten Ablesungsdatum können erfolgreich vom Server empfangen werden")
+	void t24_getEveryAblesungUntilSpecificDate() {
+		LocalDate ende = LocalDate.of(LocalDate.now().getYear() -1, 4, 1);
 		List<Ablesung> result = new ArrayList<>();
 		for (List<Ablesung> toFilter : ablesungen.values()) {
 			for (Ablesung a : toFilter) {
@@ -404,7 +438,8 @@ class ServerTest {
 	}
 
 	@Test
-	void t24_loadFromFileWorks() {
+	@DisplayName("Wird der Server beendet und der Datenbestand soll gespeichert werden, so kann der Server mit diesem Datenbestand wieder gestartet werden")
+	void t25_loadFromFileWorks() {
 		Server.stopServer(true);
 		assertThrows(ProcessingException.class, () -> postNeuerKunde(new Kunde("Fehler", "Fehler")));
 		Server.startServer(url, true);
