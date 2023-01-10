@@ -1,6 +1,7 @@
 package eu.bsinfo.gruppe4.server;
 
 import com.sun.net.httpserver.HttpServer;
+import eu.bsinfo.gruppe4.persistence.JsonRepository;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -12,6 +13,7 @@ public class Server {
     private static HttpServer server;
     private static boolean serverIsOnline = false;
 
+
     public static void startServer(String url, boolean loadFromFile) {
 
         if (serverIsOnline) {
@@ -19,7 +21,10 @@ public class Server {
             return;
         }
 
-        // TODO: Implement check if persisted data should be loaded
+        if (loadFromFile) {
+            JsonRepository jsonRepository = JsonRepository.getInstance();
+            jsonRepository.loadDataFromJsonFiles();
+        }
 
         System.out.println("Trying to start server");
         System.out.println(url);
@@ -39,10 +44,12 @@ public class Server {
             return;
         }
 
-        // TODO: Implement check if data should be persisted
+        if (saveToFile) {
+            JsonRepository jsonRepository = JsonRepository.getInstance();
+            jsonRepository.persistDataInJsonFile();
+        }
 
         server.stop(0);
-
         serverIsOnline = false;
     }
 }
