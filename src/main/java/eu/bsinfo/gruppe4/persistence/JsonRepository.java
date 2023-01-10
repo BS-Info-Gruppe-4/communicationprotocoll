@@ -87,16 +87,20 @@ public class JsonRepository {
         return new ArrayList<>();
     }
 
-    public Optional<Kunde> getKunde(UUID id) {
+    public Optional<Kunde> getKunde(UUID kundenId) {
         return alleKunden.stream()
-                .filter(kunde -> kunde.getId().equals(id))
+                .filter(kunde -> kunde.getId().equals(kundenId))
                 .findFirst();
     }
 
-    public Optional<Ablesung> getAblesung(UUID id) {
+    public Optional<Ablesung> getAblesung(UUID ablesungId) {
         return alleAblesungen.stream()
-                .filter(kunde -> kunde.getId().equals(id))
+                .filter(kunde -> kunde.getId().equals(ablesungId))
                 .findFirst();
+    }
+
+    public void deleteAblesung(UUID ablesungId) {
+        alleAblesungen.removeIf(ablesung -> ablesung.getId().equals(ablesungId));
     }
 
     public ArrayList<Kunde> getAlleKunden() {
