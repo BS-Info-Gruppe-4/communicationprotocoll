@@ -1,6 +1,8 @@
 package eu.bsinfo.gruppe4.persistence;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import eu.bsinfo.gruppe4.model.Ablesung;
 import eu.bsinfo.gruppe4.model.Kunde;
 
@@ -19,6 +21,12 @@ public class JsonRepository {
     private ArrayList<Kunde> alleKunden = new ArrayList<>();
     private ArrayList<Ablesung> alleAblesungen = new ArrayList<>();
 
+
+    public JsonRepository() {
+        // konfiguriert jackson, sodass es auch LocalDate serialisieren kann
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
 
     public static JsonRepository getInstance() {
         return instance;
