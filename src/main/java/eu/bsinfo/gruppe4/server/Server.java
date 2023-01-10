@@ -1,8 +1,7 @@
 package eu.bsinfo.gruppe4.server;
 
 import com.sun.net.httpserver.HttpServer;
-import eu.bsinfo.gruppe4.persistence.CustomerRepository;
-import eu.bsinfo.gruppe4.persistence.ReadingRepository;
+import eu.bsinfo.gruppe4.persistence.JsonRepository;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -23,13 +22,9 @@ public class Server {
         }
 
         if (loadFromFile) {
-            CustomerRepository customerRepository = CustomerRepository.getInstance();
-            ReadingRepository readingRepository = ReadingRepository.getInstance();
-
-            customerRepository.loadJsonFile();
-            readingRepository.loadJsonFile();
+            JsonRepository jsonRepository = JsonRepository.getInstance();
+            jsonRepository.loadDataFromJsonFiles();
         }
-
 
         System.out.println("Trying to start server");
         System.out.println(url);
@@ -50,11 +45,8 @@ public class Server {
         }
 
         if (saveToFile) {
-            CustomerRepository customerRepository = CustomerRepository.getInstance();
-            ReadingRepository readingRepository = ReadingRepository.getInstance();
-
-            customerRepository.saveToJsonFile();
-            readingRepository.saveToJsonFile();
+            JsonRepository jsonRepository = JsonRepository.getInstance();
+            jsonRepository.persistDataInJsonFile();
         }
 
         server.stop(0);
