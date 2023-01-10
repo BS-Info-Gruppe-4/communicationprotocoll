@@ -2,6 +2,7 @@ package eu.bsinfo.gruppe4.server;
 
 import com.sun.net.httpserver.HttpServer;
 import eu.bsinfo.gruppe4.persistence.CustomerRepository;
+import eu.bsinfo.gruppe4.persistence.ReadingRepository;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -23,7 +24,10 @@ public class Server {
 
         if (loadFromFile) {
             CustomerRepository customerRepository = CustomerRepository.getInstance();
+            ReadingRepository readingRepository = ReadingRepository.getInstance();
+
             customerRepository.loadJsonFile();
+            readingRepository.loadJsonFile();
         }
 
 
@@ -47,7 +51,10 @@ public class Server {
 
         if (saveToFile) {
             CustomerRepository customerRepository = CustomerRepository.getInstance();
+            ReadingRepository readingRepository = ReadingRepository.getInstance();
+
             customerRepository.saveToJsonFile();
+            readingRepository.saveToJsonFile();
         }
 
         server.stop(0);
