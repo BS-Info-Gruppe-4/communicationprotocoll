@@ -7,6 +7,8 @@ import eu.bsinfo.gruppe4.model.Kunde;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Optional;
+import java.util.UUID;
 
 public class JsonRepository {
 
@@ -83,6 +85,18 @@ public class JsonRepository {
         }
 
         return new ArrayList<>();
+    }
+
+    public Optional<Kunde> getKunde(UUID id) {
+        return alleKunden.stream()
+                .filter(kunde -> kunde.getId().equals(id))
+                .findFirst();
+    }
+
+    public Optional<Ablesung> getAblesung(UUID id) {
+        return alleAblesungen.stream()
+                .filter(kunde -> kunde.getId().equals(id))
+                .findFirst();
     }
 
     public ArrayList<Kunde> getAlleKunden() {
