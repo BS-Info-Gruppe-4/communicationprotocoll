@@ -111,6 +111,10 @@ public class JsonRepository {
         alleAblesungen.removeIf(ablesung -> ablesung.getId().equals(ablesungId));
     }
 
+    public void deleteKunde(UUID kundenId) {
+        alleKunden.removeIf(kunden -> kunden.getId().equals(kundenId));
+    }
+
     public ArrayList<Kunde> getAlleKunden() {
         return alleKunden;
     }
