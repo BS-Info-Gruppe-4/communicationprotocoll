@@ -66,4 +66,35 @@ public class AblesungenEndpoints {
 
         return Response.ok(queriedReading).build();
     }
+
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response updateReading(Ablesung providedReading) {
+
+        if (providedReading == null) {
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity("Der Request Body enthält keine Ablesung")
+                    .build();
+        }
+
+        Optional<Ablesung> queriedReading = jsonRepository.getAblesung(providedReading.getId());
+
+        if (queriedReading.isEmpty()) {
+            return Response
+                    .status(Response.Status.NOT_FOUND)
+                    .entity("Die Ablesung existiert nicht!")
+                    .build();
+        }
+
+        queriedReading.ifPresent(
+                ablesung -> {
+                    jsonRepository.deleteAblesung(ablesung.getId());
+                    jsonRepository.save(providedReading);
+                }
+        );
+
+        return Response.ok("Ablesung wurde aktualisiert").build();
+    }
 }
