@@ -107,6 +107,14 @@ public class JsonRepository {
                 .findFirst();
     }
 
+    public boolean kundeExists(UUID searchedKundenId) {
+        return alleKunden.stream().anyMatch(kunde -> kunde.getId().equals(searchedKundenId));
+    }
+
+    public boolean ablesungExists(UUID searchedAblesungId) {
+        return alleAblesungen.stream().anyMatch(kunde -> kunde.getId().equals(searchedAblesungId));
+    }
+
     public void deleteAblesung(UUID ablesungId) {
         alleAblesungen.removeIf(ablesung -> ablesung.getId().equals(ablesungId));
     }
