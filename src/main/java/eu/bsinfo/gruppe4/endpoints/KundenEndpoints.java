@@ -71,7 +71,7 @@ public class KundenEndpoints {
             return Response.status(Response.Status.OK).entity(üKunde.get()).build();
         }
         catch (IllegalArgumentException E){
-            return Response.status(Response.Status.NOT_FOUND).entity("Kunde existiert nicht").build();
+            return Response.status(Response.Status.NOT_FOUND).entity("ID fehlerhaft").build();
         }
 
     }
