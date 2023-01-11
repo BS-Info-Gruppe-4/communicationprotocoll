@@ -53,18 +53,28 @@ public class AblesungenEndpoints {
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getReadingById(@PathParam("id") UUID readingId) {
+    public Response getReadingById(@PathParam("id") String readingId) {
 
-        Optional<Ablesung> queriedReading = jsonRepository.getAblesung(readingId);
+        try {
+            UUID readingUUID = UUID.fromString(readingId);
+            Optional<Ablesung> queriedReading = jsonRepository.getAblesung(readingUUID);
 
-        if (queriedReading.isEmpty()) {
+            if (queriedReading.isEmpty()) {
+                return Response
+                        .status(Response.Status.NOT_FOUND)
+                        .entity("Die Ablesung existiert nicht!")
+                        .build();
+            }
+
+            return Response.ok(queriedReading.get()).build();
+        }
+        catch (IllegalArgumentException e) {
             return Response
                     .status(Response.Status.NOT_FOUND)
-                    .entity("Die Ablesung existiert nicht!")
+                    .entity("Die angegebene Id ist nicht gültig")
                     .build();
         }
 
-        return Response.ok(queriedReading).build();
     }
 
     @PUT
