@@ -1,6 +1,8 @@
 package eu.bsinfo.gruppe4.persistence;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import eu.bsinfo.gruppe4.model.Ablesung;
 import eu.bsinfo.gruppe4.model.Kunde;
 
@@ -19,6 +21,12 @@ public class JsonRepository {
     private ArrayList<Kunde> alleKunden = new ArrayList<>();
     private ArrayList<Ablesung> alleAblesungen = new ArrayList<>();
 
+
+    public JsonRepository() {
+        // konfiguriert jackson, sodass es auch LocalDate serialisieren kann
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
 
     public static JsonRepository getInstance() {
         return instance;
@@ -99,8 +107,20 @@ public class JsonRepository {
                 .findFirst();
     }
 
+    public boolean kundeExists(UUID searchedKundenId) {
+        return alleKunden.stream().anyMatch(kunde -> kunde.getId().equals(searchedKundenId));
+    }
+
+    public boolean ablesungExists(UUID searchedAblesungId) {
+        return alleAblesungen.stream().anyMatch(kunde -> kunde.getId().equals(searchedAblesungId));
+    }
+
     public void deleteAblesung(UUID ablesungId) {
         alleAblesungen.removeIf(ablesung -> ablesung.getId().equals(ablesungId));
+    }
+
+    public void deleteKunde(UUID kundenId) {
+        alleKunden.removeIf(kunden -> kunden.getId().equals(kundenId));
     }
 
     public ArrayList<Kunde> getAlleKunden() {
