@@ -98,7 +98,7 @@ public class KundenEndpoints {
             ArrayList<Ablesung> kundenAbl = new ArrayList<>();
 
             for(int i = 0; i < liste.size(); i++) {
-                if (liste.get(i).getKunde().getId() == kundenUUID) {
+                if (liste.get(i).getKunde().getId().equals(kundenUUID)) {
                     kundenAbl.add(liste.get(i));
                 }
             }
