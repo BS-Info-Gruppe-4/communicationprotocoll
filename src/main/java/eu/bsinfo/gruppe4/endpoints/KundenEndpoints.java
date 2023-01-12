@@ -1,11 +1,13 @@
 package eu.bsinfo.gruppe4.endpoints;
 
+import eu.bsinfo.gruppe4.model.Ablesung;
 import eu.bsinfo.gruppe4.model.Kunde;
 import eu.bsinfo.gruppe4.persistence.JsonRepository;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -71,6 +73,35 @@ public class KundenEndpoints {
             return Response.status(Response.Status.OK).entity(üKunde.get()).build();
         }
         catch (IllegalArgumentException E){
+            return Response.status(Response.Status.NOT_FOUND).entity("ID fehlerhaft").build();
+        }
+
+    }
+
+    @DELETE
+    @Path("{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteKunde(@PathParam(("id")) String kundenID) {
+        try {
+            UUID kundenUUID = UUID.fromString(kundenID);
+            jsonRepositoryO.deleteKunde(kundenUUID);
+            ArrayList<Ablesung> liste = jsonRepositoryO.getAlleAblesungen();
+            ArrayList<Ablesung> kundenAbl = new ArrayList<>();
+
+            for(int i = 0; i < liste.size(); i++) {
+                if (liste.get(i).getKunde().getId() == kundenUUID) {
+                    kundenAbl.add(liste.get(i));
+                }
+            }
+            for(int i = 0; i < kundenAbl.size(); i++) {
+                kundenAbl.get(i).setKunde(null);
+                jsonRepositoryO.deleteAblesung(kundenAbl.get(i).getId());
+                jsonRepositoryO.save(kundenAbl.get(i));
+            }
+
+            return Response.status(Response.Status.OK).entity(kundenAbl).build();
+
+        } catch(IllegalArgumentException e) {
             return Response.status(Response.Status.NOT_FOUND).entity("ID fehlerhaft").build();
         }
 
