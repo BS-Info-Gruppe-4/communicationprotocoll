@@ -107,4 +107,22 @@ public class AblesungenEndpoints {
 
         return Response.ok("Ablesung wurde aktualisiert").build();
     }
+    @DELETE
+    @Path("{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAblesung(@PathParam(("id")) String readingID){
+        try{
+            UUID ReadingUUID = UUID.fromString(readingID);
+            Optional<Ablesung> dReading=jsonRepository.getAblesung(ReadingUUID);
+            if (dReading.isEmpty()){
+                return Response.status(Response.Status.NOT_FOUND).entity("Reading existiert nicht").build();
+            }
+            jsonRepository.deleteAblesung(ReadingUUID);
+            return Response.status(Response.Status.OK).entity(dReading.get()).build();
+        }
+        catch (IllegalArgumentException E){
+            return Response.status(Response.Status.NOT_FOUND).entity("ID fehlerhaft").build();
+        }
+
+    }
 }
