@@ -7,10 +7,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Path("hausverwaltung/kunden")
 public class KundenEndpoints {
@@ -84,7 +81,19 @@ public class KundenEndpoints {
     public Response deleteKunde(@PathParam(("id")) String kundenID) {
         try {
             UUID kundenUUID = UUID.fromString(kundenID);
-            jsonRepositoryO.deleteKunde(kundenUUID);
+            Optional<Kunde> customerOptional = jsonRepositoryO.getKunde(kundenUUID);
+
+            if (customerOptional.isEmpty()) {
+                return Response
+                        .status(Response.Status.NOT_FOUND)
+                        .entity("Der Kunde mit der ID existiert nicht")
+                        .build();
+            }
+
+            Kunde customer = customerOptional.get();
+
+            jsonRepositoryO.deleteKunde(customer.getId());
+
             ArrayList<Ablesung> liste = jsonRepositoryO.getAlleAblesungen();
             ArrayList<Ablesung> kundenAbl = new ArrayList<>();
 
@@ -93,13 +102,17 @@ public class KundenEndpoints {
                     kundenAbl.add(liste.get(i));
                 }
             }
+
+            Map<Kunde, List<Ablesung>> customerWithItsReadings = new HashMap<>();
+            customerWithItsReadings.put(customer, kundenAbl);
+
             for(int i = 0; i < kundenAbl.size(); i++) {
                 kundenAbl.get(i).setKunde(null);
                 jsonRepositoryO.deleteAblesung(kundenAbl.get(i).getId());
                 jsonRepositoryO.save(kundenAbl.get(i));
             }
 
-            return Response.status(Response.Status.OK).entity(kundenAbl).build();
+            return Response.status(Response.Status.OK).entity(customerWithItsReadings).build();
 
         } catch(IllegalArgumentException e) {
             return Response.status(Response.Status.NOT_FOUND).entity("ID fehlerhaft").build();
