@@ -51,12 +51,12 @@ public class KundenEndpoints {
         }
 
     }*/
-    /*@GET
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getKunden(){
+    public Response getAlleKunden(){
         List<Kunde> AlleKunden=jsonRepositoryO.getAlleKunden();
         return Response.status(Response.Status.OK).entity(AlleKunden).build();
-    }*/
+    }
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
