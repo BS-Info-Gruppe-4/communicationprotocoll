@@ -42,15 +42,6 @@ public class KundenEndpoints {
         return Response.status(Response.Status.OK).entity("Kunde wurde geupdatet").build();
     }
 
-
-    /*@DELETE
-    @Produces(MediaType.APPLICATION_JSON)
-    public  Response deleteKunde(Kunde dkunde){
-        if (jsonRepositoryO.kundeExists(dkunde.getId())==false) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Kunde existiert nicht").build();
-        }
-
-    }*/
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAlleKunden(){
