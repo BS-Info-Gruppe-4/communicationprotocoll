@@ -3,15 +3,18 @@ package eu.bsinfo.gruppe4.model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 public class Ablesung {
     @EqualsAndHashCode.Include
+    @ToString.Include
     private UUID id;
     private String zaehlernummer;
     private LocalDate datum;
