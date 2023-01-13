@@ -22,7 +22,10 @@ public class AblesungenVorZweiJahrenHeuteEndpoints {
 
         ArrayList<Ablesung> alleAblesungen = jsonRepository.getAlleAblesungen();
         ArrayList<Ablesung> datumAblesungen = new ArrayList<>();
-        LocalDate datum = LocalDate.of(2021, 1, 1);
+
+        int jahr = LocalDate.now().minusYears(2).getYear();
+        LocalDate datum = LocalDate.of(jahr, 1, 1);
+
         for(int i = 0; i < alleAblesungen.size(); i++) {
             if(alleAblesungen.get(i).getDatum().isAfter(datum)){
                 datumAblesungen.add(alleAblesungen.get(i));
