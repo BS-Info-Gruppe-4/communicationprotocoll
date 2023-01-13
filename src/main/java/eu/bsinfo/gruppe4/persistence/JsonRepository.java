@@ -8,9 +8,11 @@ import eu.bsinfo.gruppe4.model.Kunde;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class JsonRepository {
 
@@ -111,10 +113,6 @@ public class JsonRepository {
         return alleKunden.stream().anyMatch(kunde -> kunde.getId().equals(searchedKundenId));
     }
 
-    public boolean ablesungExists(UUID searchedAblesungId) {
-        return alleAblesungen.stream().anyMatch(kunde -> kunde.getId().equals(searchedAblesungId));
-    }
-
     public void deleteAblesung(UUID ablesungId) {
         alleAblesungen.removeIf(ablesung -> ablesung.getId().equals(ablesungId));
     }
@@ -129,5 +127,13 @@ public class JsonRepository {
 
     public ArrayList<Ablesung> getAlleAblesungen() {
         return alleAblesungen;
+    }
+
+    public ArrayList<Ablesung> getCustomerAblesungenInDateRange(UUID customerId, LocalDate startDate, LocalDate endDate) {
+        return getAlleAblesungen().stream()
+                .filter(reading -> customerId == null || (reading.getKunde() != null && reading.getKunde().getId().equals(customerId)))
+                .filter(reading -> startDate == null || reading.getDatum().isAfter(startDate))
+                .filter(reading -> endDate == null || reading.getDatum().isBefore(endDate))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 }

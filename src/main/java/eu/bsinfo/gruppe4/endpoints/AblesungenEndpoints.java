@@ -7,6 +7,9 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -123,6 +126,45 @@ public class AblesungenEndpoints {
         catch (IllegalArgumentException E){
             return Response.status(Response.Status.NOT_FOUND).entity("ID fehlerhaft").build();
         }
+    }
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllReadingsWithRestriction(
+            @QueryParam("kunde") String customerId,
+            @QueryParam("beginn") String startingDateAsString,
+            @QueryParam("ende") String endingDateAsString
+    ){
+
+        UUID customerUUID = null;
+        LocalDate startingDate = null;
+        LocalDate endingDate = null;
+
+
+        try {
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            if (startingDateAsString != null) startingDate = LocalDate.parse(startingDateAsString, dateTimeFormatter);
+            if (endingDateAsString != null)endingDate = LocalDate.parse(endingDateAsString, dateTimeFormatter);
+        } catch (Exception e) {
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity("Die übergebenen Daten sind nicht im yyyy-MM-dd Format")
+                    .build();
+        }
+
+        if (customerId != null) {
+            try {
+                customerUUID = UUID.fromString(customerId);
+            } catch (IllegalArgumentException e) {
+                return Response
+                        .status(Response.Status.BAD_REQUEST)
+                        .entity("Die übergebene ID ist ungültig")
+                        .build();
+            }
+        }
+
+        ArrayList<Ablesung> queriedAblesungen = jsonRepository.getCustomerAblesungenInDateRange(customerUUID, startingDate, endingDate);
+
+        return Response.ok(queriedAblesungen).build();
     }
 }
