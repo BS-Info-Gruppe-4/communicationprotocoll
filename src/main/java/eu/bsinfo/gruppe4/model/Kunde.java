@@ -1,9 +1,7 @@
 package eu.bsinfo.gruppe4.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -11,6 +9,7 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
+@JsonDeserialize(keyUsing = KundeMapKeyDeserializer.class)
 public class Kunde {
     @EqualsAndHashCode.Include
     @ToString.Include

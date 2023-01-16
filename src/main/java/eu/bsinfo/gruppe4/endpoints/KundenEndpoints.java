@@ -1,5 +1,7 @@
 package eu.bsinfo.gruppe4.endpoints;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.bsinfo.gruppe4.model.Ablesung;
 import eu.bsinfo.gruppe4.model.Kunde;
 import eu.bsinfo.gruppe4.persistence.JsonRepository;
@@ -39,7 +41,7 @@ public class KundenEndpoints {
         }
         jsonRepositoryO.deleteKunde(okunde.getId());
         jsonRepositoryO.save(okunde);
-        return Response.status(Response.Status.OK).entity("Kunde wurde geupdatet").build();
+        return Response.status(Response.Status.OK).entity("Kunde wurde aktualisiert").build();
     }
 
     @GET
@@ -94,8 +96,15 @@ public class KundenEndpoints {
                 }
             }
 
-            Map<Kunde, List<Ablesung>> customerWithItsReadings = new HashMap<>();
-            customerWithItsReadings.put(customer, kundenAbl);
+            // I had to parse the customer object to a json string manually,
+            // because jackson somehow wasn't able to perform it.
+            // Instead of mapping it to json, it used the output of the toString()
+            // method of the customer class
+            ObjectMapper mapper = new ObjectMapper();
+            String customerAsJsonString = mapper.writeValueAsString(customer);
+
+            Map<String, List<Ablesung>> customerWithItsReadings = new HashMap<>();
+            customerWithItsReadings.put(customerAsJsonString, kundenAbl);
 
             for(int i = 0; i < kundenAbl.size(); i++) {
                 kundenAbl.get(i).setKunde(null);
@@ -107,6 +116,8 @@ public class KundenEndpoints {
 
         } catch(IllegalArgumentException e) {
             return Response.status(Response.Status.NOT_FOUND).entity("ID fehlerhaft").build();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
 
     }
