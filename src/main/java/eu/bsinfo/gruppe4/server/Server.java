@@ -51,5 +51,7 @@ public class Server {
 
         server.stop(0);
         serverIsOnline = false;
+
+        System.out.println("Server was shut down successfully");
     }
 }
