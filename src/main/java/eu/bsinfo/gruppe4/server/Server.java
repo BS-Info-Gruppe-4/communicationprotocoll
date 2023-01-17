@@ -9,7 +9,7 @@ import java.net.URI;
 
 public class Server {
 
-    public static final String PATH_TO_ENDPOINTS = "eu.bsinfo.gruppe4.endpoints";
+    public static final String PATH_TO_ENDPOINTS = "eu.bsinfo.gruppe4.server.endpoints";
     private static HttpServer server;
     private static boolean serverIsOnline = false;
 
