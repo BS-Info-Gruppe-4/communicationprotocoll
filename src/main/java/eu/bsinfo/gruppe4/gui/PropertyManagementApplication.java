@@ -1,5 +1,6 @@
 package eu.bsinfo.gruppe4.gui;
 
+import eu.bsinfo.gruppe4.server.Server;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -210,6 +211,7 @@ public class PropertyManagementApplication extends JFrame {
     }
 
     private void exit() {
+        Server.stopServer(true);
         System.exit(0);
     }
 }
