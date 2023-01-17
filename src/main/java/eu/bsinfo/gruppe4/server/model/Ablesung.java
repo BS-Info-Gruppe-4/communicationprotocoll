@@ -1,4 +1,4 @@
-package eu.bsinfo.gruppe4.model;
+package eu.bsinfo.gruppe4.server.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -1,14 +1,13 @@
-package eu.bsinfo.gruppe4.endpoints;
+package eu.bsinfo.gruppe4.server.endpoints;
 
-import eu.bsinfo.gruppe4.model.Ablesung;
-import eu.bsinfo.gruppe4.persistence.JsonRepository;
+import eu.bsinfo.gruppe4.server.model.Ablesung;
+import eu.bsinfo.gruppe4.server.persistence.JsonRepository;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.awt.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 

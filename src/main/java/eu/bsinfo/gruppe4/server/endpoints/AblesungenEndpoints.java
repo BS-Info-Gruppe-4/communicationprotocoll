@@ -1,8 +1,8 @@
-package eu.bsinfo.gruppe4.endpoints;
+package eu.bsinfo.gruppe4.server.endpoints;
 
-import eu.bsinfo.gruppe4.model.Ablesung;
-import eu.bsinfo.gruppe4.model.Kunde;
-import eu.bsinfo.gruppe4.persistence.JsonRepository;
+import eu.bsinfo.gruppe4.server.model.Ablesung;
+import eu.bsinfo.gruppe4.server.model.Kunde;
+import eu.bsinfo.gruppe4.server.persistence.JsonRepository;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;

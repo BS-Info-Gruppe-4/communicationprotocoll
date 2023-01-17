@@ -1,7 +1,7 @@
 package eu.bsinfo.gruppe4.server;
 
 import com.sun.net.httpserver.HttpServer;
-import eu.bsinfo.gruppe4.persistence.JsonRepository;
+import eu.bsinfo.gruppe4.server.persistence.JsonRepository;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -9,7 +9,7 @@ import java.net.URI;
 
 public class Server {
 
-    public static final String PATH_TO_ENDPOINTS = "eu.bsinfo.gruppe4.endpoints";
+    public static final String PATH_TO_ENDPOINTS = "eu.bsinfo.gruppe4.server.endpoints";
     private static HttpServer server;
     private static boolean serverIsOnline = false;
 
@@ -51,5 +51,7 @@ public class Server {
 
         server.stop(0);
         serverIsOnline = false;
+
+        System.out.println("Server was shut down successfully");
     }
 }

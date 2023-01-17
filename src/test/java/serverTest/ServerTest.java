@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import eu.bsinfo.gruppe4.model.Ablesung;
-import eu.bsinfo.gruppe4.model.Kunde;
+import eu.bsinfo.gruppe4.server.model.Ablesung;
+import eu.bsinfo.gruppe4.server.model.Kunde;
 import eu.bsinfo.gruppe4.server.Server;
 import org.junit.jupiter.api.*;
 
