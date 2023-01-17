@@ -1,7 +1,7 @@
 package eu.bsinfo.gruppe4.server;
 
 import com.sun.net.httpserver.HttpServer;
-import eu.bsinfo.gruppe4.persistence.JsonRepository;
+import eu.bsinfo.gruppe4.server.persistence.JsonRepository;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 

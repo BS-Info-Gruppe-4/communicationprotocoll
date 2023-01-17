@@ -1,10 +1,10 @@
-package eu.bsinfo.gruppe4.persistence;
+package eu.bsinfo.gruppe4.server.persistence;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import eu.bsinfo.gruppe4.model.Ablesung;
-import eu.bsinfo.gruppe4.model.Kunde;
+import eu.bsinfo.gruppe4.server.model.Ablesung;
+import eu.bsinfo.gruppe4.server.model.Kunde;
 
 import java.io.File;
 import java.io.IOException;
