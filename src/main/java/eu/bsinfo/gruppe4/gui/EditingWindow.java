@@ -11,7 +11,7 @@ public class EditingWindow extends JFrame {
     private final InputMask inputMask;
     private final PropertyManagementApplication propertyManagementApplication;
 
-    public EditingWindow(PropertyManagementApplication propertyManagementApplication, ZaehlerDatensatz zaehlerDatensatz, Daten daten) throws HeadlessException {
+    public EditingWindow(PropertyManagementApplication propertyManagementApplication, ZaehlerDatensatz zaehlerDatensatz, DatenWindow daten) throws HeadlessException {
         super("Daten bearbeiten");
 
         setSize(630, 300);
@@ -38,12 +38,12 @@ public class EditingWindow extends JFrame {
         });
     }
 
-    void updateTableDatensatz(ZaehlerDatensatz zaehlerDatensatz, Daten daten) {
+    void updateTableDatensatz(ZaehlerDatensatz zaehlerDatensatz, DatenWindow daten) {
         inputMask.save();
         propertyManagementApplication.removeDatensatzFromSession(zaehlerDatensatz);
         closeWindow();
         daten.dispose();
-        new Daten(propertyManagementApplication);
+        new DatenWindow(propertyManagementApplication);
     }
 
     void withDefaultInputFields(

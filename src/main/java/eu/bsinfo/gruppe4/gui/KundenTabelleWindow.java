@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class KundenTabelle extends JFrame{
+public class KundenTabelleWindow extends JFrame{
 
     private final JTable tabelle;
     private final ArrayList<ZaehlerDatensatz> sessionData;
 
 
-    KundenTabelle(ArrayList<ZaehlerDatensatz> sessionData, int kundennr) throws IOException {
+    KundenTabelleWindow(ArrayList<ZaehlerDatensatz> sessionData, int kundennr) throws IOException {
 
         this.sessionData = sessionData;
 

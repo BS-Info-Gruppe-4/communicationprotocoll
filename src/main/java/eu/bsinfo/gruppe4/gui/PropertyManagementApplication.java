@@ -23,8 +23,9 @@ public class PropertyManagementApplication extends JFrame {
     private final JsonFileManager jsonFileManager = new JsonFileManager();
     private InputMask inputMask = new InputMask(this);
     private JButton btn_speichern;
-    private JButton btn_auswaehlen;
-    private JButton btn_anzeigen;
+    private JButton btn_kunde_auswaehlen;
+    private JButton btn_alle_anzeigen;
+    private JButton btn_Kunde_neu;
     private JMenu menu_file, menu_about, menu_settings, submenu_themes;
     private JMenuItem item_exit, item_about, item_nimbus, item_windows, item_metal, item_motif;
     private JMenuBar menubar;
@@ -44,8 +45,9 @@ public class PropertyManagementApplication extends JFrame {
         });
 
         btn_speichern.addActionListener(e -> inputMask.save());
-        btn_anzeigen.addActionListener(e -> new Daten(this));
-        btn_auswaehlen.addActionListener(e -> new KundenAuswahlDialog(getSessionData()));
+        btn_alle_anzeigen.addActionListener(e -> new DatenWindow(this));
+        btn_kunde_auswaehlen.addActionListener(e -> new KundenAuswahlDialog(getSessionData()));
+        // btn_Kunde_neu.addActionListener(e -> new KundeErstellenDialog());
     }
 
     private void loadExistingDataIntoSessionStorage() {
@@ -72,11 +74,12 @@ public class PropertyManagementApplication extends JFrame {
         final Container con = getContentPane();
         con.setLayout(new BorderLayout());
 
-        final JPanel pn_buttons = new JPanel(new GridLayout(1, 3));
+        final JPanel pn_buttons = new JPanel(new GridLayout(1, 4));
 
         pn_buttons.add(btn_speichern = new JButton("Speichern"));
-        pn_buttons.add(btn_auswaehlen = new JButton("Kunde auswählen"));
-        pn_buttons.add(btn_anzeigen = new JButton("Alle Daten anzeigen"));
+        pn_buttons.add(btn_kunde_auswaehlen = new JButton("Kunde auswählen"));
+        pn_buttons.add(btn_alle_anzeigen = new JButton("Alle Daten anzeigen"));
+        pn_buttons.add(btn_Kunde_neu = new JButton("neuer Kunde"));
 
         // assemble menubar
         menubar = new JMenuBar();
@@ -87,7 +90,7 @@ public class PropertyManagementApplication extends JFrame {
         item_exit = new JMenuItem(new AbstractAction("Exit") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                dispose();
+                exit();
             }
         });
         item_about = new JMenuItem(new AbstractAction("About us") {
