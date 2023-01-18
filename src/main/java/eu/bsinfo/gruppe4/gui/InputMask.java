@@ -159,7 +159,7 @@ public class InputMask {
 
         String ausgewaehlteZaehlerart = zaehlerartenRadioButtons.getSelection().getActionCommand();
 
-        return Daten.stringToZaehlerartMapper(ausgewaehlteZaehlerart);
+        return DatenWindow.stringToZaehlerartMapper(ausgewaehlteZaehlerart);
     }
 
     public void setZaehlerart(String zaehlerart) {

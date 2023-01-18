@@ -38,7 +38,7 @@ public class KundenAuswahlDialog extends JFrame {
                 return;
             }
             try {
-                new KundenTabelle(sessionData, kundennr);
+                new KundenTabelleWindow(sessionData, kundennr);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
