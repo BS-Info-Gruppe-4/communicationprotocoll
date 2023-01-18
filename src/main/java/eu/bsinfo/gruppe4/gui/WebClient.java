@@ -1,7 +1,6 @@
 package eu.bsinfo.gruppe4.gui;
 
 import eu.bsinfo.gruppe4.Main;
-import eu.bsinfo.gruppe4.server.Server;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -12,11 +11,17 @@ import jakarta.ws.rs.core.Response;
 
 public class WebClient {
     private static final String URL_BASE_PATH = Main.SERVER_URL;
+    public static final String PATH_PROPERTY_MANAGEMENT = "hausverwaltung";
     private static final String PATH_CUSTOMER_ENDPOINTS = "kunden";
     private static final String PATH_READINGS_ENDPOINTS = "ablesungen";
     private static final Client client = ClientBuilder.newClient();
-    private final WebTarget webTarget = client.target(URL_BASE_PATH);
+    private WebTarget webTarget;
 
+
+    public WebClient() {
+        webTarget = client.target(URL_BASE_PATH);
+        webTarget = client.target(Main.SERVER_URL.concat(PATH_PROPERTY_MANAGEMENT));
+    }
 
     public Response createNewCustomer(Kunde kunde) {
         return webTarget.path(PATH_CUSTOMER_ENDPOINTS)
