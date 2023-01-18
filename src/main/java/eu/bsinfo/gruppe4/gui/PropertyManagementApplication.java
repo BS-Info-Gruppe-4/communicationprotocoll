@@ -47,7 +47,7 @@ public class PropertyManagementApplication extends JFrame {
         btn_speichern.addActionListener(e -> inputMask.save());
         btn_alle_anzeigen.addActionListener(e -> new DatenWindow(this));
         btn_kunde_auswaehlen.addActionListener(e -> new KundenAuswahlDialog(getSessionData()));
-        btn_Kunde_neu.addActionListener(e -> new KundeErstellenDialog());
+        // btn_Kunde_neu.addActionListener(e -> new KundeErstellenDialog());
     }
 
     private void loadExistingDataIntoSessionStorage() {
