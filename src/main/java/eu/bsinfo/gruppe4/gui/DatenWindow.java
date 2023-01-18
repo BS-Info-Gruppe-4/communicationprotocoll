@@ -5,7 +5,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Daten extends JFrame {
+public class DatenWindow extends JFrame {
 
     private JTable tabelle;
     private final PropertyManagementApplication propertyManagementApplication;
@@ -17,7 +17,7 @@ public class Daten extends JFrame {
     private final int ZAEHLERSTAND_COL_INDEX = 5;
     private final int KOMMENTAR_COL_INDEX = 6;
 
-    Daten(PropertyManagementApplication propertyManagementApplication) {
+    DatenWindow(PropertyManagementApplication propertyManagementApplication) {
 
         this.propertyManagementApplication = propertyManagementApplication;
 
@@ -114,7 +114,7 @@ public class Daten extends JFrame {
 
         // workaround zum aktualisieren der tabelle
         dispose();
-        new Daten(propertyManagementApplication);
+        new DatenWindow(propertyManagementApplication);
     }
 
     public boolean doesUserConfirmDeletionOfDatensatz(ZaehlerDatensatz zaehlerDatensatz) {

@@ -27,6 +27,9 @@ public class AboutUsWindow extends JFrame {
         final Container con = getContentPane();
         con.setLayout(new BorderLayout());
 
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(3, 1));
+
         con.add(btn_ok = new JButton("OK"), BorderLayout.SOUTH);
         btn_ok.addActionListener(e -> dispose());
 
@@ -49,12 +52,15 @@ public class AboutUsWindow extends JFrame {
         goWebsite(label_text);
 
         con.add(label_bild, BorderLayout.CENTER);
-        con.add(label_text, BorderLayout.NORTH);
+        con.add(panel, BorderLayout.EAST);
 
+        panel.add(new JLabel("BS Info Gruppe 4"));
+        panel.add(new JLabel("Version: 0.0.1"));
+        panel.add(label_text);
 
         setLocationRelativeTo(null);
         setVisible(true);
-        setSize(300, 300);
+        setSize(500, 300);
     }
 
     private void goWebsite(JLabel website) {
