@@ -87,7 +87,7 @@ public class PropertyManagementApplication extends JFrame {
         item_exit = new JMenuItem(new AbstractAction("Exit") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                dispose();
+                exit();
             }
         });
         item_about = new JMenuItem(new AbstractAction("About us") {
