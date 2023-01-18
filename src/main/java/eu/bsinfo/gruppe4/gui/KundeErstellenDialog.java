@@ -1,6 +1,7 @@
 package eu.bsinfo.gruppe4.gui;
 
 import eu.bsinfo.gruppe4.server.model.Kunde;
+import jakarta.ws.rs.core.Response;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,7 +37,8 @@ public class KundeErstellenDialog extends JFrame {
         btn_ok.addActionListener(e -> {
             Kunde kunde = new Kunde(tf_nachname.getText(), tf_vorname.getText());
             WebClient webClient = new WebClient();
-            webClient.createNewCustomer(kunde);
+            Response r = webClient.createNewCustomer(kunde);
+            System.out.println(r);
         });
 
         setLocationRelativeTo(null);
