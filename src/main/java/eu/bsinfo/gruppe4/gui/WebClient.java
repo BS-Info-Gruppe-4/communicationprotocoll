@@ -9,6 +9,8 @@ import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.util.UUID;
+
 public class WebClient {
     private static final String URL_BASE_PATH = Main.SERVER_URL;
     public static final String PATH_PROPERTY_MANAGEMENT = "hausverwaltung";
@@ -32,5 +34,13 @@ public class WebClient {
 
     public static boolean entityWasCreated(Response response) {
         return response.getStatus() == 201;
+    }
+
+    public Response deleteCustomer(UUID id) {
+        String pfad = PATH_CUSTOMER_ENDPOINTS+"/"+id;
+        return webTarget.path(pfad)
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .delete();
     }
 }
