@@ -29,4 +29,8 @@ public class WebClient {
                 .accept(MediaType.APPLICATION_JSON)
                 .post(Entity.entity(kunde, MediaType.APPLICATION_JSON));
     }
+
+    public static boolean entityWasCreated(Response response) {
+        return response.getStatus() == 201;
+    }
 }

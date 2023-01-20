@@ -19,13 +19,19 @@ public class KundenEndpoints {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createKunde(Kunde kunde) {
         if (kunde == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Fehler").build();
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity("Es wurde kein gültigen Kundenobjekt übergeben")
+                    .build();
         }
 
         kunde.setId(UUID.randomUUID());
         jsonRepositoryO.save(kunde);
 
-        return Response.status(Response.Status.CREATED).entity(kunde).build();
+        return Response
+                .status(Response.Status.CREATED)
+                .entity(kunde)
+                .build();
     }
 
 

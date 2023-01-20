@@ -10,12 +10,12 @@ import java.awt.event.KeyEvent;
 
 public class KundeErstellenDialog extends JFrame {
 
-    private JTextField tf_vorname;
-    private JTextField tf_nachname;
-    private JLabel lb_vorname;
-    private JLabel lb_nachname;
-    private JButton btn_ok;
-    private JButton btn_abbrechen;
+    private final JTextField tf_vorname;
+    private final JTextField tf_nachname;
+    private final JLabel lb_vorname;
+    private final JLabel lb_nachname;
+    private final JButton btn_ok;
+    private final JButton btn_abbrechen;
 
     public KundeErstellenDialog() {
         super("Erstelle neuen Kunden");
@@ -61,20 +61,48 @@ public class KundeErstellenDialog extends JFrame {
 
         btn_abbrechen.addActionListener(e -> dispose());
         btn_ok.addActionListener(e -> {
-            Kunde kunde = new Kunde(tf_nachname.getText(), tf_vorname.getText());
+
+            String kundeNachname = tf_nachname.getText();
+            String kundeVorname = tf_vorname.getText();
+
+            if (isBlankOrEmpty(kundeNachname) || isBlankOrEmpty(kundeVorname)) {
+                MessageDialog.showErrorMessage("Bitte gib einen Vor- und Nachnamen für den Kunden ein");
+                return;
+            }
+
+            Kunde kunde = new Kunde(kundeNachname, kundeVorname);
+
             WebClient webClient = new WebClient();
             Response r = webClient.createNewCustomer(kunde);
             System.out.println(r);
-            String message = "Kunde konnte nicht erstellt werden\n\n";
-            if (r.getStatus() == 201) {
-                JOptionPane.showMessageDialog(this, "Kunde wurde erfolgreich erstellt", "Kunde erstellt", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, message, "Fehler", JOptionPane.ERROR_MESSAGE);
+
+            if (WebClient.entityWasCreated(r)) {
+                MessageDialog.showSuccessMessage("Kunde wurde erfolgreich erstellt");
+            }
+            else {
+                String errorMessage;
+
+                try {
+                    errorMessage = getErrorMessageOfResponse(r);
+                }
+                catch (Exception e1) {
+                    errorMessage = "Es ist ein unbekannter Fehler aufgetreten";
+                }
+
+                MessageDialog.showErrorMessage(errorMessage);
             }
         });
 
         setLocationRelativeTo(null);
         setSize(400, 150);
         setVisible(true);
+    }
+
+    private boolean isBlankOrEmpty(String string) {
+        return string == null || string.isEmpty() || string.isBlank();
+    }
+
+    private String getErrorMessageOfResponse(Response response) {
+        return response.readEntity(String.class);
     }
 }
