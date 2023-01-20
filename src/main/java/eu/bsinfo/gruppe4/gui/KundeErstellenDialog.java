@@ -5,6 +5,8 @@ import jakarta.ws.rs.core.Response;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class KundeErstellenDialog extends JFrame {
 
@@ -28,10 +30,34 @@ public class KundeErstellenDialog extends JFrame {
 
         pn_eingabemaske.add(lb_vorname = new JLabel("Vorname:"));
         pn_eingabemaske.add(tf_vorname = new JTextField("Hansi"));
+        tf_vorname.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    tf_nachname.requestFocusInWindow();
+                }
+            }
+        });
         pn_eingabemaske.add(lb_nachname = new JLabel("Nachname: "));
         pn_eingabemaske.add(tf_nachname = new JTextField("Huber"));
+        tf_nachname.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    btn_ok.requestFocusInWindow();
+                }
+            }
+        });
         pn_buttons.add(btn_abbrechen = new JButton("Abbrechen"));
         pn_buttons.add(btn_ok = new JButton("OK"));
+        btn_ok.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    btn_ok.doClick();
+                }
+            }
+        });
 
         btn_abbrechen.addActionListener(e -> dispose());
         btn_ok.addActionListener(e -> {
@@ -39,6 +65,12 @@ public class KundeErstellenDialog extends JFrame {
             WebClient webClient = new WebClient();
             Response r = webClient.createNewCustomer(kunde);
             System.out.println(r);
+            String message = "Kunde konnte nicht erstellt werden\n\n";
+            if (r.getStatus() == 201) {
+                JOptionPane.showMessageDialog(this, "Kunde wurde erfolgreich erstellt", "Kunde erstellt", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, message, "Fehler", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         setLocationRelativeTo(null);
