@@ -28,10 +28,10 @@ public class KundenAuswahlDialog extends JFrame {
         con.add(pn_buttons, BorderLayout.SOUTH);
 
         pn_eingabemaske.add(new JLabel("Kundennummer:"));
-        pn_eingabemaske.add(tf_kundennr = new JTextField("1234"));
+        pn_eingabemaske.add(tf_kundennr = new JTextField(""));
 
         pn_buttons.add(btn_abbrechen = new JButton("Abbrechen"));
-        pn_buttons.add(btn_ok = new JButton("OK"));
+        pn_buttons.add(btn_ok = new JButton("Ablesungen anzeigen"));
         pn_buttons.add(btn_loeschen = new JButton("löschen"));
 
         btn_ok.addActionListener(e -> {
@@ -53,9 +53,9 @@ public class KundenAuswahlDialog extends JFrame {
             WebClient webClient = new WebClient();
             Response r = webClient.deleteCustomer(UUID.fromString(tf_kundennr.getText()));
             System.out.println(r);
-            String message = "Kunde konnte nicht gelscht werden\n\n";
+            String message = "Kunde konnte nicht gelöscht werden\n\n";
             if (r.getStatus() == 200) {
-                MessageDialog.showSuccessMessage("Kunde wurde erfolgreich gelscht");
+                MessageDialog.showSuccessMessage("Kunde wurde erfolgreich gelöscht");
             } else {
                 MessageDialog.showErrorMessage(message);
             }
@@ -65,7 +65,7 @@ public class KundenAuswahlDialog extends JFrame {
 
         setLocationRelativeTo(null);
         setVisible(true);
-        setSize(300, 100);
+        setSize(500, 100);
     }
 
 }
