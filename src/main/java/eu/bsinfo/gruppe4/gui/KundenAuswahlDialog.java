@@ -21,7 +21,7 @@ public class KundenAuswahlDialog extends JFrame {
         final Container con = getContentPane();
         con.setLayout(new BorderLayout());
 
-        final JPanel pn_eingabemaske = new JPanel(new GridLayout(1, 2));
+        final JPanel pn_eingabemaske = new JPanel(new GridLayout(2, 2));
         con.add(pn_eingabemaske, BorderLayout.CENTER);
 
         final JPanel pn_buttons = new JPanel(new GridLayout(1, 3));
@@ -29,6 +29,8 @@ public class KundenAuswahlDialog extends JFrame {
 
         pn_eingabemaske.add(new JLabel("Kundennummer:"));
         pn_eingabemaske.add(tf_kundennr = new JTextField(""));
+        pn_eingabemaske.add(new JLabel(""));
+        pn_eingabemaske.add(new JComboBox(getAllCustomers()));
 
         pn_buttons.add(btn_abbrechen = new JButton("Abbrechen"));
         pn_buttons.add(btn_ok = new JButton("Ablesungen anzeigen"));
@@ -68,4 +70,10 @@ public class KundenAuswahlDialog extends JFrame {
         setSize(500, 100);
     }
 
+    public String[] getAllCustomers() {
+        String[] allCustomers = new String[10];
+        allCustomers[0] = "423ß867tßq4eugj";
+
+        return allCustomers;
+    }
 }
