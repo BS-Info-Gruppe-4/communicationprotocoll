@@ -4,15 +4,18 @@ import eu.bsinfo.gruppe4.server.model.Kunde;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.ArrayList;
 
+
 public class AllCustomersTable extends JFrame {
 
-    private JTable table;
-    private JButton editButton;
-    private JButton deleteButton;
-    private JButton newCustomerButton;
+    private final JTable table;
+    private final TableRowSorter<DefaultTableModel> sorter;
+    private final JButton editButton = new JButton("Bearbeiten");
+    private final JButton deleteButton = new JButton("Löschen");
+    private final JButton newCustomerButton = new JButton("Neuer Kunde");
 
     public AllCustomersTable() {
         setTitle("Kundenliste");
@@ -20,11 +23,6 @@ public class AllCustomersTable extends JFrame {
 
         // Erzeuge die Tabelle
         table = new JTable();
-
-        // Set up buttons
-        editButton = new JButton("Bearbeiten");
-        deleteButton = new JButton("Löschen");
-        newCustomerButton = new JButton("Neuer Kunde");
 
         final JPanel buttonPanel = new JPanel(new GridLayout(1, 3));
         buttonPanel.add(newCustomerButton);
@@ -39,7 +37,7 @@ public class AllCustomersTable extends JFrame {
         table.setModel(model);
 
         // Erzeuge eine Liste von Kunden
-        ArrayList<Kunde> customers = new ArrayList<Kunde>();
+        ArrayList<Kunde> customers = new ArrayList<>();
         customers.add(new Kunde("Max", "Mustermann"));
         customers.add(new Kunde("Maria", "Müller"));
         customers.add(new Kunde("Hans", "Huber"));
@@ -49,6 +47,15 @@ public class AllCustomersTable extends JFrame {
             Object[] row = {customer.getId(), customer.getVorname(), customer.getName()};
             model.addRow(row);
         }
+
+        // Erstelle Sorter
+        sorter = new TableRowSorter<>(model);
+        table.setRowSorter(sorter);
+
+        // Sortiere Tabelle nach ID aufsteigend
+        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
+        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+        sorter.setSortKeys(sortKeys);
 
         // Füge die Tabelle zum Fenster hinzu
         JScrollPane scrollPane = new JScrollPane(table);
