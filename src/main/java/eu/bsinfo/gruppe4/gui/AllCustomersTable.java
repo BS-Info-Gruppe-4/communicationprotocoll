@@ -1,5 +1,6 @@
 package eu.bsinfo.gruppe4.gui;
 
+import eu.bsinfo.gruppe4.gui.persistence.SessionStorage;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 
 import javax.swing.*;
@@ -11,12 +12,12 @@ import java.util.ArrayList;
 
 public class AllCustomersTable extends JFrame {
 
+    private final SessionStorage sessionStorage = SessionStorage.getInstance();
     private final JTable table;
     private final TableRowSorter<DefaultTableModel> sorter;
     private final JButton editButton = new JButton("Bearbeiten");
     private final JButton deleteButton = new JButton("Löschen");
     private final JButton newCustomerButton = new JButton("Neuer Kunde");
-    ArrayList<Kunde> customers = new ArrayList<>();
     DefaultTableModel model = new DefaultTableModel();
 
     public AllCustomersTable() {
@@ -36,13 +37,7 @@ public class AllCustomersTable extends JFrame {
         model.setColumnIdentifiers(columns);
         table.setModel(model);
 
-        // Erzeuge eine Liste von Kunden
-
-        customers.add(new Kunde("Max", "Mustermann"));
-        customers.add(new Kunde("Maria", "Müller"));
-        customers.add(new Kunde("Hans", "Huber"));
-
-        loadCustomers();
+        loadInitialTableData();
 
         // Erstelle Sorter
         sorter = new TableRowSorter<>(model);
@@ -66,7 +61,9 @@ public class AllCustomersTable extends JFrame {
         setVisible(true);
     }
 
-    public void loadCustomers() {
+    public void loadInitialTableData() {
+
+        var customers = sessionStorage.getKunden();
 
         // Füge die Kunden zur Tabelle hinzu
         for (Kunde customer : customers) {
@@ -74,5 +71,11 @@ public class AllCustomersTable extends JFrame {
             model.addRow(row);
         }
 
+    }
+
+    public void addCustomerToTable(Kunde kunde) {
+        Object[] row = {kunde.getId(), kunde.getVorname(), kunde.getName()};
+        model.addRow(row);
+        model.fireTableDataChanged();
     }
 }

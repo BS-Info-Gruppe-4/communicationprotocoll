@@ -1,5 +1,6 @@
 package eu.bsinfo.gruppe4.gui;
 
+import eu.bsinfo.gruppe4.gui.persistence.SessionStorage;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 import jakarta.ws.rs.core.Response;
 
@@ -9,6 +10,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class KundeErstellenDialog extends JFrame {
+
+    private final SessionStorage sessionStorage = SessionStorage.getInstance();
 
     private final JTextField tf_vorname;
     private final JTextField tf_nachname;
@@ -78,7 +81,9 @@ public class KundeErstellenDialog extends JFrame {
 
             if (WebClient.entityWasCreated(r)) {
                 MessageDialog.showSuccessMessage("Kunde wurde erfolgreich erstellt");
-                act.loadCustomers();
+
+                sessionStorage.addKunde(kunde);
+                act.addCustomerToTable(kunde);
             }
             else {
                 String errorMessage;

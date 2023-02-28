@@ -28,4 +28,8 @@ public class SessionStorage {
         var readingsOfLast2Years = webClient.getReadingsOfLast2Years();
         setAblesungen(readingsOfLast2Years);
     }
+
+    public void addKunde(Kunde kunde) {
+        kunden.add(kunde);
+    }
 }
