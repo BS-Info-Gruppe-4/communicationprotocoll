@@ -80,7 +80,6 @@ public class AllCustomersTable extends JFrame {
         });
 
         editButton.addActionListener(e -> {
-            WebClient webClient = new WebClient();
             int selectedRow = table.getSelectedRow();
             String customerId = "";
             if(selectedRow >= 0) {
@@ -90,15 +89,10 @@ public class AllCustomersTable extends JFrame {
                 MessageDialog.showErrorMessage("kein Kunde ausgewählt");
                 return;
             }
-            new EditCustomerDataWindow(UUID.fromString(customerId));
-            Response r = webClient.deleteCustomer(UUID.fromString(customerId)); // tbd
-            System.out.println(r);
-            String message = "Kunde konnte nicht geändert werden\n\n";
-            if (r.getStatus() == 200) {
-                MessageDialog.showSuccessMessage("Kunde wurde erfolgreich geändert");
-            } else {
-                MessageDialog.showErrorMessage(message);
-            }
+            new EditCustomerDataWindow(UUID.fromString(customerId),
+                    table.getValueAt(selectedRow, 1).toString(),
+                    table.getValueAt(selectedRow, 2).toString(),
+                    this);
         });
 
         // Passe die Größe des Fensters an
@@ -119,6 +113,7 @@ public class AllCustomersTable extends JFrame {
     }
 
     public void refreshTable() {
+        sessionStorage.syncWithBackend();
         model.setRowCount(0);
 
         for (Kunde customer : sessionStorage.getKunden()) {
