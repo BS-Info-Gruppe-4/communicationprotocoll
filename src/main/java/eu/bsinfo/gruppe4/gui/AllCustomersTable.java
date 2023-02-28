@@ -95,9 +95,14 @@ public class AllCustomersTable extends JFrame {
 
     }
 
-    public void addCustomerToTable(Kunde kunde) {
-        Object[] row = {kunde.getId(), kunde.getVorname(), kunde.getName()};
-        model.addRow(row);
+    public void refreshTable() {
+        model.setRowCount(0);
+
+        for (Kunde customer : sessionStorage.getKunden()) {
+            Object[] row = {customer.getId(), customer.getVorname(), customer.getName()};
+            model.addRow(row);
+        }
+
         model.fireTableDataChanged();
     }
 }

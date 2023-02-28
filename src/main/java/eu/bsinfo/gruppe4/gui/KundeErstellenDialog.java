@@ -83,7 +83,7 @@ public class KundeErstellenDialog extends JFrame {
                 MessageDialog.showSuccessMessage("Kunde wurde erfolgreich erstellt");
 
                 sessionStorage.addKunde(kunde);
-                act.addCustomerToTable(kunde);
+                act.refreshTable();
             }
             else {
                 String errorMessage;
