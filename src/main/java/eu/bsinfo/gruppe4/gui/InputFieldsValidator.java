@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 public class InputFieldsValidator implements Serializable {
 
@@ -65,6 +67,12 @@ public class InputFieldsValidator implements Serializable {
         Pattern.matches(regex, datum);
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(datum);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        LocalDateTime now = LocalDateTime.now();
+        String CurrantDate = dtf.format(now);
+        System.out.println(CurrantDate);
+        System.out.println(datum);
+        if ( !datum.equals(CurrantDate) ) return false;
         return matcher.matches();
     }
 
