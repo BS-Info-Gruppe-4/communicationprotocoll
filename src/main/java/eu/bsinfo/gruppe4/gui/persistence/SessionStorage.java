@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 public class SessionStorage {
 
+    private final WebClient webClient = new WebClient();
     @Getter
     private static final SessionStorage instance = new SessionStorage();
     @Getter
@@ -20,16 +21,18 @@ public class SessionStorage {
     private ArrayList<Ablesung> ablesungen = new ArrayList<>();
 
     public SessionStorage() {
-        WebClient webClient = new WebClient();
+        syncWithBackend();
+    }
 
+    public void addKunde(Kunde kunde) {
+        kunden.add(kunde);
+    }
+
+    public void syncWithBackend() {
         var alleKunden = webClient.getAllCustomers();
         setKunden(alleKunden);
 
         var readingsOfLast2Years = webClient.getReadingsOfLast2Years();
         setAblesungen(readingsOfLast2Years);
-    }
-
-    public void addKunde(Kunde kunde) {
-        kunden.add(kunde);
     }
 }
