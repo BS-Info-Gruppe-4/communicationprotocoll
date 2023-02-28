@@ -25,7 +25,7 @@ public class KundenEndpoints {
                     .build();
         }
 
-        kunde.setId(UUID.randomUUID());
+        //kunde.setId(UUID.randomUUID());
         jsonRepositoryO.save(kunde);
 
         return Response

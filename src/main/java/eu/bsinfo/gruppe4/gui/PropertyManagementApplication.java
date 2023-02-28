@@ -25,7 +25,7 @@ public class PropertyManagementApplication extends JFrame {
     private JButton btn_speichern;
     private JButton btn_kunde_auswaehlen;
     private JButton btn_alle_anzeigen;
-    private JButton btn_Kunde_neu;
+    private JButton btn_alle_Kunden_anzeigen;
     private JMenu menu_file, menu_about, menu_settings, submenu_themes;
     private JMenuItem item_exit, item_about, item_nimbus, item_windows, item_metal, item_motif;
     private JMenuBar menubar;
@@ -47,7 +47,7 @@ public class PropertyManagementApplication extends JFrame {
         btn_speichern.addActionListener(e -> inputMask.save());
         btn_alle_anzeigen.addActionListener(e -> new DatenWindow(this));
         btn_kunde_auswaehlen.addActionListener(e -> new KundenAuswahlDialog(getSessionData()));
-        btn_Kunde_neu.addActionListener(e -> new KundeErstellenDialog());
+        btn_alle_Kunden_anzeigen.addActionListener(e -> new AllCustomersTable());
     }
 
     private void loadExistingDataIntoSessionStorage() {
@@ -79,7 +79,7 @@ public class PropertyManagementApplication extends JFrame {
         pn_buttons.add(btn_speichern = new JButton("Speichern"));
         pn_buttons.add(btn_kunde_auswaehlen = new JButton("Kunde auswählen"));
         pn_buttons.add(btn_alle_anzeigen = new JButton("Alle Daten anzeigen"));
-        pn_buttons.add(btn_Kunde_neu = new JButton("neuer Kunde"));
+        pn_buttons.add(btn_alle_Kunden_anzeigen = new JButton("alle Kunden anzeigen"));
 
         // assemble menubar
         menubar = new JMenuBar();
