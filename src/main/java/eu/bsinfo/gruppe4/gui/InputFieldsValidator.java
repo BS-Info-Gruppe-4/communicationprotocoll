@@ -70,8 +70,6 @@ public class InputFieldsValidator implements Serializable {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         LocalDateTime now = LocalDateTime.now();
         String CurrantDate = dtf.format(now);
-        System.out.println(CurrantDate);
-        System.out.println(datum);
         if ( !datum.equals(CurrantDate) ) return false;
         return matcher.matches();
     }
