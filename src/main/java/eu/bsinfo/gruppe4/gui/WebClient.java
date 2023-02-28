@@ -11,6 +11,8 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.util.UUID;
+
 import java.util.ArrayList;
 
 public class WebClient {
@@ -55,5 +57,13 @@ public class WebClient {
 
     public static boolean entityWasCreated(Response response) {
         return response.getStatus() == 201;
+    }
+
+    public Response deleteCustomer(UUID id) {
+        String pfad = PATH_CUSTOMER_ENDPOINTS+"/"+id;
+        return webTarget.path(pfad)
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .delete();
     }
 }
