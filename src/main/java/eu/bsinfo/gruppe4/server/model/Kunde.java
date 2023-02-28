@@ -13,7 +13,7 @@ import java.util.UUID;
 public class Kunde {
     @EqualsAndHashCode.Include
     @ToString.Include
-    private UUID id;
+    private UUID id = UUID.randomUUID();
     private String name;
     private String vorname;
 
