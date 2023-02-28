@@ -61,7 +61,13 @@ public class AllCustomersTable extends JFrame {
         deleteButton.addActionListener(e -> {
             WebClient webClient = new WebClient();
             int selectedRow = table.getSelectedRow();
-            String customerId = table.getValueAt(selectedRow, 0).toString();
+            String customerId = "";
+            if(selectedRow >= 0) {
+                customerId = table.getValueAt(selectedRow, 0).toString();
+            } else {
+                MessageDialog.showErrorMessage("kein Kunde ausgewählt");
+                return;
+            }
             Response r = webClient.deleteCustomer(UUID.fromString(customerId));
             System.out.println(r);
             String message = "Kunde konnte nicht gelöscht werden\n\n";
