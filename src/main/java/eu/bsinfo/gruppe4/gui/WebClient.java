@@ -48,7 +48,7 @@ public class WebClient {
 
     public Response updateCustomer(Kunde kunde) {
          return webTarget.path(PATH_CUSTOMER_ENDPOINTS)
-                .request(MediaType.APPLICATION_JSON)
+                .request(MediaType.TEXT_PLAIN)
                 .accept(MediaType.APPLICATION_JSON)
                 .put(Entity.entity(kunde, MediaType.APPLICATION_JSON));
 
