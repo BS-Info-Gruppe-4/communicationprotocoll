@@ -2,12 +2,14 @@ package eu.bsinfo.gruppe4.gui;
 
 import eu.bsinfo.gruppe4.gui.persistence.SessionStorage;
 import eu.bsinfo.gruppe4.server.model.Kunde;
+import jakarta.ws.rs.core.Response;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.UUID;
 
 
 public class AllCustomersTable extends JFrame {
@@ -55,6 +57,20 @@ public class AllCustomersTable extends JFrame {
         add(buttonPanel, BorderLayout.SOUTH);
 
         newCustomerButton.addActionListener(e -> new KundeErstellenDialog(this));
+
+        deleteButton.addActionListener(e -> {
+            WebClient webClient = new WebClient();
+            int selectedRow = table.getSelectedRow();
+            String customerId = table.getValueAt(selectedRow, 0).toString();
+            Response r = webClient.deleteCustomer(UUID.fromString(customerId));
+            System.out.println(r);
+            String message = "Kunde konnte nicht gelöscht werden\n\n";
+            if (r.getStatus() == 200) {
+                MessageDialog.showSuccessMessage("Kunde wurde erfolgreich gelöscht");
+            } else {
+                MessageDialog.showErrorMessage(message);
+            }
+        });
 
         // Passe die Größe des Fensters an
         setSize(500, 300);
