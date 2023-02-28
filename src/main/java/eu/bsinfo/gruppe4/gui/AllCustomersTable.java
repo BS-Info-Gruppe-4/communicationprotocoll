@@ -1,5 +1,6 @@
 package eu.bsinfo.gruppe4.gui;
 
+import eu.bsinfo.gruppe4.gui.persistence.EditCustomerDataWindow;
 import eu.bsinfo.gruppe4.gui.persistence.SessionStorage;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 import jakarta.ws.rs.core.Response;
@@ -73,6 +74,28 @@ public class AllCustomersTable extends JFrame {
             String message = "Kunde konnte nicht gelöscht werden\n\n";
             if (r.getStatus() == 200) {
                 MessageDialog.showSuccessMessage("Kunde wurde erfolgreich gelöscht");
+            } else {
+                MessageDialog.showErrorMessage(message);
+            }
+        });
+
+        editButton.addActionListener(e -> {
+            WebClient webClient = new WebClient();
+            int selectedRow = table.getSelectedRow();
+            String customerId = "";
+            if(selectedRow >= 0) {
+                customerId = table.getValueAt(selectedRow, 0).toString();
+
+            } else {
+                MessageDialog.showErrorMessage("kein Kunde ausgewählt");
+                return;
+            }
+            new EditCustomerDataWindow(UUID.fromString(customerId));
+            Response r = webClient.deleteCustomer(UUID.fromString(customerId)); // tbd
+            System.out.println(r);
+            String message = "Kunde konnte nicht geändert werden\n\n";
+            if (r.getStatus() == 200) {
+                MessageDialog.showSuccessMessage("Kunde wurde erfolgreich geändert");
             } else {
                 MessageDialog.showErrorMessage(message);
             }
