@@ -17,7 +17,7 @@ public class KundeErstellenDialog extends JFrame {
     private final JButton btn_ok;
     private final JButton btn_abbrechen;
 
-    public KundeErstellenDialog() {
+    public KundeErstellenDialog(AllCustomersTable act) {
         super("Erstelle neuen Kunden");
 
         final Container con = getContentPane();
@@ -78,6 +78,7 @@ public class KundeErstellenDialog extends JFrame {
 
             if (WebClient.entityWasCreated(r)) {
                 MessageDialog.showSuccessMessage("Kunde wurde erfolgreich erstellt");
+                act.loadCustomers();
             }
             else {
                 String errorMessage;

@@ -16,10 +16,11 @@ public class AllCustomersTable extends JFrame {
     private final JButton editButton = new JButton("Bearbeiten");
     private final JButton deleteButton = new JButton("Löschen");
     private final JButton newCustomerButton = new JButton("Neuer Kunde");
+    ArrayList<Kunde> customers = new ArrayList<>();
+    DefaultTableModel model = new DefaultTableModel();
 
     public AllCustomersTable() {
         setTitle("Kundenliste");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Erzeuge die Tabelle
         table = new JTable();
@@ -29,24 +30,19 @@ public class AllCustomersTable extends JFrame {
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
 
-
         // Erzeuge die Tabellen-Header
         Object[] columns = {"ID", "Vorname", "Nachname"};
-        var model = new DefaultTableModel();
+
         model.setColumnIdentifiers(columns);
         table.setModel(model);
 
         // Erzeuge eine Liste von Kunden
-        ArrayList<Kunde> customers = new ArrayList<>();
+
         customers.add(new Kunde("Max", "Mustermann"));
         customers.add(new Kunde("Maria", "Müller"));
         customers.add(new Kunde("Hans", "Huber"));
 
-        // Füge die Kunden zur Tabelle hinzu
-        for (Kunde customer : customers) {
-            Object[] row = {customer.getId(), customer.getVorname(), customer.getName()};
-            model.addRow(row);
-        }
+        loadCustomers();
 
         // Erstelle Sorter
         sorter = new TableRowSorter<>(model);
@@ -63,8 +59,20 @@ public class AllCustomersTable extends JFrame {
 
         add(buttonPanel, BorderLayout.SOUTH);
 
+        newCustomerButton.addActionListener(e -> new KundeErstellenDialog(this));
+
         // Passe die Größe des Fensters an
         setSize(500, 300);
         setVisible(true);
+    }
+
+    public void loadCustomers() {
+
+        // Füge die Kunden zur Tabelle hinzu
+        for (Kunde customer : customers) {
+            Object[] row = {customer.getId(), customer.getVorname(), customer.getName()};
+            model.addRow(row);
+        }
+
     }
 }
