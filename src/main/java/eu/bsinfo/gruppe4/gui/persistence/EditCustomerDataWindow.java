@@ -19,7 +19,7 @@ public class EditCustomerDataWindow extends JFrame {
     private Kunde kunde;
 
     public EditCustomerDataWindow(UUID uuid, String selected_name, String selected_surname, AllCustomersTable act) {
-        super("Kundendaten ändern für " + uuid);
+        super("Kundendaten ändern für UUID: " + uuid);
 
         final Container con = getContentPane();
         con.setLayout(new BorderLayout());
@@ -42,6 +42,15 @@ public class EditCustomerDataWindow extends JFrame {
             String name = tf_name.getText();
             String surname = tf_surname.getText();
 
+            if (isEmpty(surname, name) == true) {
+                MessageDialog.showErrorMessage("Eingabefeld darf nicht leer sein!");
+                return;
+            }
+            if (eingabevalidierung(selected_surname, selected_name, surname, name) == false) {
+                MessageDialog.showErrorMessage("Es wurden keine Änderungen vorgenommen!");
+                return;
+            }
+
             kunde = new Kunde(uuid, surname, name);
             WebClient webClient = new WebClient();
 
@@ -61,5 +70,30 @@ public class EditCustomerDataWindow extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
         setSize(600, 150);
+    }
+
+    public boolean eingabevalidierung(String origin_surname, String origin_name, String new_surname, String new_name) {
+        boolean edited;
+        if (new_surname.equals(origin_surname)) {
+            edited = false;
+        } else {
+            edited = true;
+        }
+        if (new_name.equals(origin_name)) {
+            edited = false;
+        } else {
+            edited = true;
+        }
+        return edited;
+    }
+
+    public boolean isEmpty(String surname, String name) {
+        boolean isEmpty;
+        if (surname.equals("") || name.equals("")) {
+            isEmpty = true;
+        } else {
+            isEmpty = false;
+        }
+        return isEmpty;
     }
 }
