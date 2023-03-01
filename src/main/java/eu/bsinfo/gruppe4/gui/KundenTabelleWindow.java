@@ -1,44 +1,44 @@
 package eu.bsinfo.gruppe4.gui;
 
+import eu.bsinfo.gruppe4.gui.service.ReadingService;
+import eu.bsinfo.gruppe4.server.model.Ablesung;
+import eu.bsinfo.gruppe4.server.model.Kunde;
+
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 public class KundenTabelleWindow extends JFrame{
 
     private final JTable tabelle;
-    private final ArrayList<ZaehlerDatensatz> sessionData;
+    DefaultTableModel model = new DefaultTableModel();
 
-
-    KundenTabelleWindow(ArrayList<ZaehlerDatensatz> sessionData, int kundennr) throws IOException {
-
-        this.sessionData = sessionData;
-
-        setTitle("Datensätze für Kundennummer: " + kundennr);
+    KundenTabelleWindow(UUID uuid) throws IOException {
+        ReadingService readingService = new ReadingService();
+        setTitle("Datensätze für Kundennummer: "+uuid);
 
         final Container con = getContentPane();
         con.setLayout(new BorderLayout());
 
-        List <ZaehlerDatensatz> datensaetze = getAllRecordsOfCustomer(kundennr);
-        String[][] daten = new String[datensaetze.size()][4];
-        for (int i = 0; i < datensaetze.size(); i++) {
+        ArrayList<Ablesung> datensaetze = readingService.getReadingsWithRestrictions(uuid, null, null);
 
-                daten[i][0] = PropertyManagementApplication.convertDateToString(datensaetze.get(i).getDatum());
-                daten[i][1] = capitalize(datensaetze.get(i).getZaehlerart().name());
-                daten[i][2] = datensaetze.get(i).getZaehlernummer();
-                daten[i][3] = String.valueOf(datensaetze.get(i).getZaehlerstand());
-
+        for (Ablesung ablesung : datensaetze) {
+            Object[] row = {ablesung.getId(), ablesung.getKunde(), ablesung.getDatum(), ablesung.getZaehlernummer()};
+            model.addRow(row);
         }
 
-        String[] spaltennamen = { "Datum", "Zählerart", "Zählernummer", "Zählerstand" };
+        String[] columns = { "UUID", "Zählerart", "Zählernummer", "Zählerstand" };
 
         // Tabelle initialisieren
-        tabelle = new JTable(daten, spaltennamen);
+        tabelle = new JTable();
+        model.setColumnIdentifiers(columns);
+        tabelle.setModel(model);
         tabelle.setBounds(30, 40, 200, 500);
         sortTable();
 
@@ -47,15 +47,8 @@ public class KundenTabelleWindow extends JFrame{
         JScrollPane sp = new JScrollPane(tabelle);
         con.add(sp, BorderLayout.CENTER);
 
-        setSize(500, 500);
+        setSize(700, 600);
         setVisible(true);
-    }
-
-    private List<ZaehlerDatensatz> getAllRecordsOfCustomer(int customerId) {
-        return this.sessionData
-                .stream()
-                .filter(zaehlerDatensatz -> zaehlerDatensatz.getKundennummer() == customerId)
-                .collect(Collectors.toList());
     }
 
     private String capitalize(String name) {

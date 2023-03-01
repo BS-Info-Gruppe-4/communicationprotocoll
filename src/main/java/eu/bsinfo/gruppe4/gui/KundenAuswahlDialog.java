@@ -44,11 +44,11 @@ public class KundenAuswahlDialog extends JFrame {
                 MessageDialog.showErrorMessage("Ungültige Kundennummer");
                 return;
             }
-            try {
-                new KundenTabelleWindow(sessionData, kundennr);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+//            try {
+//                new KundenTabelleWindow();
+//            } catch (IOException ex) {
+//                throw new RuntimeException(ex);
+//            }
         });
 
         btn_loeschen.addActionListener(e -> {

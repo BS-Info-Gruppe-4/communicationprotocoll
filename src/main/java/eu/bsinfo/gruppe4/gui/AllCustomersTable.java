@@ -11,6 +11,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -25,6 +26,7 @@ public class AllCustomersTable extends JFrame {
     private final JButton editButton = new JButton("Bearbeiten");
     private final JButton deleteButton = new JButton("Löschen");
     private final JButton newCustomerButton = new JButton("Neuer Kunde");
+    private final JButton showDataButton = new JButton("Ablesungen anzeigen");
     DefaultTableModel model = new DefaultTableModel();
 
     public AllCustomersTable() {
@@ -33,10 +35,11 @@ public class AllCustomersTable extends JFrame {
         // Erzeuge die Tabelle
         table = new JTable();
 
-        final JPanel buttonPanel = new JPanel(new GridLayout(1, 3));
+        final JPanel buttonPanel = new JPanel(new GridLayout(2, 2));
         buttonPanel.add(newCustomerButton);
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
+        buttonPanel.add(showDataButton);
 
         // Erzeuge die Tabellen-Header
         Object[] columns = {"ID", "Vorname", "Nachname"};
@@ -79,6 +82,24 @@ public class AllCustomersTable extends JFrame {
                     table.getValueAt(selectedRow, 1).toString(),
                     table.getValueAt(selectedRow, 2).toString(),
                     this);
+        });
+
+        showDataButton.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            boolean noRowIsSelected = selectedRow == -1;
+
+            if (noRowIsSelected) {
+                MessageDialog.showErrorMessage("Bitte wähle einen Kunden aus.");
+                return;
+            }
+
+            String customerId = table.getValueAt(selectedRow, USER_ID_COLUMN_INDEX).toString();
+
+            try {
+                new KundenTabelleWindow(UUID.fromString(customerId));
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         });
 
         // Passe die Größe des Fensters an
