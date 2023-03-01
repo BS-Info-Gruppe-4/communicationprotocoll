@@ -73,4 +73,12 @@ public class WebClient {
                 .accept(MediaType.APPLICATION_JSON)
                 .delete();
     }
+
+    public Response compareData(UUID id) {
+        String pfad = PATH_CUSTOMER_ENDPOINTS+"/"+id;
+        return webTarget.path(pfad)
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
+    }
 }
