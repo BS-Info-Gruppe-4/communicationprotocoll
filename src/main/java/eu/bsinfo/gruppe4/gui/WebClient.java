@@ -46,12 +46,19 @@ public class WebClient {
         return response.readEntity(new GenericType<>() {});
     }
 
+    public Response updateCustomer(Kunde kunde) {
+         return webTarget.path(PATH_CUSTOMER_ENDPOINTS)
+                .request(MediaType.TEXT_PLAIN)
+                .accept(MediaType.APPLICATION_JSON)
+                .put(Entity.entity(kunde, MediaType.APPLICATION_JSON));
+
+    }
+
     public ArrayList<Ablesung> getReadingsOfLast2Years() {
         Response response = webTarget.path(PATH_READINGS_LAST_TWO_YEARS)
                 .request(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .get();
-
         return response.readEntity(new GenericType<>() {});
     }
 

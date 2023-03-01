@@ -1,5 +1,6 @@
 package eu.bsinfo.gruppe4.gui;
 
+import eu.bsinfo.gruppe4.gui.persistence.EditCustomerDataWindow;
 import eu.bsinfo.gruppe4.gui.persistence.SessionStorage;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 import jakarta.ws.rs.core.Response;
@@ -78,6 +79,22 @@ public class AllCustomersTable extends JFrame {
             }
         });
 
+        editButton.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            String customerId = "";
+            if(selectedRow >= 0) {
+                customerId = table.getValueAt(selectedRow, 0).toString();
+
+            } else {
+                MessageDialog.showErrorMessage("kein Kunde ausgewählt");
+                return;
+            }
+            new EditCustomerDataWindow(UUID.fromString(customerId),
+                    table.getValueAt(selectedRow, 1).toString(),
+                    table.getValueAt(selectedRow, 2).toString(),
+                    this);
+        });
+
         // Passe die Größe des Fensters an
         setSize(500, 300);
         setVisible(true);
@@ -95,9 +112,15 @@ public class AllCustomersTable extends JFrame {
 
     }
 
-    public void addCustomerToTable(Kunde kunde) {
-        Object[] row = {kunde.getId(), kunde.getVorname(), kunde.getName()};
-        model.addRow(row);
+    public void refreshTable() {
+        sessionStorage.syncWithBackend();
+        model.setRowCount(0);
+
+        for (Kunde customer : sessionStorage.getKunden()) {
+            Object[] row = {customer.getId(), customer.getVorname(), customer.getName()};
+            model.addRow(row);
+        }
+
         model.fireTableDataChanged();
     }
 }

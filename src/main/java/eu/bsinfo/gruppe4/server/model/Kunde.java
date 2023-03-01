@@ -9,6 +9,7 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonDeserialize(keyUsing = KundeMapKeyDeserializer.class)
 public class Kunde {
     @EqualsAndHashCode.Include
