@@ -75,10 +75,11 @@ public class AllCustomersTable extends JFrame {
                 MessageDialog.showErrorMessage("kein Kunde ausgewählt");
                 return;
             }
-            new EditCustomerDataWindow(UUID.fromString(customerId),
+
+            Kunde customerSelected = new Kunde(UUID.fromString(customerId),
                     table.getValueAt(selectedRow, 1).toString(),
-                    table.getValueAt(selectedRow, 2).toString(),
-                    this);
+                    table.getValueAt(selectedRow, 2).toString());
+            new EditCustomerDataWindow(customerSelected, this);
         });
 
         // Passe die Größe des Fensters an

@@ -18,8 +18,8 @@ public class EditCustomerDataWindow extends JFrame {
     private final JButton btn_abbrechen;
     private Kunde kunde;
 
-    public EditCustomerDataWindow(UUID uuid, String selected_name, String selected_surname, AllCustomersTable act) {
-        super("Kundendaten ändern für UUID: " + uuid);
+    public EditCustomerDataWindow(Kunde customer, AllCustomersTable act) {
+        super("Kundendaten ändern für UUID: " + customer.getId());
 
         final Container con = getContentPane();
         con.setLayout(new BorderLayout());
@@ -31,9 +31,9 @@ public class EditCustomerDataWindow extends JFrame {
         con.add(pn_buttons, BorderLayout.SOUTH);
 
         pn_eingabemaske.add(new JLabel("Vorname"));
-        pn_eingabemaske.add(tf_name = new JTextField(selected_name));
+        pn_eingabemaske.add(tf_name = new JTextField(customer.getVorname()));
         pn_eingabemaske.add(new JLabel("Nachname"));
-        pn_eingabemaske.add(tf_surname = new JTextField(selected_surname));
+        pn_eingabemaske.add(tf_surname = new JTextField(customer.getName()));
 
         pn_buttons.add(btn_abbrechen = new JButton("Abbrechen"));
         pn_buttons.add(btn_ok = new JButton("Änderungen speichern"));
@@ -46,13 +46,20 @@ public class EditCustomerDataWindow extends JFrame {
                 MessageDialog.showErrorMessage("Eingabefeld darf nicht leer sein!");
                 return;
             }
-            if (eingabevalidierung(selected_surname, selected_name, surname, name) == false) {
+            if (eingabevalidierung(customer.getName(), customer.getVorname(), surname, name) == false) {
                 MessageDialog.showErrorMessage("Es wurden keine Änderungen vorgenommen!");
                 return;
             }
 
-            kunde = new Kunde(uuid, surname, name);
+            kunde = new Kunde(customer.getId(), surname, name);
             WebClient webClient = new WebClient();
+
+            Kunde vergleichsKunde = webClient.getCustomer(kunde.getId());
+            System.out.println(vergleichsKunde.toString());
+
+            if (!customer.equals(vergleichsKunde)) {
+                MessageDialog.showErrorMessage("Daten stimmen nicht mit Serverdaten überein!");
+            }
 
             Response r = webClient.updateCustomer(kunde);
             System.out.println(r);
