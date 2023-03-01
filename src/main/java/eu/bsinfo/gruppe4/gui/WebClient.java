@@ -51,7 +51,13 @@ public class WebClient {
                 .request(MediaType.TEXT_PLAIN)
                 .accept(MediaType.APPLICATION_JSON)
                 .put(Entity.entity(kunde, MediaType.APPLICATION_JSON));
+    }
 
+    public Response createAblesung(Ablesung ablesung) {
+        return webTarget.path(PATH_READINGS_ENDPOINTS)
+                .request(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .put(Entity.entity(ablesung, MediaType.APPLICATION_JSON));
     }
 
     public ArrayList<Ablesung> getReadingsOfLast2Years() {
