@@ -10,6 +10,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -19,26 +20,24 @@ public class KundenTabelleWindow extends JFrame{
     private final JTable tabelle;
     DefaultTableModel model = new DefaultTableModel();
 
-    KundenTabelleWindow(UUID uuid) throws IOException {
+    KundenTabelleWindow(UUID uuid, LocalDate start, LocalDate end) throws IOException {
         ReadingService readingService = new ReadingService();
-        setTitle("Datensätze für Kundennummer: "+uuid);
+        setTitle("Datensätze für Kundennummer: " + uuid + " (" + start + " - " + end + ")");
 
         final Container con = getContentPane();
         con.setLayout(new BorderLayout());
 
-
-
-        String[] columns = { "UUID", "Zählerart", "Zählernummer", "Zählerstand" };
+        String[] columns = { "UUID","Kunde", "Zählerart", "Zählernummer", "Zählerstand" , "neu eingebaut", "Kommentar"};
 
         // Tabelle initialisieren
         tabelle = new JTable();
         model.setColumnIdentifiers(columns);
         tabelle.setModel(model);
 
-        ArrayList<Ablesung> datensaetze = readingService.getReadingsWithRestrictions(uuid, null, null);
+        ArrayList<Ablesung> datensaetze = readingService.getReadingsWithRestrictions(uuid, start, end);
 
         for (Ablesung ablesung : datensaetze) {
-            Object[] row = {ablesung.getId(), ablesung.getKunde(), ablesung.getDatum(), ablesung.getZaehlernummer()};
+            Object[] row = {ablesung.getId(), ablesung.getKunde(), ablesung.getDatum(), ablesung.getZaehlernummer(), ablesung.getZaehlerstand(), ablesung.getId(), ablesung.getKommentar()};
             model.addRow(row);
         }
 
