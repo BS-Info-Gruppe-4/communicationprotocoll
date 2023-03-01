@@ -196,7 +196,7 @@ public class PropertyManagementApplication extends JFrame {
         con.add(inputMask.getMainContainer(), BorderLayout.CENTER);
         con.add(pn_buttons, BorderLayout.SOUTH);
 
-        setSize(630, 300);
+        setSize(650, 300);
         setVisible(true);
     }
 
