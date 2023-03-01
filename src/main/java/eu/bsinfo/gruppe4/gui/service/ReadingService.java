@@ -51,7 +51,7 @@ public class ReadingService {
             throw new NotFoundException(errorMessage);
         }
 
-        if (response.getStatus() != Response.Status.CREATED.getStatusCode()) {
+        if (response.getStatus() != Response.Status.OK.getStatusCode()) {
             throw new UnknownError("Es ist ein unbekannter Fehler aufgetreten");
         }
 
