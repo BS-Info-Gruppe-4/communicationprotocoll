@@ -137,7 +137,7 @@ public class InputMask {
     public ZaehlerDatensatz getZaehlerDatensatzOfInputFields() {
 
         return new ZaehlerDatensatz(
-                getKundennummer(),
+                Integer.parseInt(getKundennummer()),
                 getZaehlerart(),
                 getZaehlernummer(),
                 convertStringToDate(getDatum()),

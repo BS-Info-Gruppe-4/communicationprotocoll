@@ -2,7 +2,6 @@ package eu.bsinfo.gruppe4.gui;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -50,7 +49,7 @@ public class InputFieldsValidator implements Serializable {
     void validateKundennummer() {
         // überprüfen, ob Kundennummer ein int ist
         try {
-            UUID.fromString(inputMask.getKundennummer());
+            Integer.parseInt(inputMask.getKundennummer());
         } catch (NumberFormatException ex) {
             validationErrorMessages.add("Kundennummer ist fehlerhaft");
         }

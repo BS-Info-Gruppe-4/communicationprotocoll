@@ -18,6 +18,7 @@ public class ReadingService {
     private final SessionStorage sessionStorage = SessionStorage.getInstance();
 
     public Ablesung createReading(Ablesung ablesung) {
+        //TODO: Validation
         Response response = webClient.createAblesung(ablesung);
 
         if (response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode()) {

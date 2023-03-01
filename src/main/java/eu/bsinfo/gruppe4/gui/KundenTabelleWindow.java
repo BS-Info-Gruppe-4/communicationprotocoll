@@ -26,12 +26,7 @@ public class KundenTabelleWindow extends JFrame{
         final Container con = getContentPane();
         con.setLayout(new BorderLayout());
 
-        ArrayList<Ablesung> datensaetze = readingService.getReadingsWithRestrictions(uuid, null, null);
 
-        for (Ablesung ablesung : datensaetze) {
-            Object[] row = {ablesung.getId(), ablesung.getKunde(), ablesung.getDatum(), ablesung.getZaehlernummer()};
-            model.addRow(row);
-        }
 
         String[] columns = { "UUID", "Zählerart", "Zählernummer", "Zählerstand" };
 
@@ -39,6 +34,14 @@ public class KundenTabelleWindow extends JFrame{
         tabelle = new JTable();
         model.setColumnIdentifiers(columns);
         tabelle.setModel(model);
+
+        ArrayList<Ablesung> datensaetze = readingService.getReadingsWithRestrictions(uuid, null, null);
+
+        for (Ablesung ablesung : datensaetze) {
+            Object[] row = {ablesung.getId(), ablesung.getKunde(), ablesung.getDatum(), ablesung.getZaehlernummer()};
+            model.addRow(row);
+        }
+
         tabelle.setBounds(30, 40, 200, 500);
         sortTable();
 

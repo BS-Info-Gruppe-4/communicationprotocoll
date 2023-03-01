@@ -15,7 +15,7 @@ import java.util.Objects;
 @NoArgsConstructor
 public class ZaehlerDatensatz {
 
-    private String kundennummer;
+    private int kundennummer;
     private Zaehlerart zaehlerart;
     private String zaehlernummer;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
