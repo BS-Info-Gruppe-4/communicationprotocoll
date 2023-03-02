@@ -77,8 +77,8 @@ public class AllCustomersTable extends JFrame {
             }
 
             Kunde customerSelected = new Kunde(UUID.fromString(customerId),
-                    table.getValueAt(selectedRow, 1).toString(),
-                    table.getValueAt(selectedRow, 2).toString());
+                    table.getValueAt(selectedRow, 2).toString(),
+                    table.getValueAt(selectedRow, 1).toString());
             new EditCustomerDataWindow(customerSelected, this);
         });
 

@@ -8,7 +8,6 @@ import jakarta.ws.rs.core.Response;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.UUID;
 
 public class EditCustomerDataWindow extends JFrame {
 
@@ -42,11 +41,11 @@ public class EditCustomerDataWindow extends JFrame {
             String name = tf_name.getText();
             String surname = tf_surname.getText();
 
-            if (isEmpty(surname, name) == true) {
+            if (isEmpty(surname, name)) {
                 MessageDialog.showErrorMessage("Eingabefeld darf nicht leer sein!");
                 return;
             }
-            if (eingabevalidierung(customer.getName(), customer.getVorname(), surname, name) == false) {
+            if (!eingabevalidierung(customer.getName(), customer.getVorname(), surname, name)) {
                 MessageDialog.showErrorMessage("Es wurden keine Änderungen vorgenommen!");
                 return;
             }
@@ -80,27 +79,18 @@ public class EditCustomerDataWindow extends JFrame {
     }
 
     public boolean eingabevalidierung(String origin_surname, String origin_name, String new_surname, String new_name) {
-        boolean edited;
-        if (new_surname.equals(origin_surname)) {
-            edited = false;
-        } else {
-            edited = true;
-        }
-        if (new_name.equals(origin_name)) {
-            edited = false;
-        } else {
-            edited = true;
-        }
+        String surname = new_surname.trim();
+        String name = new_name.trim();
+        boolean edited, edited_surname, edited_name;
+        edited_surname = !surname.equals(origin_surname);
+        edited_name = !name.equals(origin_name);
+        edited = edited_name || edited_surname;
         return edited;
     }
 
     public boolean isEmpty(String surname, String name) {
         boolean isEmpty;
-        if (surname.equals("") || name.equals("")) {
-            isEmpty = true;
-        } else {
-            isEmpty = false;
-        }
+        isEmpty = surname.equals("") || name.equals("");
         return isEmpty;
     }
 }
