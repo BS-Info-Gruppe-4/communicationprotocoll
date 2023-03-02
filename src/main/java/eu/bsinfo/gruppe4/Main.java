@@ -8,8 +8,7 @@ public class Main {
 
     public static String SERVER_URL = "http://localhost:8080/";
     public static void main(String[] args) throws InterruptedException {
-        new LoadingWindow();
-
         Server.startServer(SERVER_URL, true);
+        new LoadingWindow();
     }
 }

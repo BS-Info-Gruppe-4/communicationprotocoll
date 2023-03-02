@@ -1,8 +1,12 @@
 package eu.bsinfo.gruppe4.gui;
 
+import eu.bsinfo.gruppe4.server.Server;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +21,13 @@ public class LoadingWindow extends JFrame {
 
     public LoadingWindow() throws InterruptedException {
         super("Starting...");
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(final WindowEvent e) {
+                exit();
+            }
+        });
 
         final Container con = getContentPane();
         con.setLayout(new BorderLayout());
@@ -39,11 +50,11 @@ public class LoadingWindow extends JFrame {
         con.add(progressBar, BorderLayout.SOUTH);
 
         label_starting = new JLabel("Starting server...");
-        label_starting.setHorizontalAlignment((int) CENTER_ALIGNMENT);
+        label_starting.setHorizontalAlignment(0);
         label_starting.setFont(new Font("Serif", Font.PLAIN, 24));
 
         label_gruppe4 = new JLabel("Hausverwaltung");
-        label_gruppe4.setHorizontalAlignment((int) CENTER_ALIGNMENT);
+        label_gruppe4.setHorizontalAlignment(0);
         label_gruppe4.setFont(new Font("Serif", Font.PLAIN, 20));
 
         panel.add(new JLabel("BS Info Gruppe 4"));
@@ -69,6 +80,11 @@ public class LoadingWindow extends JFrame {
         }
         dispose();
         new PropertyManagementApplication();
+    }
+
+    private void exit() {
+        Server.stopServer(true);
+        System.exit(0);
     }
 
 }

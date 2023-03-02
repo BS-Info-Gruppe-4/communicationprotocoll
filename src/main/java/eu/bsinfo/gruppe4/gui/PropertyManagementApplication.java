@@ -131,13 +131,8 @@ public class PropertyManagementApplication extends JFrame {
                 try {
                     UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
                     SwingUtilities.updateComponentTreeUI(PropertyManagementApplication.this);
-                } catch (UnsupportedLookAndFeelException ex) {
-                    throw new RuntimeException(ex);
-                } catch (ClassNotFoundException ex) {
-                    throw new RuntimeException(ex);
-                } catch (InstantiationException ex) {
-                    throw new RuntimeException(ex);
-                } catch (IllegalAccessException ex) {
+                } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException |
+                         IllegalAccessException ex) {
                     throw new RuntimeException(ex);
                 }
                 JFrame.setDefaultLookAndFeelDecorated(true);
@@ -149,13 +144,8 @@ public class PropertyManagementApplication extends JFrame {
                 try {
                     UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
                     SwingUtilities.updateComponentTreeUI(PropertyManagementApplication.this);
-                } catch (UnsupportedLookAndFeelException ex) {
-                    throw new RuntimeException(ex);
-                } catch (ClassNotFoundException ex) {
-                    throw new RuntimeException(ex);
-                } catch (InstantiationException ex) {
-                    throw new RuntimeException(ex);
-                } catch (IllegalAccessException ex) {
+                } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException |
+                         IllegalAccessException ex) {
                     throw new RuntimeException(ex);
                 }
                 JFrame.setDefaultLookAndFeelDecorated(true);
@@ -167,13 +157,8 @@ public class PropertyManagementApplication extends JFrame {
                 try {
                     UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
                     SwingUtilities.updateComponentTreeUI(PropertyManagementApplication.this);
-                } catch (UnsupportedLookAndFeelException ex) {
-                    throw new RuntimeException(ex);
-                } catch (ClassNotFoundException ex) {
-                    throw new RuntimeException(ex);
-                } catch (InstantiationException ex) {
-                    throw new RuntimeException(ex);
-                } catch (IllegalAccessException ex) {
+                } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException |
+                         IllegalAccessException ex) {
                     throw new RuntimeException(ex);
                 }
                 JFrame.setDefaultLookAndFeelDecorated(true);
