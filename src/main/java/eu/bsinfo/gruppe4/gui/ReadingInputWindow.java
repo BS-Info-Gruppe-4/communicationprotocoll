@@ -113,6 +113,7 @@ public class ReadingInputWindow extends JFrame {
 
 
         saveButton.addActionListener(e -> save());
+        cancelButton.addActionListener(e -> dispose());
 
         // Passe die Größe des Fensters an
         setLocationRelativeTo(null);
@@ -135,6 +136,7 @@ public class ReadingInputWindow extends JFrame {
     }
 
 
+    //FIXME: Will only be written to file if the window of PropertyManagementApplication class is closed
     private void save() {
         if (areInputFieldsInvalid()) {
             displayAllOccurredValidationErrors();
