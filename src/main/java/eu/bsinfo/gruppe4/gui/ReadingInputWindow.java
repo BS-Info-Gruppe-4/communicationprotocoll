@@ -1,6 +1,5 @@
 package eu.bsinfo.gruppe4.gui;
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import eu.bsinfo.gruppe4.gui.service.ReadingService;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import eu.bsinfo.gruppe4.server.model.Kunde;
@@ -11,7 +10,9 @@ import net.sourceforge.jdatepicker.impl.UtilDateModel;
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
 
@@ -132,66 +133,18 @@ public class ReadingInputWindow extends JFrame {
             MessageDialog.showWarningMessage(e.getMessage());
         }
     }
-    public Ablesung getReadingOfInputFields() throws DataFormatException {
-
-        if (areInputFieldsInvalid()) {
-            throw new DataFormatException(getValidationErrorsWithLineBreak());
-        }
+    private Ablesung getReadingOfInputFields() throws DataFormatException {
 
         //FIXME: reading type is missing
         return new Ablesung(
                 getZaehlernummer(),
-                convertStringToDate(getDatum()),
+                getDatum(),
                 currentCustomer,
                 getKommentar(),
                 getWurdeNeuEingebaut(),
-                Integer.parseInt(getZaehlerstand())
+                getZaehlerstand()
         );
     }
-
-    private boolean areInputFieldsInvalid() {
-        this.validationErrorMessages.clear();
-
-        checkIfInputFieldsAreEmpty();
-        checkIfZaehlerstandIsNumber();
-
-        return validationErrorMessages.size() > 0;
-    }
-
-
-    private void checkIfZaehlerstandIsNumber() {
-        try {
-            Integer.parseInt(getZaehlerstand());
-        } catch (NumberFormatException ex) {
-            validationErrorMessages.add("Zählerstand muss eine Ganzzahl sein");
-        }
-    }
-
-    private void checkIfInputFieldsAreEmpty() {
-        JTextField[] textFields = {zaehlernummer, zaehlerstand};
-
-        for (JTextField textField : textFields) {
-            String textFieldsContent = textField.getText();
-
-            if (isBlankOrEmpty(textFieldsContent)) validationErrorMessages.add("Bitte fülle alle Felder aus");
-            return;
-        }
-    }
-
-    private boolean isBlankOrEmpty(String input) {
-        return input.isEmpty() || input.isBlank();
-    }
-
-
-    private String getValidationErrorsWithLineBreak() {
-        return this.validationErrorMessages
-                .stream()
-                .map(fehlermeldung -> "\n" + fehlermeldung)
-                .collect(Collectors.joining());
-    }
-
-
-
 
 
     public void setKundennummer(String kundennummer) {
@@ -214,19 +167,23 @@ public class ReadingInputWindow extends JFrame {
         }
     }
 
-    public String getZaehlernummer() {
-        return zaehlernummer.getText();
+    public String getZaehlernummer() throws DataFormatException {
+
+        String zaehlernummer = this.zaehlernummer.getText();
+
+        if (isBlankOrEmpty(zaehlernummer)) throw new DataFormatException("Zählernummer ist leer");
+
+        return zaehlernummer;
     }
 
     public void setZaehlernummer(String zaehlernummer) {
         this.zaehlernummer.setText(zaehlernummer);
     }
 
-    public String getDatum() {
+    public LocalDate getDatum() {
         // Das model zeigt komischerweise das datum einen monat in der vergangenheit an
         // von daher muss hier beim monat 1 hinzugefügt werden
-        LocalDate date = LocalDate.of(model.getYear(), model.getMonth() + 1, model.getDay());
-        return PropertyManagementApplication.convertDateToString(date);
+        return LocalDate.of(model.getYear(), model.getMonth() + 1, model.getDay());
     }
 
     public void setDatum(LocalDate datum) {
@@ -235,8 +192,18 @@ public class ReadingInputWindow extends JFrame {
         this.model.setDate(datum.getYear(), datum.getMonthValue() - 1, datum.getDayOfMonth());
     }
 
-    public String getZaehlerstand() {
-        return zaehlerstand.getText();
+    public int getZaehlerstand() throws DataFormatException {
+
+        String zaehlerstandAsString = zaehlerstand.getText();
+
+        if (isBlankOrEmpty(zaehlerstandAsString)) throw new DataFormatException("Zählerstand ist leer");
+
+        try {
+            return Integer.parseInt(zaehlerstandAsString);
+        }
+        catch (NumberFormatException e) {
+            throw new DataFormatException("Zählerstand muss eine Ganzzahl sein");
+        }
     }
 
     public void setZaehlerstand(String zaehlerstand) {
@@ -257,5 +224,9 @@ public class ReadingInputWindow extends JFrame {
 
     public void setWurdeNeuEingebaut(boolean wurdeNeuEingebaut) {
         this.wurdeNeuEingebaut.setSelected(wurdeNeuEingebaut);
+    }
+
+    private boolean isBlankOrEmpty(String input) {
+        return input.isEmpty() || input.isBlank();
     }
 }
