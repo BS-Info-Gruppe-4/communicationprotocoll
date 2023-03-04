@@ -143,7 +143,13 @@ public class ReadingInputWindow extends JFrame {
 
         Ablesung reading = getReadingOfInputFields();
 
-        readingService.createReading(reading);
+        try {
+            readingService.createReading(reading);
+            MessageDialog.showSuccessMessage("Ablesung wurde erstellt");
+        }
+        catch (Exception e) {
+            MessageDialog.showWarningMessage(e.getMessage());
+        }
     }
 
     private boolean areInputFieldsInvalid() {
