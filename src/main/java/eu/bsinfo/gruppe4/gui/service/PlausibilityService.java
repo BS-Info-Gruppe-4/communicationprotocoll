@@ -11,7 +11,8 @@ public class PlausibilityService implements Serializable {
     private final SessionStorage sessionStorage = SessionStorage.getInstance();
 
 
-    public boolean isNotPlausible(int zaehlerstand) {
+    public boolean isNotPlausible(Ablesung reading) {
+        int zaehlerstand = reading.getZaehlerstand();
 
         if (getAverageZaehlerstand() == 0) return true;
 

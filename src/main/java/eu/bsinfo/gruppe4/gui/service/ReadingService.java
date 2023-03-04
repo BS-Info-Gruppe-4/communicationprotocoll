@@ -1,7 +1,7 @@
 package eu.bsinfo.gruppe4.gui.service;
 
+import eu.bsinfo.gruppe4.gui.MessageDialog;
 import eu.bsinfo.gruppe4.gui.WebClient;
-import eu.bsinfo.gruppe4.gui.exceptions.NotPlausibleException;
 import eu.bsinfo.gruppe4.gui.persistence.SessionStorage;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import jakarta.ws.rs.NotFoundException;
@@ -14,12 +14,10 @@ public class ReadingService {
     private final SessionStorage sessionStorage = SessionStorage.getInstance();
 
 
-    public Ablesung createReading(Ablesung reading) throws NotPlausibleException {
+    public Ablesung createReading(Ablesung reading) {
 
-        int zaehlerstand = reading.getZaehlerstand();
-
-        if (plausibilityService.isNotPlausible(zaehlerstand)) {
-            throw new NotPlausibleException("Der Wert des Zählerstands liegt außerhalb des Normbereichs!\n" +
+        if (plausibilityService.isNotPlausible(reading)) {
+            MessageDialog.showWarningMessage("Der Wert des Zählerstands liegt außerhalb des Normbereichs!\n" +
                     "Möglicherweise liegt ein Leck vor.");
         }
 
