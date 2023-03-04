@@ -12,6 +12,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 
@@ -25,6 +26,7 @@ public class AllCustomersTable extends JFrame {
     private final JButton editButton = new JButton("Bearbeiten");
     private final JButton deleteButton = new JButton("Löschen");
     private final JButton newCustomerButton = new JButton("Neuer Kunde");
+    private final JButton newReadingButton = new JButton("Neue Ablesung");
     DefaultTableModel model = new DefaultTableModel();
 
     public AllCustomersTable() {
@@ -33,8 +35,9 @@ public class AllCustomersTable extends JFrame {
         // Erzeuge die Tabelle
         table = new JTable();
 
-        final JPanel buttonPanel = new JPanel(new GridLayout(1, 3));
+        final JPanel buttonPanel = new JPanel(new GridLayout(1, 4));
         buttonPanel.add(newCustomerButton);
+        buttonPanel.add(newReadingButton);
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
 
@@ -63,6 +66,11 @@ public class AllCustomersTable extends JFrame {
 
         newCustomerButton.addActionListener(e -> new KundeErstellenDialog(this));
 
+        newReadingButton.addActionListener(e -> {
+            Kunde customer = getSelectedCustomer();
+            new ReadingInputWindow(customer);
+        });
+
         deleteButton.addActionListener(e -> attemptCustomerDeletion());
 
         editButton.addActionListener(e -> {
@@ -85,6 +93,14 @@ public class AllCustomersTable extends JFrame {
         // Passe die Größe des Fensters an
         setSize(500, 300);
         setVisible(true);
+    }
+
+    private Kunde getSelectedCustomer() {
+        int selectedRow = table.getSelectedRow();
+
+        if (selectedRow == -1) throw new NoSuchElementException("Bitte wähle einen Kunden aus");
+
+        return sessionStorage.getKunden().get(selectedRow);
     }
 
     private void attemptCustomerDeletion() {
