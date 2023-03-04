@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import static eu.bsinfo.gruppe4.gui.PropertyManagementApplication.convertStringToDate;
 
@@ -27,7 +28,7 @@ public class ReadingInputWindow extends JFrame {
     private JTextField kommentar;
     private JCheckBox wurdeNeuEingebaut;
     private UtilDateModel model;
-    private Ablesung currentReading;
+    private Kunde currentCustomer;
     protected ArrayList<String> validationErrorMessages = new ArrayList<>();
 
     private final JButton saveButton = new JButton("Speichern");
@@ -41,8 +42,8 @@ public class ReadingInputWindow extends JFrame {
         assembleJFrameElements();
     }
 
-    public ReadingInputWindow(Ablesung ablesung) {
-        this.currentReading = ablesung;
+    public ReadingInputWindow(Kunde kunde) {
+        currentCustomer = kunde;
         assembleJFrameElements();
     }
 
@@ -82,7 +83,8 @@ public class ReadingInputWindow extends JFrame {
 
         // Gridlayout mit Label und Textfelder befüllen
         inputFieldsPanel.add(new JLabel("Kundennummer"));
-        inputFieldsPanel.add(kundennummer = new JTextField());
+        inputFieldsPanel.add(kundennummer = new JTextField(currentCustomer.getId().toString()));
+        kundennummer.setEditable(false);
 
         inputFieldsPanel.add(new JLabel("Zählerart (Strom, Gas, Heizung, Wasser)"));
         inputFieldsPanel.add(pn_radio_buttons);
@@ -109,6 +111,9 @@ public class ReadingInputWindow extends JFrame {
         inputFieldsPanel.add(new JLabel("Kommentar"));
         inputFieldsPanel.add(kommentar = new JTextField());
 
+
+        saveButton.addActionListener(e -> save());
+
         // Passe die Größe des Fensters an
         setLocationRelativeTo(null);
         setSize(650, 300);
@@ -122,7 +127,7 @@ public class ReadingInputWindow extends JFrame {
         return new Ablesung(
                 getZaehlernummer(),
                 convertStringToDate(getDatum()),
-                new Kunde(),
+                currentCustomer,
                 getKommentar(),
                 getWurdeNeuEingebaut(),
                 Integer.parseInt(getZaehlerstand())
@@ -131,7 +136,10 @@ public class ReadingInputWindow extends JFrame {
 
 
     private void save() {
-        if (areInputFieldsInvalid()) return;
+        if (areInputFieldsInvalid()) {
+            displayAllOccurredValidationErrors();
+            return;
+        }
 
         Ablesung reading = getReadingOfInputFields();
 
@@ -168,6 +176,19 @@ public class ReadingInputWindow extends JFrame {
     private boolean isBlankOrEmpty(String input) {
         return input.isEmpty() || input.isBlank();
     }
+
+
+    void displayAllOccurredValidationErrors() {
+
+        String allErrorMessagesWithLineBreak = this.validationErrorMessages
+                .stream()
+                .map(fehlermeldung -> "\n" + fehlermeldung)
+                .collect(Collectors.joining());
+
+        MessageDialog.showErrorMessage(allErrorMessagesWithLineBreak);
+        this.validationErrorMessages.clear();
+    }
+
 
 
 
