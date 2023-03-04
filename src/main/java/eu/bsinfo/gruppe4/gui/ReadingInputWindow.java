@@ -1,5 +1,6 @@
 package eu.bsinfo.gruppe4.gui;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import eu.bsinfo.gruppe4.gui.service.ReadingService;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import eu.bsinfo.gruppe4.server.model.Kunde;
@@ -12,6 +13,7 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import java.util.zip.DataFormatException;
 
 import static eu.bsinfo.gruppe4.gui.PropertyManagementApplication.convertStringToDate;
 
@@ -21,7 +23,6 @@ public class ReadingInputWindow extends JFrame {
     private JRadioButton rb_gas;
     private JRadioButton rb_heizung;
     private JRadioButton rb_wasser;
-    //TODO: Make not editable
     private JTextField kundennummer;
     private JTextField zaehlernummer;
     private JTextField zaehlerstand;
@@ -34,13 +35,8 @@ public class ReadingInputWindow extends JFrame {
     private final JButton saveButton = new JButton("Speichern");
     private final JButton cancelButton = new JButton("Abbrechen");
     // TODO: Make this class abstract and it inherit from a new reading window and a edit reading window, which implement the save method
-    private boolean isEditingExistingReading = false;
-    private ReadingService readingService = new ReadingService();
+    private final ReadingService readingService = new ReadingService();
 
-
-    public ReadingInputWindow() {
-        assembleJFrameElements();
-    }
 
     public ReadingInputWindow(Kunde kunde) {
         currentCustomer = kunde;
@@ -83,7 +79,8 @@ public class ReadingInputWindow extends JFrame {
 
         // Gridlayout mit Label und Textfelder befüllen
         inputFieldsPanel.add(new JLabel("Kundennummer"));
-        inputFieldsPanel.add(kundennummer = new JTextField(currentCustomer.getId().toString()));
+        inputFieldsPanel.add(kundennummer = new JTextField());
+        setKundennummer(currentCustomer.getId().toString());
         kundennummer.setEditable(false);
 
         inputFieldsPanel.add(new JLabel("Zählerart (Strom, Gas, Heizung, Wasser)"));
@@ -122,9 +119,26 @@ public class ReadingInputWindow extends JFrame {
     }
 
 
-    public Ablesung getReadingOfInputFields() {
+
+    //FIXME: Will only be written to file if the window of PropertyManagementApplication class is closed
+
+    private void save() {
+        try {
+            Ablesung reading = getReadingOfInputFields();
+            readingService.createReading(reading);
+            MessageDialog.showSuccessMessage("Ablesung wurde erstellt");
+        }
+        catch (Exception e) {
+            MessageDialog.showWarningMessage(e.getMessage());
+        }
+    }
+    public Ablesung getReadingOfInputFields() throws DataFormatException {
+
+        if (areInputFieldsInvalid()) {
+            throw new DataFormatException(getValidationErrorsWithLineBreak());
+        }
+
         //FIXME: reading type is missing
-        //FIXME: replace with real customer object
         return new Ablesung(
                 getZaehlernummer(),
                 convertStringToDate(getDatum()),
@@ -135,26 +149,9 @@ public class ReadingInputWindow extends JFrame {
         );
     }
 
-
-    //FIXME: Will only be written to file if the window of PropertyManagementApplication class is closed
-    private void save() {
-        if (areInputFieldsInvalid()) {
-            displayAllOccurredValidationErrors();
-            return;
-        }
-
-        Ablesung reading = getReadingOfInputFields();
-
-        try {
-            readingService.createReading(reading);
-            MessageDialog.showSuccessMessage("Ablesung wurde erstellt");
-        }
-        catch (Exception e) {
-            MessageDialog.showWarningMessage(e.getMessage());
-        }
-    }
-
     private boolean areInputFieldsInvalid() {
+        this.validationErrorMessages.clear();
+
         checkIfInputFieldsAreEmpty();
         checkIfZaehlerstandIsNumber();
 
@@ -186,23 +183,16 @@ public class ReadingInputWindow extends JFrame {
     }
 
 
-    void displayAllOccurredValidationErrors() {
-
-        String allErrorMessagesWithLineBreak = this.validationErrorMessages
+    private String getValidationErrorsWithLineBreak() {
+        return this.validationErrorMessages
                 .stream()
                 .map(fehlermeldung -> "\n" + fehlermeldung)
                 .collect(Collectors.joining());
-
-        MessageDialog.showErrorMessage(allErrorMessagesWithLineBreak);
-        this.validationErrorMessages.clear();
     }
 
 
 
 
-    public String getKundennummer() {
-        return kundennummer.getText();
-    }
 
     public void setKundennummer(String kundennummer) {
         this.kundennummer.setText(kundennummer);
