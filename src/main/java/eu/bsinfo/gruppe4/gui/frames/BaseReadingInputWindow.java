@@ -1,8 +1,10 @@
-package eu.bsinfo.gruppe4.gui;
+package eu.bsinfo.gruppe4.gui.frames;
 
-import eu.bsinfo.gruppe4.gui.service.ReadingService;
+import eu.bsinfo.gruppe4.gui.DatePickerFormatter;
+import eu.bsinfo.gruppe4.gui.DatenWindow;
+import eu.bsinfo.gruppe4.gui.MessageDialog;
+import eu.bsinfo.gruppe4.gui.Zaehlerart;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
-import eu.bsinfo.gruppe4.server.model.Kunde;
 import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
 import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
 import net.sourceforge.jdatepicker.impl.UtilDateModel;
@@ -10,15 +12,9 @@ import net.sourceforge.jdatepicker.impl.UtilDateModel;
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
 
-import static eu.bsinfo.gruppe4.gui.PropertyManagementApplication.convertStringToDate;
-
-public class ReadingInputWindow extends JFrame {
+public abstract class BaseReadingInputWindow extends JFrame {
     private ButtonGroup zaehlerartenRadioButtons;
     private JRadioButton rb_strom;
     private JRadioButton rb_gas;
@@ -30,22 +26,16 @@ public class ReadingInputWindow extends JFrame {
     private JTextField kommentar;
     private JCheckBox wurdeNeuEingebaut;
     private UtilDateModel model;
-    private Kunde currentCustomer;
-    protected ArrayList<String> validationErrorMessages = new ArrayList<>();
 
     private final JButton saveButton = new JButton("Speichern");
     private final JButton cancelButton = new JButton("Abbrechen");
-    // TODO: Make this class abstract and it inherit from a new reading window and a edit reading window, which implement the save method
-    private final ReadingService readingService = new ReadingService();
 
 
-    public ReadingInputWindow(Kunde kunde) {
-        currentCustomer = kunde;
-        assembleJFrameElements();
+    public BaseReadingInputWindow() throws HeadlessException {
+        initializeComponents();
     }
 
-
-    private void assembleJFrameElements() {
+    private void initializeComponents() {
 
         final Container con = getContentPane();
         con.setLayout(new BorderLayout());
@@ -81,7 +71,6 @@ public class ReadingInputWindow extends JFrame {
         // Gridlayout mit Label und Textfelder befüllen
         inputFieldsPanel.add(new JLabel("Kundennummer"));
         inputFieldsPanel.add(kundennummer = new JTextField());
-        setKundennummer(currentCustomer.getId().toString());
         kundennummer.setEditable(false);
 
         inputFieldsPanel.add(new JLabel("Zählerart (Strom, Gas, Heizung, Wasser)"));
@@ -122,29 +111,19 @@ public class ReadingInputWindow extends JFrame {
 
 
     //FIXME: Will only be written to file if the window of PropertyManagementApplication class is closed
-
     private void save() {
         try {
             Ablesung reading = getReadingOfInputFields();
-            readingService.createReading(reading);
+            updateOrSaveReading(reading);
             MessageDialog.showSuccessMessage("Ablesung wurde erstellt");
         }
         catch (Exception e) {
             MessageDialog.showWarningMessage(e.getMessage());
         }
     }
-    private Ablesung getReadingOfInputFields() throws DataFormatException {
 
-        //FIXME: reading type is missing
-        return new Ablesung(
-                getZaehlernummer(),
-                getDatum(),
-                currentCustomer,
-                getKommentar(),
-                getWurdeNeuEingebaut(),
-                getZaehlerstand()
-        );
-    }
+    protected abstract Ablesung updateOrSaveReading(Ablesung reading);
+    protected abstract Ablesung getReadingOfInputFields() throws DataFormatException;
 
 
     public void setKundennummer(String kundennummer) {

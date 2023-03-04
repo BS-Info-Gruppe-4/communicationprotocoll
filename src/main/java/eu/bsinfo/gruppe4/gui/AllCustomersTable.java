@@ -1,18 +1,17 @@
 package eu.bsinfo.gruppe4.gui;
 
+import eu.bsinfo.gruppe4.gui.frames.NewReadingInputWindow;
 import eu.bsinfo.gruppe4.gui.persistence.EditCustomerDataWindow;
 import eu.bsinfo.gruppe4.gui.persistence.SessionStorage;
 import eu.bsinfo.gruppe4.gui.service.CustomerService;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.core.Response;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 
@@ -107,7 +106,7 @@ public class AllCustomersTable extends JFrame {
                 table.getValueAt(selectedRow, 2).toString(),
                 table.getValueAt(selectedRow, 1).toString());
 
-        new ReadingInputWindow(selectedCustomer);
+        new NewReadingInputWindow(selectedCustomer);
     }
 
 
