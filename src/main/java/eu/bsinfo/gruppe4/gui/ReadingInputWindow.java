@@ -169,7 +169,7 @@ public class ReadingInputWindow extends JFrame {
     }
 
     private void checkIfInputFieldsAreEmpty() {
-        JTextField[] textFields = {zaehlernummer, zaehlerstand, kommentar};
+        JTextField[] textFields = {zaehlernummer, zaehlerstand};
 
         for (JTextField textField : textFields) {
             String textFieldsContent = textField.getText();
