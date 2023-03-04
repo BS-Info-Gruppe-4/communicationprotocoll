@@ -66,10 +66,7 @@ public class AllCustomersTable extends JFrame {
 
         newCustomerButton.addActionListener(e -> new KundeErstellenDialog(this));
 
-        newReadingButton.addActionListener(e -> {
-            Kunde customer = getSelectedCustomer();
-            new ReadingInputWindow(customer);
-        });
+        newReadingButton.addActionListener(e -> openNewReadingsWindow());
 
         deleteButton.addActionListener(e -> attemptCustomerDeletion());
 
@@ -95,13 +92,24 @@ public class AllCustomersTable extends JFrame {
         setVisible(true);
     }
 
-    private Kunde getSelectedCustomer() {
+    private void openNewReadingsWindow() {
         int selectedRow = table.getSelectedRow();
+        String customerId = "";
+        if(selectedRow >= 0) {
+            customerId = table.getValueAt(selectedRow, 0).toString();
 
-        if (selectedRow == -1) throw new NoSuchElementException("Bitte wähle einen Kunden aus");
+        } else {
+            MessageDialog.showErrorMessage("kein Kunde ausgewählt");
+            return;
+        }
 
-        return sessionStorage.getKunden().get(selectedRow);
+        Kunde selectedCustomer = new Kunde(UUID.fromString(customerId),
+                table.getValueAt(selectedRow, 2).toString(),
+                table.getValueAt(selectedRow, 1).toString());
+
+        new ReadingInputWindow(selectedCustomer);
     }
+
 
     private void attemptCustomerDeletion() {
         int selectedRow = table.getSelectedRow();
