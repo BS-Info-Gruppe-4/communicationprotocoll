@@ -60,6 +60,13 @@ public class WebClient {
                 .put(Entity.entity(ablesung, MediaType.APPLICATION_JSON));
     }
 
+    public Response createReading(Ablesung reading) {
+        return webTarget.path(PATH_READINGS_ENDPOINTS)
+                .request(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .post(Entity.entity(reading, MediaType.APPLICATION_JSON));
+    }
+
     public ArrayList<Ablesung> getReadingsOfLast2Years() {
         Response response = webTarget.path(PATH_READINGS_LAST_TWO_YEARS)
                 .request(MediaType.APPLICATION_JSON)
@@ -78,5 +85,19 @@ public class WebClient {
                 .request()
                 .accept(MediaType.APPLICATION_JSON)
                 .delete();
+    }
+
+    public Kunde getCustomer(UUID id) {
+        String pfad = PATH_CUSTOMER_ENDPOINTS+"/"+id;
+//        return webTarget.path(pfad)
+//                .request()
+//                .accept(MediaType.APPLICATION_JSON)
+//                .get();
+        Response response = webTarget.path(pfad)
+                .request(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
+        System.out.println(response);
+        return response.readEntity(new GenericType<>() {});
     }
 }

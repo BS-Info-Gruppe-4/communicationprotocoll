@@ -22,7 +22,7 @@ public class MessageDialog {
         );
     }
 
-    static void showWarningMessage(String message) {
+    public static void showWarningMessage(String message) {
         JOptionPane.showMessageDialog(
                 null,
                 message,

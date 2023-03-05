@@ -1,26 +1,34 @@
 package eu.bsinfo.gruppe4.gui.service;
 
+import eu.bsinfo.gruppe4.gui.MessageDialog;
 import eu.bsinfo.gruppe4.gui.WebClient;
 import eu.bsinfo.gruppe4.gui.persistence.SessionStorage;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 
 public class ReadingService {
 
     private final WebClient webClient = new WebClient();
+    private final PlausibilityService plausibilityService = new PlausibilityService();
     private final SessionStorage sessionStorage = SessionStorage.getInstance();
 
-    public Ablesung createReading(Ablesung ablesung) {
-        Response response = webClient.createAblesung(ablesung);
 
-        if (response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode()) {
-            String errorMessage = response.readEntity(String.class);
-            throw new BadRequestException(errorMessage);
+    public Ablesung createReading(Ablesung reading) {
+
+        if (plausibilityService.isNotPlausible(reading)) {
+            MessageDialog.showWarningMessage("Der Wert des Zählerstands liegt außerhalb des Normbereichs!\n" +
+                    "Möglicherweise liegt ein Leck vor.");
         }
 
+        Response response = webClient.createReading(reading);
+
         if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+            String errorMessage = response.readEntity(String.class);
+            throw new NotFoundException(errorMessage);
+        }
+
+        if (response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode()) {
             String errorMessage = response.readEntity(String.class);
             throw new NotFoundException(errorMessage);
         }

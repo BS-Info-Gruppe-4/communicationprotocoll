@@ -160,7 +160,7 @@ public class DatenWindow extends JFrame {
         return input ? "Ja" : "Nein";
     }
 
-    static Zaehlerart stringToZaehlerartMapper(String input) {
+    public static Zaehlerart stringToZaehlerartMapper(String input) {
 
         Zaehlerart zaehlerart = Zaehlerart.STROM;
 
