@@ -53,7 +53,7 @@ public class WebClient {
                 .put(Entity.entity(kunde, MediaType.APPLICATION_JSON));
     }
 
-    public Response createAblesung(Ablesung ablesung) {
+    public Response updateAblesung(Ablesung ablesung) {
         return webTarget.path(PATH_READINGS_ENDPOINTS)
                 .request(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)

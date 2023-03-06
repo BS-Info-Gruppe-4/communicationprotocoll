@@ -114,15 +114,15 @@ public abstract class BaseReadingInputWindow extends JFrame {
     private void save() {
         try {
             Ablesung reading = getReadingOfInputFields();
-            updateOrSaveReading(reading);
-            MessageDialog.showSuccessMessage("Ablesung wurde erstellt");
+            saveReading(reading);
+            MessageDialog.showSuccessMessage("Ablesung wurde gespeichert");
         }
         catch (Exception e) {
             MessageDialog.showWarningMessage(e.getMessage());
         }
     }
 
-    protected abstract Ablesung updateOrSaveReading(Ablesung reading);
+    protected abstract Ablesung saveReading(Ablesung reading);
     protected abstract Ablesung getReadingOfInputFields() throws DataFormatException;
 
 

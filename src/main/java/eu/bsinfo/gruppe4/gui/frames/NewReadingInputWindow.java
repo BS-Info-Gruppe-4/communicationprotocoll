@@ -32,7 +32,7 @@ public class NewReadingInputWindow extends BaseReadingInputWindow {
     }
 
     @Override
-    protected Ablesung updateOrSaveReading(Ablesung reading) {
+    protected Ablesung saveReading(Ablesung reading) {
         return readingService.createReading(reading);
     }
 

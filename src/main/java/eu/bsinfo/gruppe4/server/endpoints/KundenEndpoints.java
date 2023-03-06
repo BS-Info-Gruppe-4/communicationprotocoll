@@ -123,6 +123,7 @@ public class KundenEndpoints {
         } catch(IllegalArgumentException e) {
             return Response.status(Response.Status.NOT_FOUND).entity("ID fehlerhaft").build();
         } catch (JsonProcessingException e) {
+            //TODO: Return as response
             throw new RuntimeException(e);
         }
 
