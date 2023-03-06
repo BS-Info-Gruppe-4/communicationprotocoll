@@ -98,4 +98,12 @@ public class WebClient {
         System.out.println(response);
         return response.readEntity(new GenericType<>() {});
     }
+
+    public Response deleteReadingById(UUID id) {
+        String pfad = PATH_READINGS_ENDPOINTS + "/" + id;
+        return webTarget.path(pfad)
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .delete();
+    }
 }

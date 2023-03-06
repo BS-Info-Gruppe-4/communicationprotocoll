@@ -67,4 +67,21 @@ public class ReadingService {
         sessionStorage.syncWithBackend();
         return response.readEntity(String.class);
     }
+
+    public Ablesung deleteReading(Ablesung reading) {
+
+        Response response = webClient.deleteReadingById(reading.getId());
+
+        if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+            String errorMessage = response.readEntity(String.class);
+            throw new NotFoundException(errorMessage);
+        }
+
+        if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+            throw new UnknownError("Es ist ein unbekannter Fehler aufgetreten");
+        }
+
+        sessionStorage.syncWithBackend();
+        return response.readEntity(Ablesung.class);
+    }
 }
