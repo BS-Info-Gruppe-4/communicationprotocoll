@@ -54,7 +54,7 @@ public class WebClient {
 
     public Response updateAblesung(Ablesung ablesung) {
         return webTarget.path(PATH_READINGS_ENDPOINTS)
-                .request(MediaType.APPLICATION_JSON)
+                .request(MediaType.TEXT_PLAIN)
                 .put(Entity.entity(ablesung, MediaType.APPLICATION_JSON));
     }
 

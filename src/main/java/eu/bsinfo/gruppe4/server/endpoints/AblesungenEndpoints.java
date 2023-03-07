@@ -97,7 +97,7 @@ public class AblesungenEndpoints {
         if (queriedReading.isEmpty()) {
             return Response
                     .status(Response.Status.NOT_FOUND)
-                    .entity("Die Ablesung existiert nicht!")
+                    .entity("Die übergebene Ablesung existiert nicht!")
                     .build();
         }
 
