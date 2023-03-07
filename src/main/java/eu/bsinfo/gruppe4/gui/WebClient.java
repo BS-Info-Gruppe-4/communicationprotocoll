@@ -81,6 +81,6 @@ public class WebClient {
                 .accept(MediaType.APPLICATION_JSON)
                 .get();
         System.out.println(response);
-        return response.readEntity(new GenericType<>() {});
+        return response.readEntity(Kunde.class);
     }
 }
