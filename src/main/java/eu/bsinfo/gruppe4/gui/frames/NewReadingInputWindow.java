@@ -32,8 +32,8 @@ public class NewReadingInputWindow extends BaseReadingInputWindow {
     }
 
     @Override
-    protected Ablesung saveReading(Ablesung reading) {
-        return readingService.createReading(reading);
+    protected void saveReading(Ablesung reading) {
+        readingService.createReading(reading);
     }
 
 }

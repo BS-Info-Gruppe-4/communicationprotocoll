@@ -17,16 +17,23 @@ public class ReadingService {
     private final SessionStorage sessionStorage = SessionStorage.getInstance();
 
 
-    public Ablesung createReading(Ablesung reading) {
+    public void createReading(Ablesung newReading) {
 
-        if (plausibilityService.isNotPlausible(reading)) {
+        if (plausibilityService.isNotPlausible(newReading)) {
             MessageDialog.showWarningMessage("Der Wert des Zählerstands liegt außerhalb des Normbereichs!\n" +
                     "Möglicherweise liegt ein Leck vor.");
         }
 
-        removePossibleDuplicate(reading);
+        // Checking for duplicate
+        Optional<Ablesung> ablesungDuplicate = getDuplicateOf(newReading);
 
-        Response response = webClient.createReading(reading);
+        if (ablesungDuplicate.isPresent()) {
+            if (doesUserWantToKeepOldReading()) return;
+
+            removeDuplicate(ablesungDuplicate.get());
+        }
+
+        Response response = webClient.createReading(newReading);
 
         if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
             String errorMessage = response.readEntity(String.class);
@@ -43,7 +50,7 @@ public class ReadingService {
         }
 
         sessionStorage.syncWithBackend();
-        return response.readEntity(Ablesung.class);
+        MessageDialog.showSuccessMessage("Ablesung wurde gespeichert");
     }
 
     public String updateReading(Ablesung reading) {
@@ -92,30 +99,21 @@ public class ReadingService {
 
 
 
-    private void removePossibleDuplicate(Ablesung newReading) {
-        Optional<Ablesung> ablesungDuplicate = getDuplicateOf(newReading);
-
-        if (ablesungDuplicate.isEmpty()) return;
-        if (doesUserWantToKeepTheOriginal()) return;
-
-        removeDuplicate(ablesungDuplicate.get());
-    }
-
     private Optional<Ablesung> getDuplicateOf(Ablesung readingToCheck) {
         return sessionStorage.getAblesungen().stream()
                 .filter(ablesung -> ablesung.equals(readingToCheck))
                 .findFirst();
     }
 
-    private boolean doesUserWantToKeepTheOriginal() {
+    private boolean doesUserWantToKeepOldReading() {
         int reply = JOptionPane.showConfirmDialog(
                 null,
                 "Ein Datensatz mit den selben Werten ist bereits vorhanden. \n" +
-                        "Möchtest du ihn überschreiben?",
+                        "Möchtest du ihn ersetzen? Ansonsten wird der neue Datensatz nicht gespeichert",
                 "Duplikat erkannt",
                 JOptionPane.YES_NO_OPTION);
 
-        return reply != JOptionPane.YES_OPTION;
+        return reply == JOptionPane.NO_OPTION;
     }
 
     private void removeDuplicate(Ablesung oldReading) {
