@@ -49,9 +49,20 @@ public class WebClient {
     public Response updateCustomer(Kunde kunde) {
          return webTarget.path(PATH_CUSTOMER_ENDPOINTS)
                 .request(MediaType.TEXT_PLAIN)
-                .accept(MediaType.APPLICATION_JSON)
                 .put(Entity.entity(kunde, MediaType.APPLICATION_JSON));
+    }
 
+    public Response updateAblesung(Ablesung ablesung) {
+        return webTarget.path(PATH_READINGS_ENDPOINTS)
+                .request(MediaType.APPLICATION_JSON)
+                .put(Entity.entity(ablesung, MediaType.APPLICATION_JSON));
+    }
+
+    public Response createReading(Ablesung reading) {
+        return webTarget.path(PATH_READINGS_ENDPOINTS)
+                .request(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .post(Entity.entity(reading, MediaType.APPLICATION_JSON));
     }
 
     public ArrayList<Ablesung> getReadingsOfLast2Years() {
@@ -82,5 +93,13 @@ public class WebClient {
                 .get();
         System.out.println(response);
         return response.readEntity(Kunde.class);
+    }
+
+    public Response deleteReadingById(UUID id) {
+        String pfad = PATH_READINGS_ENDPOINTS + "/" + id;
+        return webTarget.path(pfad)
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .delete();
     }
 }

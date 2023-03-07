@@ -1,11 +1,11 @@
 package eu.bsinfo.gruppe4.gui;
 
+import eu.bsinfo.gruppe4.gui.frames.NewReadingInputWindow;
 import eu.bsinfo.gruppe4.gui.persistence.EditCustomerDataWindow;
 import eu.bsinfo.gruppe4.gui.persistence.SessionStorage;
 import eu.bsinfo.gruppe4.gui.service.CustomerService;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.core.Response;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -25,6 +25,7 @@ public class AllCustomersTable extends JFrame {
     private final JButton editButton = new JButton("Bearbeiten");
     private final JButton deleteButton = new JButton("Löschen");
     private final JButton newCustomerButton = new JButton("Neuer Kunde");
+    private final JButton newReadingButton = new JButton("Neue Ablesung");
     DefaultTableModel model = new DefaultTableModel();
 
     public AllCustomersTable() {
@@ -33,8 +34,9 @@ public class AllCustomersTable extends JFrame {
         // Erzeuge die Tabelle
         table = new JTable();
 
-        final JPanel buttonPanel = new JPanel(new GridLayout(1, 3));
+        final JPanel buttonPanel = new JPanel(new GridLayout(1, 4));
         buttonPanel.add(newCustomerButton);
+        buttonPanel.add(newReadingButton);
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
 
@@ -63,6 +65,8 @@ public class AllCustomersTable extends JFrame {
 
         newCustomerButton.addActionListener(e -> new KundeErstellenDialog(this));
 
+        newReadingButton.addActionListener(e -> openNewReadingsWindow());
+
         deleteButton.addActionListener(e -> attemptCustomerDeletion());
 
         editButton.addActionListener(e -> {
@@ -86,6 +90,25 @@ public class AllCustomersTable extends JFrame {
         setSize(500, 300);
         setVisible(true);
     }
+
+    private void openNewReadingsWindow() {
+        int selectedRow = table.getSelectedRow();
+        String customerId = "";
+        if(selectedRow >= 0) {
+            customerId = table.getValueAt(selectedRow, 0).toString();
+
+        } else {
+            MessageDialog.showErrorMessage("kein Kunde ausgewählt");
+            return;
+        }
+
+        Kunde selectedCustomer = new Kunde(UUID.fromString(customerId),
+                table.getValueAt(selectedRow, 2).toString(),
+                table.getValueAt(selectedRow, 1).toString());
+
+        new NewReadingInputWindow(selectedCustomer);
+    }
+
 
     private void attemptCustomerDeletion() {
         int selectedRow = table.getSelectedRow();
