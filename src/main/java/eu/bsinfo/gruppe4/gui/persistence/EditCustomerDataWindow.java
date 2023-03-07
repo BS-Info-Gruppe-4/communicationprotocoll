@@ -13,12 +13,12 @@ public class EditCustomerDataWindow extends JFrame {
 
     private final JTextField tf_name;
     private final JTextField tf_surname;
-    private final JButton btn_ok;
+    private final JButton btn_saveChanges;
     private final JButton btn_abbrechen;
-    private Kunde kunde;
+    private Kunde customerEdited;
 
-    public EditCustomerDataWindow(Kunde customer, AllCustomersTable act) {
-        super("Kundendaten ändern für UUID: " + customer.getId());
+    public EditCustomerDataWindow(Kunde customerToEdit, AllCustomersTable act) {
+        super("Kundendaten ändern für UUID: " + customerToEdit.getId());
 
         final Container con = getContentPane();
         con.setLayout(new BorderLayout());
@@ -30,14 +30,14 @@ public class EditCustomerDataWindow extends JFrame {
         con.add(pn_buttons, BorderLayout.SOUTH);
 
         pn_eingabemaske.add(new JLabel("Vorname"));
-        pn_eingabemaske.add(tf_name = new JTextField(customer.getVorname()));
+        pn_eingabemaske.add(tf_name = new JTextField(customerToEdit.getVorname()));
         pn_eingabemaske.add(new JLabel("Nachname"));
-        pn_eingabemaske.add(tf_surname = new JTextField(customer.getName()));
+        pn_eingabemaske.add(tf_surname = new JTextField(customerToEdit.getName()));
 
         pn_buttons.add(btn_abbrechen = new JButton("Abbrechen"));
-        pn_buttons.add(btn_ok = new JButton("Änderungen speichern"));
+        pn_buttons.add(btn_saveChanges = new JButton("Änderungen speichern"));
 
-        btn_ok.addActionListener(e -> {
+        btn_saveChanges.addActionListener(e -> {
             String name = tf_name.getText();
             String surname = tf_surname.getText();
 
@@ -45,22 +45,24 @@ public class EditCustomerDataWindow extends JFrame {
                 MessageDialog.showErrorMessage("Eingabefeld darf nicht leer sein!");
                 return;
             }
-            if (!eingabevalidierung(customer.getName(), customer.getVorname(), surname, name)) {
+            if (!eingabevalidierung(customerToEdit.getName(), customerToEdit.getVorname(), surname, name)) {
                 MessageDialog.showErrorMessage("Es wurden keine Änderungen vorgenommen!");
                 return;
             }
 
-            kunde = new Kunde(customer.getId(), surname, name);
+            customerEdited = new Kunde(customerToEdit.getId(), surname, name);
             WebClient webClient = new WebClient();
 
-            Kunde vergleichsKunde = webClient.getCustomer(kunde.getId());
-            System.out.println(vergleichsKunde.toString());
+            Kunde customerToCompare = webClient.getCustomer(customerToEdit.getId());
+            System.out.println(customerToCompare.toString());
 
-            if (!customer.equals(vergleichsKunde)) {
-                MessageDialog.showErrorMessage("Daten stimmen nicht mit Serverdaten überein!");
+            if (!customerToEdit.equals(customerToCompare)) {
+                MessageDialog.showErrorMessage("Daten stimmen nicht mit Serverdaten überein!\n" +
+                        "Auf dem Server speichert: "+customerToCompare.getVorname()+" "+customerToCompare.getName() +
+                        "\nGerade eingegeben: "+ customerToEdit.getVorname() + " "+customerToEdit.getName());
             }
 
-            Response r = webClient.updateCustomer(kunde);
+            Response r = webClient.updateCustomer(customerEdited);
             System.out.println(r);
             String message = "Kunde konnte nicht geändert werden\n\n";
             if (r.getStatus() == 200) {
