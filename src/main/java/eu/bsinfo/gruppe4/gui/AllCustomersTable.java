@@ -32,11 +32,12 @@ public class AllCustomersTable extends JFrame {
     private final JTable table_readings;
     private final TableRowSorter<DefaultTableModel> sorter;
     private final TableRowSorter<DefaultTableModel> sorter_readings;
-    private final JButton editButton = new JButton("Bearbeiten");
+    private final JButton editCustomerButton = new JButton("Kunde bearbeiten");
     private final JButton deleteButton = new JButton("Löschen");
     private final JButton newCustomerButton = new JButton("Neuer Kunde");
     private final JButton newReadingButton = new JButton("Neue Ablesung");
     private final JButton showReadingsSelectedCustomer = new JButton("zeige Ablesungen");
+    private final JButton editReadingButton = new JButton("Ablesung bearbeiten");
     DefaultTableModel model = new DefaultTableModel();
     DefaultTableModel model_readings = new DefaultTableModel();
     private JMenu menu_file, menu_about, menu_settings, submenu_themes;
@@ -170,12 +171,13 @@ public class AllCustomersTable extends JFrame {
         table = new JTable();
         table_readings = new JTable();
 
-        final JPanel buttonPanel = new JPanel(new GridLayout(1, 5));
+        final JPanel buttonPanel = new JPanel(new GridLayout(1, 6));
         buttonPanel.add(newCustomerButton);
         buttonPanel.add(newReadingButton);
-        buttonPanel.add(editButton);
+        buttonPanel.add(editCustomerButton);
         buttonPanel.add(deleteButton);
         buttonPanel.add(showReadingsSelectedCustomer);
+        buttonPanel.add(editReadingButton);
 
         final JPanel tablePanel = new JPanel(new GridLayout(1, 2));
         add(tablePanel, BorderLayout.CENTER);
@@ -217,7 +219,7 @@ public class AllCustomersTable extends JFrame {
 
         deleteButton.addActionListener(e -> attemptCustomerDeletion());
 
-        editButton.addActionListener(e -> {
+        editCustomerButton.addActionListener(e -> {
             int selectedRow = table.getSelectedRow();
             String customerId = "";
             if(selectedRow >= 0) {
