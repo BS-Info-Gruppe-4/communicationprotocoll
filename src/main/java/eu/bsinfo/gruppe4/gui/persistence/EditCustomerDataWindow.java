@@ -8,18 +8,17 @@ import jakarta.ws.rs.core.Response;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.UUID;
 
 public class EditCustomerDataWindow extends JFrame {
 
     private final JTextField tf_name;
     private final JTextField tf_surname;
-    private final JButton btn_ok;
+    private final JButton btn_saveChanges;
     private final JButton btn_abbrechen;
-    private Kunde kunde;
+    private Kunde customerEdited;
 
-    public EditCustomerDataWindow(UUID uuid, String selected_name, String selected_surname, AllCustomersTable act) {
-        super("Kundendaten ändern für UUID: " + uuid);
+    public EditCustomerDataWindow(Kunde customerToEdit, AllCustomersTable act) {
+        super("Kundendaten ändern für UUID: " + customerToEdit.getId());
 
         final Container con = getContentPane();
         con.setLayout(new BorderLayout());
@@ -31,30 +30,39 @@ public class EditCustomerDataWindow extends JFrame {
         con.add(pn_buttons, BorderLayout.SOUTH);
 
         pn_eingabemaske.add(new JLabel("Vorname"));
-        pn_eingabemaske.add(tf_name = new JTextField(selected_name));
+        pn_eingabemaske.add(tf_name = new JTextField(customerToEdit.getVorname()));
         pn_eingabemaske.add(new JLabel("Nachname"));
-        pn_eingabemaske.add(tf_surname = new JTextField(selected_surname));
+        pn_eingabemaske.add(tf_surname = new JTextField(customerToEdit.getName()));
 
         pn_buttons.add(btn_abbrechen = new JButton("Abbrechen"));
-        pn_buttons.add(btn_ok = new JButton("Änderungen speichern"));
+        pn_buttons.add(btn_saveChanges = new JButton("Änderungen speichern"));
 
-        btn_ok.addActionListener(e -> {
+        btn_saveChanges.addActionListener(e -> {
             String name = tf_name.getText();
             String surname = tf_surname.getText();
 
-            if (isEmpty(surname, name) == true) {
+            if (isEmpty(surname, name)) {
                 MessageDialog.showErrorMessage("Eingabefeld darf nicht leer sein!");
                 return;
             }
-            if (eingabevalidierung(selected_surname, selected_name, surname, name) == false) {
+            if (!eingabevalidierung(customerToEdit.getName(), customerToEdit.getVorname(), surname, name)) {
                 MessageDialog.showErrorMessage("Es wurden keine Änderungen vorgenommen!");
                 return;
             }
 
-            kunde = new Kunde(uuid, surname, name);
+            customerEdited = new Kunde(customerToEdit.getId(), surname, name);
             WebClient webClient = new WebClient();
 
-            Response r = webClient.updateCustomer(kunde);
+            Kunde customerToCompare = webClient.getCustomer(customerToEdit.getId());
+            System.out.println(customerToCompare.toString());
+
+            if (!customerToEdit.equals(customerToCompare)) {
+                MessageDialog.showErrorMessage("Daten stimmen nicht mit Serverdaten überein!\n" +
+                        "Auf dem Server speichert: "+customerToCompare.getVorname()+" "+customerToCompare.getName() +
+                        "\nGerade eingegeben: "+ customerToEdit.getVorname() + " "+customerToEdit.getName());
+            }
+
+            Response r = webClient.updateCustomer(customerEdited);
             System.out.println(r);
             String message = "Kunde konnte nicht geändert werden\n\n";
             if (r.getStatus() == 200) {
@@ -73,27 +81,18 @@ public class EditCustomerDataWindow extends JFrame {
     }
 
     public boolean eingabevalidierung(String origin_surname, String origin_name, String new_surname, String new_name) {
-        boolean edited;
-        if (new_surname.equals(origin_surname)) {
-            edited = false;
-        } else {
-            edited = true;
-        }
-        if (new_name.equals(origin_name)) {
-            edited = false;
-        } else {
-            edited = true;
-        }
+        String surname = new_surname.trim();
+        String name = new_name.trim();
+        boolean edited, edited_surname, edited_name;
+        edited_surname = !surname.equals(origin_surname);
+        edited_name = !name.equals(origin_name);
+        edited = edited_name || edited_surname;
         return edited;
     }
 
     public boolean isEmpty(String surname, String name) {
         boolean isEmpty;
-        if (surname.equals("") || name.equals("")) {
-            isEmpty = true;
-        } else {
-            isEmpty = false;
-        }
+        isEmpty = surname.equals("") || name.equals("");
         return isEmpty;
     }
 }
