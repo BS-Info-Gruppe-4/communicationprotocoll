@@ -7,6 +7,9 @@ import eu.bsinfo.gruppe4.server.model.Ablesung;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 
+import javax.swing.*;
+import java.util.Optional;
+
 public class ReadingService {
 
     private final WebClient webClient = new WebClient();
@@ -20,6 +23,8 @@ public class ReadingService {
             MessageDialog.showWarningMessage("Der Wert des Zählerstands liegt außerhalb des Normbereichs!\n" +
                     "Möglicherweise liegt ein Leck vor.");
         }
+
+        removePossibleDuplicate(reading);
 
         Response response = webClient.createReading(reading);
 
@@ -83,5 +88,37 @@ public class ReadingService {
 
         sessionStorage.syncWithBackend();
         return response.readEntity(Ablesung.class);
+    }
+
+
+
+    private void removePossibleDuplicate(Ablesung newReading) {
+        Optional<Ablesung> ablesungDuplicate = getDuplicateOf(newReading);
+
+        if (ablesungDuplicate.isEmpty()) return;
+        if (doesUserWantToKeepTheOriginal()) return;
+
+        removeDuplicate(ablesungDuplicate.get());
+    }
+
+    private Optional<Ablesung> getDuplicateOf(Ablesung readingToCheck) {
+        return sessionStorage.getAblesungen().stream()
+                .filter(ablesung -> ablesung.equals(readingToCheck))
+                .findFirst();
+    }
+
+    private boolean doesUserWantToKeepTheOriginal() {
+        int reply = JOptionPane.showConfirmDialog(
+                null,
+                "Ein Datensatz mit den selben Werten ist bereits vorhanden. \n" +
+                        "Möchtest du ihn überschreiben?",
+                "Duplikat erkannt",
+                JOptionPane.YES_NO_OPTION);
+
+        return reply != JOptionPane.YES_OPTION;
+    }
+
+    private void removeDuplicate(Ablesung oldReading) {
+        deleteReading(oldReading);
     }
 }
