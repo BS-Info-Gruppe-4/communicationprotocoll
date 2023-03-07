@@ -33,8 +33,7 @@ public class Ablesung {
         this.zaehlerstand = zaehlerstand;
     }
 
-    @Override
-    public boolean equals(Object o) {
+    public boolean isEqualsWithoutCheckingId(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 

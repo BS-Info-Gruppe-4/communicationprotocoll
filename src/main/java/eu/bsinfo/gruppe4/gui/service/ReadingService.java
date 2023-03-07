@@ -101,7 +101,7 @@ public class ReadingService {
 
     private Optional<Ablesung> getDuplicateOf(Ablesung readingToCheck) {
         return sessionStorage.getAblesungen().stream()
-                .filter(ablesung -> ablesung.equals(readingToCheck))
+                .filter(ablesung -> ablesung.isEqualsWithoutCheckingId(readingToCheck))
                 .findFirst();
     }
 
