@@ -1,10 +1,9 @@
 package eu.bsinfo.gruppe4.gui.frames;
 
 import eu.bsinfo.gruppe4.gui.DatePickerFormatter;
-import eu.bsinfo.gruppe4.gui.DatenWindow;
 import eu.bsinfo.gruppe4.gui.MessageDialog;
-import eu.bsinfo.gruppe4.gui.Zaehlerart;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
+import eu.bsinfo.gruppe4.server.model.Kunde;
 import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
 import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
 import net.sourceforge.jdatepicker.impl.UtilDateModel;
@@ -30,8 +29,11 @@ public abstract class BaseReadingInputWindow extends JFrame {
     private final JButton saveButton = new JButton("Speichern");
     private final JButton cancelButton = new JButton("Abbrechen");
 
+    private final Kunde customerOfReading;
 
-    public BaseReadingInputWindow() throws HeadlessException {
+
+    public BaseReadingInputWindow(Kunde customerOfReading) throws HeadlessException {
+        this.customerOfReading = customerOfReading;
         initializeComponents();
     }
 
@@ -71,6 +73,7 @@ public abstract class BaseReadingInputWindow extends JFrame {
         // Gridlayout mit Label und Textfelder befüllen
         inputFieldsPanel.add(new JLabel("Kundennummer"));
         inputFieldsPanel.add(kundennummer = new JTextField());
+        setKundennummer(customerOfReading.getId().toString());
         kundennummer.setEditable(false);
 
         inputFieldsPanel.add(new JLabel("Zählerart (Strom, Gas, Heizung, Wasser)"));
@@ -122,27 +125,21 @@ public abstract class BaseReadingInputWindow extends JFrame {
     }
 
     protected abstract void saveReading(Ablesung reading);
-    protected abstract Ablesung getReadingOfInputFields() throws DataFormatException;
+
+    private Ablesung getReadingOfInputFields() throws DataFormatException {
+        return new Ablesung(
+                getZaehlernummer(),
+                getDatum(),
+                customerOfReading,
+                getKommentar(),
+                getWurdeNeuEingebaut(),
+                getZaehlerstand()
+        );
+    }
 
 
     public void setKundennummer(String kundennummer) {
         this.kundennummer.setText(kundennummer);
-    }
-
-    public Zaehlerart getZaehlerart() {
-
-        String ausgewaehlteZaehlerart = zaehlerartenRadioButtons.getSelection().getActionCommand();
-
-        return DatenWindow.stringToZaehlerartMapper(ausgewaehlteZaehlerart);
-    }
-
-    public void setZaehlerart(String zaehlerart) {
-        switch (zaehlerart) {
-            case "Strom" -> rb_strom.setSelected(true);
-            case "Gas" -> rb_gas.setSelected(true);
-            case "Heizung" -> rb_heizung.setSelected(true);
-            case "Wasser" -> rb_wasser.setSelected(true);
-        }
     }
 
     public String getZaehlernummer() throws DataFormatException {
