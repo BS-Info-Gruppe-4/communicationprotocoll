@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.UUID;
 
 @Data
@@ -31,4 +32,20 @@ public class Ablesung {
         this.neuEingebaut = neuEingebaut;
         this.zaehlerstand = zaehlerstand;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Ablesung ablesung = (Ablesung) o;
+
+        if (neuEingebaut != ablesung.neuEingebaut) return false;
+        if (zaehlerstand != ablesung.zaehlerstand) return false;
+        if (!zaehlernummer.equals(ablesung.zaehlernummer)) return false;
+        if (!datum.equals(ablesung.datum)) return false;
+        if (!Objects.equals(kunde, ablesung.kunde)) return false;
+        return Objects.equals(kommentar, ablesung.kommentar);
+    }
+
 }
