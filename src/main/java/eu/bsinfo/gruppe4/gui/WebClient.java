@@ -96,14 +96,13 @@ public class WebClient {
                 .delete();
     }
 
-    public Kunde getCustomer(UUID id) {
+    public Response getCustomer(UUID id) {
         String pfad = PATH_CUSTOMER_ENDPOINTS+"/"+id;
-        Response response = webTarget.path(pfad)
+
+        return webTarget.path(pfad)
                 .request(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .get();
-        System.out.println(response);
-        return response.readEntity(Kunde.class);
     }
 
     public Response deleteReadingById(UUID id) {

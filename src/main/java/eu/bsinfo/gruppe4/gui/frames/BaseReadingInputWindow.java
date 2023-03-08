@@ -73,7 +73,9 @@ public abstract class BaseReadingInputWindow extends JFrame {
         // Gridlayout mit Label und Textfelder befüllen
         inputFieldsPanel.add(new JLabel("Kundennummer"));
         inputFieldsPanel.add(kundennummer = new JTextField());
-        setKundennummer(customerOfReading.getId().toString());
+
+        String customerIdAsString = customerOfReading != null ? customerOfReading.getId().toString() : "Gelöschter Kunde";
+        setKundennummer(customerIdAsString);
         kundennummer.setEditable(false);
 
         inputFieldsPanel.add(new JLabel("Zählerart (Strom, Gas, Heizung, Wasser)"));
