@@ -50,8 +50,14 @@ public class WebClient {
     public Response updateCustomer(Kunde kunde) {
          return webTarget.path(PATH_CUSTOMER_ENDPOINTS)
                 .request(MediaType.TEXT_PLAIN)
-                .accept(MediaType.APPLICATION_JSON)
                 .put(Entity.entity(kunde, MediaType.APPLICATION_JSON));
+    }
+    }
+
+    public Response updateAblesung(Ablesung ablesung) {
+        return webTarget.path(PATH_READINGS_ENDPOINTS)
+                .request(MediaType.APPLICATION_JSON)
+                .put(Entity.entity(ablesung, MediaType.APPLICATION_JSON));
     }
 
     public Response createAblesung(Ablesung ablesung) {
@@ -59,6 +65,21 @@ public class WebClient {
                 .request(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .put(Entity.entity(ablesung, MediaType.APPLICATION_JSON));
+    public Response createReading(Ablesung reading) {
+        return webTarget.path(PATH_READINGS_ENDPOINTS)
+                .request(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .post(Entity.entity(reading, MediaType.APPLICATION_JSON));
+    }
+
+    public Response getReadingsWithRestrictions(UUID customerId, LocalDate startingDate, LocalDate endingDate) {
+        return  webTarget.path(PATH_READINGS_ENDPOINTS)
+                .queryParam("kunde", customerId)
+                .queryParam("beginn", startingDate)
+                .queryParam("ende", endingDate)
+                .request(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
     }
 
     public ArrayList<Ablesung> getReadingsOfLast2Years() {
@@ -85,6 +106,24 @@ public class WebClient {
 
     public Response deleteCustomer(UUID id) {
         String pfad = PATH_CUSTOMER_ENDPOINTS+"/"+id;
+        return webTarget.path(pfad)
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .delete();
+    }
+
+    public Kunde getCustomer(UUID id) {
+        String pfad = PATH_CUSTOMER_ENDPOINTS+"/"+id;
+        Response response = webTarget.path(pfad)
+                .request(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
+        System.out.println(response);
+        return response.readEntity(Kunde.class);
+    }
+
+    public Response deleteReadingById(UUID id) {
+        String pfad = PATH_READINGS_ENDPOINTS + "/" + id;
         return webTarget.path(pfad)
                 .request()
                 .accept(MediaType.APPLICATION_JSON)

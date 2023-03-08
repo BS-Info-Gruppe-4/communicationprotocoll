@@ -22,4 +22,8 @@ public class Kunde {
         this.name = name;
         this.vorname = vorname;
     }
+
+    public String toString() {
+        return "UUID: "+this.id+ "Name: "+this.vorname+ " "+this.name;
+    }
 }

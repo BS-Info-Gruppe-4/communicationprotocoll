@@ -113,7 +113,7 @@ public class AblesungenEndpoints {
     @DELETE
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAblesung(@PathParam(("id")) String readingID){
+    public Response deleteReading(@PathParam(("id")) String readingID){
         try{
             UUID ReadingUUID = UUID.fromString(readingID);
             Optional<Ablesung> dReading=jsonRepository.getAblesung(ReadingUUID);
