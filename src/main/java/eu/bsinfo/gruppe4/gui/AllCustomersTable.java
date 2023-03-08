@@ -218,7 +218,7 @@ public class AllCustomersTable extends JFrame {
 
         // Erzeuge die Tabellen-Header
         Object[] columns = {"ID", "Vorname", "Nachname"};
-        Object[] columns_readings = {"Kundennummer", "Datum", "Zählernummer", "Zählerstand", "Kommentar", "Ablesung-ID"};
+        Object[] columns_readings = {"Kundennummer", "Datum", "Zählernummer", "Zählerstand", "Neu eingebaut?","Kommentar", "Ablesung-ID"};
 
         model.setColumnIdentifiers(columns);
         table_customers.setModel(model);
@@ -290,7 +290,7 @@ public class AllCustomersTable extends JFrame {
         editReadingButton.addActionListener(e -> openEditReadingsWindow());
 
         // Passe die Größe des Fensters an
-        setSize(1600, 800);
+        setSize(1500, 600);
         setVisible(true);
     }
 
@@ -312,14 +312,15 @@ public class AllCustomersTable extends JFrame {
         String dateAsString = table_readings.getValueAt(selectedReadingsRow, 1).toString();
         String customerId =  table_readings.getValueAt(selectedReadingsRow, 0).toString();
 
-        UUID readingId = UUID.fromString(table_readings.getValueAt(selectedReadingsRow, 5).toString());
+        UUID readingId = UUID.fromString(table_readings.getValueAt(selectedReadingsRow, 6).toString());
         Kunde customerOfReading = customerId.equals("null") ? null : customerService.getCustomerById(UUID.fromString(customerId));
         String zaehlernummer = table_readings.getValueAt(selectedReadingsRow, 2).toString();
         LocalDate date = convertStringToDate(dateAsString);
         int zaehlerstand = Integer.parseInt(table_readings.getValueAt(selectedReadingsRow,3).toString());
-        String kommentar = table_readings.getValueAt(selectedReadingsRow,4).toString();
+        boolean wurdeNeuEingebaut = (boolean) table_readings.getValueAt(selectedReadingsRow,4);
+        String kommentar = table_readings.getValueAt(selectedReadingsRow,5).toString();
 
-        return new Ablesung(readingId, zaehlernummer, date, customerOfReading, kommentar, true, zaehlerstand);
+        return new Ablesung(readingId, zaehlernummer, date, customerOfReading, kommentar, wurdeNeuEingebaut, zaehlerstand);
     }
 
     private void openNewReadingsWindow() {
@@ -387,7 +388,7 @@ public class AllCustomersTable extends JFrame {
         for (Ablesung reading : readings) {
             String customerIdAsString = reading.getKunde() == null ? "null" : reading.getKunde().getId().toString();
 
-            Object[] row = {customerIdAsString, reading.getDatum(), reading.getZaehlernummer(), reading.getZaehlerstand(), reading.getKommentar(), reading.getId()};
+            Object[] row = {customerIdAsString, reading.getDatum(), reading.getZaehlernummer(), reading.getZaehlerstand(), reading.isNeuEingebaut(),reading.getKommentar(), reading.getId()};
             model_readings.addRow(row);
         }
 
@@ -434,7 +435,7 @@ public class AllCustomersTable extends JFrame {
         for (Ablesung reading : readings) {
             String customerIdAsString = reading.getKunde() == null ? "null" : reading.getKunde().getId().toString();
 
-            Object[] row = {customerIdAsString, reading.getDatum(), reading.getZaehlernummer(), reading.getZaehlerstand(), reading.getKommentar(), reading.getId()};
+            Object[] row = {customerIdAsString, reading.getDatum(), reading.getZaehlernummer(), reading.getZaehlerstand(), reading.isNeuEingebaut(),reading.getKommentar(), reading.getId()};
             model_readings.addRow(row);
         }
 
