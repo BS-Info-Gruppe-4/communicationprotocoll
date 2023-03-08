@@ -11,6 +11,7 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 import java.util.ArrayList;
@@ -63,6 +64,16 @@ public class WebClient {
                 .request(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .post(Entity.entity(reading, MediaType.APPLICATION_JSON));
+    }
+
+    public Response getReadingsWithRestrictions(UUID customerId, LocalDate startingDate, LocalDate endingDate) {
+        return  webTarget.path(PATH_READINGS_ENDPOINTS)
+                .queryParam("kunde", customerId)
+                .queryParam("beginn", startingDate)
+                .queryParam("ende", endingDate)
+                .request(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
     }
 
     public ArrayList<Ablesung> getReadingsOfLast2Years() {
