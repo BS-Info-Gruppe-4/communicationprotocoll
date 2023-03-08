@@ -1,5 +1,6 @@
 package eu.bsinfo.gruppe4.gui.frames;
 
+import eu.bsinfo.gruppe4.gui.AllCustomersTable;
 import eu.bsinfo.gruppe4.gui.DatePickerFormatter;
 import eu.bsinfo.gruppe4.gui.MessageDialog;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
@@ -28,12 +29,14 @@ public abstract class BaseReadingInputWindow extends JFrame {
 
     private final JButton saveButton = new JButton("Speichern");
     private final JButton cancelButton = new JButton("Abbrechen");
+    private final AllCustomersTable allCustomersTable;
 
     private final Kunde customerOfReading;
 
 
-    public BaseReadingInputWindow(Kunde customerOfReading) throws HeadlessException {
+    public BaseReadingInputWindow(Kunde customerOfReading, AllCustomersTable allCustomersTable) throws HeadlessException {
         this.customerOfReading = customerOfReading;
+        this.allCustomersTable = allCustomersTable;
         initializeComponents();
     }
 
@@ -120,6 +123,8 @@ public abstract class BaseReadingInputWindow extends JFrame {
         try {
             Ablesung reading = getReadingOfInputFields();
             saveReading(reading);
+            allCustomersTable.refreshTable();
+            allCustomersTable.refreshTableReadings();
             MessageDialog.showSuccessMessage("Ablesung wurde gespeichert");
         }
         catch (Exception e) {

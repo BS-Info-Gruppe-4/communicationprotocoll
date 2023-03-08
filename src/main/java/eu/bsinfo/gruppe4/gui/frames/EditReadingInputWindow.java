@@ -1,5 +1,6 @@
 package eu.bsinfo.gruppe4.gui.frames;
 
+import eu.bsinfo.gruppe4.gui.AllCustomersTable;
 import eu.bsinfo.gruppe4.gui.service.ReadingService;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 
@@ -11,8 +12,8 @@ public class EditReadingInputWindow extends BaseReadingInputWindow {
     private final Ablesung currentEditingReading;
 
 
-    public EditReadingInputWindow(Ablesung readingToEdit) throws HeadlessException {
-        super(readingToEdit.getKunde());
+    public EditReadingInputWindow(Ablesung readingToEdit, AllCustomersTable allCustomersTable) throws HeadlessException {
+        super(readingToEdit.getKunde(), allCustomersTable);
         currentEditingReading = readingToEdit;
         setDefaultInputValues();
     }

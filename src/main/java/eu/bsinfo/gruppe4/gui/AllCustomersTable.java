@@ -251,7 +251,7 @@ public class AllCustomersTable extends JFrame {
     private void openEditReadingsWindow() {
         try {
             Ablesung selectedReading = getSelectedReading();
-            new EditReadingInputWindow(selectedReading);
+            new EditReadingInputWindow(selectedReading, this);
         }
         catch (Exception e) {
             MessageDialog.showErrorMessage(e.getMessage());
@@ -291,7 +291,7 @@ public class AllCustomersTable extends JFrame {
                 table_customers.getValueAt(selectedRow, 2).toString(),
                 table_customers.getValueAt(selectedRow, 1).toString());
 
-        new NewReadingInputWindow(selectedCustomer);
+        new NewReadingInputWindow(selectedCustomer, this);
     }
 
 
@@ -379,7 +379,10 @@ public class AllCustomersTable extends JFrame {
         model.fireTableDataChanged();
     }
 
-    public void refreshTableReadings(ArrayList<Ablesung> readings) {
+    public void refreshTableReadings() {
+
+        var readings = sessionStorage.getAblesungen();
+
         model_readings.setRowCount(0);
 
         for (Ablesung reading : readings) {
