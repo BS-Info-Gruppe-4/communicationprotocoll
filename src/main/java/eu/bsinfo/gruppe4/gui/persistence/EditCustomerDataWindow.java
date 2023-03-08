@@ -54,9 +54,17 @@ public class EditCustomerDataWindow extends JFrame {
             }
 
             customerEdited = new Kunde(customerToEdit.getId(), surname, name);
-            WebClient webClient = new WebClient();
 
-            Kunde customerToCompare = webClient.getCustomer(customerToEdit.getId());
+            Kunde customerToCompare = new Kunde();
+
+            try {
+                customerToCompare = customerService.getCustomerById(customerToEdit.getId());
+            }
+            catch (Exception exception) {
+                MessageDialog.showErrorMessage(exception.getMessage());
+            }
+
+
             System.out.println(customerToCompare.toString());
 
             if (!customerToEdit.equals(customerToCompare)) {

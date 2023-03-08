@@ -1,5 +1,6 @@
 package eu.bsinfo.gruppe4.gui;
 
+import eu.bsinfo.gruppe4.gui.frames.EditReadingInputWindow;
 import eu.bsinfo.gruppe4.gui.frames.NewReadingInputWindow;
 import eu.bsinfo.gruppe4.gui.persistence.EditCustomerDataWindow;
 import eu.bsinfo.gruppe4.gui.persistence.SessionStorage;
@@ -23,6 +24,8 @@ import java.time.LocalDate;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -33,7 +36,7 @@ public class AllCustomersTable extends JFrame {
     private final SessionStorage sessionStorage = SessionStorage.getInstance();
     private final CustomerService customerService = new CustomerService();
     private final ReadingService readingService = new ReadingService();
-    private final JTable table;
+    private final JTable table_customers;
     private final JTable table_readings;
     private final TableRowSorter<DefaultTableModel> sorter;
     private final TableRowSorter<DefaultTableModel> sorter_readings;
@@ -176,7 +179,7 @@ public class AllCustomersTable extends JFrame {
         add(menubar, BorderLayout.NORTH);
 
         // Erzeuge die Tabelle
-        table = new JTable();
+        table_customers = new JTable();
         table_readings = new JTable();
 
         // Buttons
@@ -216,19 +219,19 @@ public class AllCustomersTable extends JFrame {
 
         // Erzeuge die Tabellen-Header
         Object[] columns = {"ID", "Vorname", "Nachname"};
-        Object[] columns_readings = {"Kundennummer", "Datum", "Zählernummer", "Zählerstand", "Kommentar"};
+        Object[] columns_readings = {"Kundennummer", "Datum", "Zählernummer", "Zählerstand", "Kommentar", "Ablesung-ID"};
 
         model.setColumnIdentifiers(columns);
-        table.setModel(model);
+        table_customers.setModel(model);
         model_readings.setColumnIdentifiers(columns_readings);
         table_readings.setModel(model_readings);
 
-        loadInitialTableData();
+        loadInitialCustomerTableData();
         loadInitialTableDataReadings();
 
         // Erstelle Sorter
         sorter = new TableRowSorter<>(model);
-        table.setRowSorter(sorter);
+        table_customers.setRowSorter(sorter);
         sorter_readings = new TableRowSorter<>(model_readings);
         table_readings.setRowSorter(sorter_readings);
 
@@ -238,7 +241,7 @@ public class AllCustomersTable extends JFrame {
         sorter.setSortKeys(sortKeys);
 
         // Füge die Tabelle zum Fenster hinzu
-        JScrollPane scrollPane = new JScrollPane(table);
+        JScrollPane scrollPane = new JScrollPane(table_customers);
         tablePanel.add(scrollPane);
         scrollPane.setBorder(BorderFactory.createTitledBorder("Kunden"));
         JScrollPane scrollPane_reading = new JScrollPane(table_readings);
@@ -255,10 +258,10 @@ public class AllCustomersTable extends JFrame {
         deleteButton.addActionListener(e -> attemptCustomerDeletion());
 
         editCustomerButton.addActionListener(e -> {
-            int selectedRow = table.getSelectedRow();
+            int selectedRow = table_customers.getSelectedRow();
             String customerId = "";
             if(selectedRow >= 0) {
-                customerId = table.getValueAt(selectedRow, 0).toString();
+                customerId = table_customers.getValueAt(selectedRow, 0).toString();
 
             } else {
                 MessageDialog.showErrorMessage("kein Kunde ausgewählt");
@@ -266,8 +269,8 @@ public class AllCustomersTable extends JFrame {
             }
 
             Kunde customerSelected = new Kunde(UUID.fromString(customerId),
-                    table.getValueAt(selectedRow, 2).toString(),
-                    table.getValueAt(selectedRow, 1).toString());
+                    table_customers.getValueAt(selectedRow, 2).toString(),
+                    table_customers.getValueAt(selectedRow, 1).toString());
             new EditCustomerDataWindow(customerSelected, this);
         });
 
@@ -278,7 +281,7 @@ public class AllCustomersTable extends JFrame {
         });
 
         showDataButton.addActionListener(e -> {
-            int selectedRow = table.getSelectedRow();
+            int selectedRow = table_customers.getSelectedRow();
             boolean noRowIsSelected = selectedRow == -1;
 
             if (noRowIsSelected) {
@@ -286,7 +289,7 @@ public class AllCustomersTable extends JFrame {
                 return;
             }
 
-            String customerId = table.getValueAt(selectedRow, USER_ID_COLUMN_INDEX).toString();
+            String customerId = table_customers.getValueAt(selectedRow, USER_ID_COLUMN_INDEX).toString();
 
             try {
                 new KundenTabelleWindow(UUID.fromString(customerId), start_date, end_date);
@@ -295,16 +298,46 @@ public class AllCustomersTable extends JFrame {
             }
         });
 
+        editReadingButton.addActionListener(e -> openEditReadingsWindow());
+
         // Passe die Größe des Fensters an
         setSize(1600, 800);
         setVisible(true);
     }
 
+    private void openEditReadingsWindow() {
+        try {
+            Ablesung selectedReading = getSelectedReading();
+            new EditReadingInputWindow(selectedReading, this);
+        }
+        catch (Exception e) {
+            MessageDialog.showErrorMessage(e.getMessage());
+        }
+    }
+
+    private Ablesung getSelectedReading() throws Exception {
+        int selectedReadingsRow = table_readings.getSelectedRow();
+
+        if (selectedReadingsRow == -1) throw new Exception("Bitte wähle zuerst eine Ablesung aus");
+
+        String dateAsString = table_readings.getValueAt(selectedReadingsRow, 1).toString();
+        String customerId =  table_readings.getValueAt(selectedReadingsRow, 0).toString();
+
+        UUID readingId = UUID.fromString(table_readings.getValueAt(selectedReadingsRow, 5).toString());
+        Kunde customerOfReading = customerId.equals("null") ? null : customerService.getCustomerById(UUID.fromString(customerId));
+        String zaehlernummer = table_readings.getValueAt(selectedReadingsRow, 2).toString();
+        LocalDate date = convertStringToDate(dateAsString);
+        int zaehlerstand = Integer.parseInt(table_readings.getValueAt(selectedReadingsRow,3).toString());
+        String kommentar = table_readings.getValueAt(selectedReadingsRow,4).toString();
+
+        return new Ablesung(readingId, zaehlernummer, date, customerOfReading, kommentar, true, zaehlerstand);
+    }
+
     private void openNewReadingsWindow() {
-        int selectedRow = table.getSelectedRow();
+        int selectedRow = table_customers.getSelectedRow();
         String customerId = "";
         if(selectedRow >= 0) {
-            customerId = table.getValueAt(selectedRow, 0).toString();
+            customerId = table_customers.getValueAt(selectedRow, 0).toString();
 
         } else {
             MessageDialog.showErrorMessage("kein Kunde ausgewählt");
@@ -312,15 +345,15 @@ public class AllCustomersTable extends JFrame {
         }
 
         Kunde selectedCustomer = new Kunde(UUID.fromString(customerId),
-                table.getValueAt(selectedRow, 2).toString(),
-                table.getValueAt(selectedRow, 1).toString());
+                table_customers.getValueAt(selectedRow, 2).toString(),
+                table_customers.getValueAt(selectedRow, 1).toString());
 
-        new NewReadingInputWindow(selectedCustomer);
+        new NewReadingInputWindow(selectedCustomer, this);
     }
 
 
     private void attemptCustomerDeletion() {
-        int selectedRow = table.getSelectedRow();
+        int selectedRow = table_customers.getSelectedRow();
         boolean noRowIsSelected = selectedRow == -1;
 
         if (noRowIsSelected) {
@@ -328,7 +361,7 @@ public class AllCustomersTable extends JFrame {
             return;
         }
 
-        String customerId = table.getValueAt(selectedRow, USER_ID_COLUMN_INDEX).toString();
+        String customerId = table_customers.getValueAt(selectedRow, USER_ID_COLUMN_INDEX).toString();
 
         try {
             customerService.deleteCustomerById(UUID.fromString(customerId));
@@ -341,7 +374,7 @@ public class AllCustomersTable extends JFrame {
         
     }
 
-    public void loadInitialTableData() {
+    public void loadInitialCustomerTableData() {
 
         var customers = sessionStorage.getKunden();
 
@@ -358,14 +391,20 @@ public class AllCustomersTable extends JFrame {
         var readings = sessionStorage.getAblesungen();
 
         // Füge alle Ablesungen zur Tabelle hinzu
+        model_readings.setRowCount(0);
+
         for (Ablesung reading : readings) {
-            Object[] row = {reading.getId(), reading.getDatum(), reading.getZaehlernummer(), reading.getZaehlerstand(), reading.getKommentar()};
+            String customerIdAsString = reading.getKunde() == null ? "null" : reading.getKunde().getId().toString();
+
+            Object[] row = {customerIdAsString, reading.getDatum(), reading.getZaehlernummer(), reading.getZaehlerstand(), reading.getKommentar(), reading.getId()};
             model_readings.addRow(row);
         }
+
+        model_readings.fireTableDataChanged();
     }
 
     public void showReadingsForSelectedCustomer(LocalDate start, LocalDate end) {
-        int selectedRow = table.getSelectedRow();
+        int selectedRow = table_customers.getSelectedRow();
         boolean noRowIsSelected = selectedRow == -1;
 
         if (noRowIsSelected) {
@@ -374,7 +413,7 @@ public class AllCustomersTable extends JFrame {
         }
 
         ArrayList <Ablesung> current_readings = new ArrayList<>();
-        String customerId = table.getValueAt(selectedRow, USER_ID_COLUMN_INDEX).toString();
+        String customerId = table_customers.getValueAt(selectedRow, USER_ID_COLUMN_INDEX).toString();
         try {
             current_readings = readingService.getReadingsWithRestrictions(UUID.fromString(customerId), start, end);
             refreshTableReadings(current_readings);
@@ -398,14 +437,24 @@ public class AllCustomersTable extends JFrame {
     }
 
     public void refreshTableReadings(ArrayList<Ablesung> readings) {
+
         model_readings.setRowCount(0);
 
         for (Ablesung reading : readings) {
-            Object[] row = {reading.getId(), reading.getDatum(), reading.getZaehlernummer(), reading.getZaehlerstand(), reading.getKommentar()};
+            String customerIdAsString = reading.getKunde() == null ? "null" : reading.getKunde().getId().toString();
+
+            Object[] row = {customerIdAsString, reading.getDatum(), reading.getZaehlernummer(), reading.getZaehlerstand(), reading.getKommentar(), reading.getId()};
             model_readings.addRow(row);
         }
 
         model_readings.fireTableDataChanged();
+    }
+
+    static LocalDate convertStringToDate(String dateAsString) {
+
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        return LocalDate.parse(dateAsString, dateTimeFormatter);
     }
 
     private void exit() {

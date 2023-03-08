@@ -1,9 +1,6 @@
 package eu.bsinfo.gruppe4.server.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -13,6 +10,7 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
+@AllArgsConstructor
 public class Ablesung {
     @EqualsAndHashCode.Include
     @ToString.Include
