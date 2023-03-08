@@ -9,7 +9,6 @@ import eu.bsinfo.gruppe4.server.Server;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.core.Response;
 import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
 import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
 import net.sourceforge.jdatepicker.impl.UtilDateModel;
@@ -44,7 +43,7 @@ public class AllCustomersTable extends JFrame {
     private final JButton showDataButton = new JButton("Ablesungen anzeigen");
     private UtilDateModel datemodel, datemodel1;
     private final JButton newReadingButton = new JButton("Neue Ablesung");
-    private final JButton showReadingsSelectedCustomer = new JButton("zeige Ablesungen");
+    private final JButton showReadingsSelectedCustomerButton = new JButton("zeige Ablesungen");
     private final JButton editReadingButton = new JButton("Ablesung bearbeiten");
     DefaultTableModel model = new DefaultTableModel();
     DefaultTableModel model_readings = new DefaultTableModel();
@@ -204,7 +203,7 @@ public class AllCustomersTable extends JFrame {
         datemodel1.setSelected(true);
         LocalDate start_date = LocalDate.of(datemodel.getYear(), datemodel.getMonth() + 1, datemodel.getDay());
         LocalDate end_date = LocalDate.of(datemodel1.getYear(), datemodel1.getMonth() + 1, datemodel1.getDay());
-        buttonPanel.add(showReadingsSelectedCustomer);
+        buttonPanel.add(showReadingsSelectedCustomerButton);
         buttonPanel.add(editReadingButton);
 
         final JPanel centerPanel = new JPanel(new BorderLayout());
@@ -239,8 +238,10 @@ public class AllCustomersTable extends JFrame {
         // Füge die Tabelle zum Fenster hinzu
         JScrollPane scrollPane = new JScrollPane(table);
         tablePanel.add(scrollPane);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Kunden"));
         JScrollPane scrollPane_reading = new JScrollPane(table_readings);
         tablePanel.add(scrollPane_reading);
+        scrollPane_reading.setBorder(BorderFactory.createTitledBorder("Ablesungen"));
 
         add(buttonPanel, BorderLayout.SOUTH);
         centerPanel.add(datumPanel, BorderLayout.NORTH);
@@ -268,7 +269,7 @@ public class AllCustomersTable extends JFrame {
             new EditCustomerDataWindow(customerSelected, this);
         });
 
-        showReadingsSelectedCustomer.addActionListener(e -> showReadingsForSelectedCustomer());
+        showReadingsSelectedCustomerButton.addActionListener(e -> showReadingsForSelectedCustomer());
 
         showDataButton.addActionListener(e -> {
             int selectedRow = table.getSelectedRow();
@@ -289,7 +290,7 @@ public class AllCustomersTable extends JFrame {
         });
 
         // Passe die Größe des Fensters an
-        setSize(1300, 700);
+        setSize(1600, 800);
         setVisible(true);
     }
 
