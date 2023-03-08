@@ -18,20 +18,8 @@ import java.util.UUID;
 public class ReadingService {
 
     private final WebClient webClient = new WebClient();
-    private final SessionStorage sessionStorage = SessionStorage.getInstance();
-
-    public Ablesung createReading(Ablesung ablesung) {
-        //TODO: Validation
-        Response response = webClient.createAblesung(ablesung);
-
-        if (response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode()) {
-            String errorMessage = response.readEntity(String.class);
-            throw new BadRequestException(errorMessage);
-        }
-
     private final PlausibilityService plausibilityService = new PlausibilityService();
     private final SessionStorage sessionStorage = SessionStorage.getInstance();
-
 
     public void createReading(Ablesung newReading) {
 
@@ -106,15 +94,14 @@ public class ReadingService {
         }
 
         if (response.getStatus() != Response.Status.OK.getStatusCode()) {
-        if (response.getStatus() != Response.Status.CREATED.getStatusCode()) {
             throw new UnknownError("Es ist ein unbekannter Fehler aufgetreten");
         }
-
-        sessionStorage.syncWithBackend();
-        return response.readEntity(Ablesung.class);
+            sessionStorage.syncWithBackend();
+            return response.readEntity(Ablesung.class);
     }
 
-    public ArrayList<Ablesung> getReadingsWithRestrictions(UUID customerId, LocalDate startingDate, LocalDate endingDate) {
+    public ArrayList<Ablesung> getReadingsWithRestrictions (UUID customerId, LocalDate startingDate, LocalDate
+    endingDate){
         Response response = webClient.getReadingsWithRestrictions(customerId, startingDate, endingDate);
 
         if (response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode()) {
@@ -132,17 +119,18 @@ public class ReadingService {
         }
 
         sessionStorage.syncWithBackend();
-        return response.readEntity(new GenericType<>() {});
+        return response.readEntity(new GenericType<>() {
+        });
     }
 
 
-    private Optional<Ablesung> getDuplicateOf(Ablesung readingToCheck) {
+    private Optional<Ablesung> getDuplicateOf (Ablesung readingToCheck){
         return sessionStorage.getAblesungen().stream()
                 .filter(ablesung -> ablesung.isEqualsWithoutCheckingId(readingToCheck))
                 .findFirst();
     }
 
-    private boolean doesUserWantToKeepOldReading() {
+    private boolean doesUserWantToKeepOldReading () {
         int reply = JOptionPane.showConfirmDialog(
                 null,
                 "Ein Datensatz mit den selben Werten ist bereits vorhanden. \n" +
@@ -153,7 +141,8 @@ public class ReadingService {
         return reply == JOptionPane.NO_OPTION;
     }
 
-    private void removeDuplicate(Ablesung oldReading) {
+    private void removeDuplicate (Ablesung oldReading){
         deleteReading(oldReading);
     }
+
 }

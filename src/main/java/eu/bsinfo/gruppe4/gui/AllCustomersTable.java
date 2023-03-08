@@ -180,7 +180,6 @@ public class AllCustomersTable extends JFrame {
         table_readings = new JTable();
 
         // Buttons
-        final JPanel buttonPanel = new JPanel(new GridLayout(2, 2));
         final JPanel buttonPanel = new JPanel(new GridLayout(1, 6));
         buttonPanel.add(newCustomerButton);
         buttonPanel.add(newReadingButton);
