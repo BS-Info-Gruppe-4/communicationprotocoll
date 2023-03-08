@@ -9,7 +9,6 @@ public class Main {
     public static String SERVER_URL = "http://localhost:8080/";
     public static void main(String[] args) {
 
-        //new PropertyManagementApplication();
         Server.startServer(SERVER_URL, true);
         new AllCustomersTable();
 
