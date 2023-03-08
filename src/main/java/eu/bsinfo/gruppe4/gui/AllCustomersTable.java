@@ -22,7 +22,6 @@ import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.UUID;
 
 
@@ -188,14 +187,14 @@ public class AllCustomersTable extends JFrame {
 
         // Erzeuge die Tabellen-Header
         Object[] columns = {"ID", "Vorname", "Nachname"};
-        Object[] columns_readings = {"Kundennummer", "Datum", "Zählernummer", "Zählerstand", "Kommentar"};
+        Object[] columns_readings = {"Kundennummer", "Datum", "Zählernummer", "Zählerstand", "Kommentar", "Ablesung-ID"};
 
         model.setColumnIdentifiers(columns);
         table_customers.setModel(model);
         model_readings.setColumnIdentifiers(columns_readings);
         table_readings.setModel(model_readings);
 
-        loadInitialTableData();
+        loadInitialCustomerTableData();
         loadInitialTableDataReadings();
 
         // Erstelle Sorter
@@ -267,13 +266,14 @@ public class AllCustomersTable extends JFrame {
         String dateAsString = table_readings.getValueAt(selectedReadingsRow, 1).toString();
         String customerId =  table_readings.getValueAt(selectedReadingsRow, 0).toString();
 
+        UUID readingId = UUID.fromString(table_readings.getValueAt(selectedReadingsRow, 5).toString());
         Kunde customerOfReading = customerId.equals("null") ? null : customerService.getCustomerById(UUID.fromString(customerId));
         String zaehlernummer = table_readings.getValueAt(selectedReadingsRow, 2).toString();
         LocalDate date = convertStringToDate(dateAsString);
         int zaehlerstand = Integer.parseInt(table_readings.getValueAt(selectedReadingsRow,3).toString());
         String kommentar = table_readings.getValueAt(selectedReadingsRow,4).toString();
 
-        return new Ablesung(zaehlernummer, date, customerOfReading, kommentar, true, zaehlerstand);
+        return new Ablesung(readingId, zaehlernummer, date, customerOfReading, kommentar, true, zaehlerstand);
     }
 
     private void openNewReadingsWindow() {
@@ -317,7 +317,7 @@ public class AllCustomersTable extends JFrame {
         
     }
 
-    public void loadInitialTableData() {
+    public void loadInitialCustomerTableData() {
 
         var customers = sessionStorage.getKunden();
 
@@ -334,13 +334,16 @@ public class AllCustomersTable extends JFrame {
         var readings = sessionStorage.getAblesungen();
 
         // Füge alle Ablesungen zur Tabelle hinzu
-        for (Ablesung reading : readings) {
+        model_readings.setRowCount(0);
 
+        for (Ablesung reading : readings) {
             String customerIdAsString = reading.getKunde() == null ? "null" : reading.getKunde().getId().toString();
 
-            Object[] row = {customerIdAsString, reading.getDatum(), reading.getZaehlernummer(), reading.getZaehlerstand(), reading.getKommentar()};
+            Object[] row = {customerIdAsString, reading.getDatum(), reading.getZaehlernummer(), reading.getZaehlerstand(), reading.getKommentar(), reading.getId()};
             model_readings.addRow(row);
         }
+
+        model_readings.fireTableDataChanged();
     }
 
     public void showReadingsForSelectedCustomer() {
@@ -356,7 +359,7 @@ public class AllCustomersTable extends JFrame {
         String customerId = table_customers.getValueAt(selectedRow, USER_ID_COLUMN_INDEX).toString();
         try {
             current_readings = readingService.getReadingsWithRestrictions(UUID.fromString(customerId), null, null);
-            refreshTableReadings(current_readings);
+            loadInitialTableDataReadings();
         }
         catch (NotFoundException | UnknownError ex) {
             MessageDialog.showErrorMessage(ex.getMessage());
@@ -382,7 +385,7 @@ public class AllCustomersTable extends JFrame {
         for (Ablesung reading : readings) {
             String customerIdAsString = reading.getKunde() == null ? "null" : reading.getKunde().getId().toString();
 
-            Object[] row = {customerIdAsString, reading.getDatum(), reading.getZaehlernummer(), reading.getZaehlerstand(), reading.getKommentar()};
+            Object[] row = {customerIdAsString, reading.getDatum(), reading.getZaehlernummer(), reading.getZaehlerstand(), reading.getKommentar(), reading.getId()};
             model_readings.addRow(row);
         }
 

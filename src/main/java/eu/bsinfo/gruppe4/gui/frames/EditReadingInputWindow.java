@@ -29,6 +29,7 @@ public class EditReadingInputWindow extends BaseReadingInputWindow {
 
     @Override
     protected void saveReading(Ablesung reading) {
+        reading.setId(currentEditingReading.getId());
         readingService.updateReading(reading);
     }
 }

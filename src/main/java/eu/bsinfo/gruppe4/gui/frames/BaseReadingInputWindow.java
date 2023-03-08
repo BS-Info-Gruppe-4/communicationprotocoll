@@ -120,6 +120,7 @@ public abstract class BaseReadingInputWindow extends JFrame {
         try {
             Ablesung reading = getReadingOfInputFields();
             saveReading(reading);
+            MessageDialog.showSuccessMessage("Ablesung wurde gespeichert");
         }
         catch (Exception e) {
             MessageDialog.showWarningMessage(e.getMessage());

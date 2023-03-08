@@ -55,7 +55,6 @@ public class ReadingService {
         }
 
         sessionStorage.syncWithBackend();
-        MessageDialog.showSuccessMessage("Ablesung wurde gespeichert");
     }
 
     public String updateReading(Ablesung reading) {
