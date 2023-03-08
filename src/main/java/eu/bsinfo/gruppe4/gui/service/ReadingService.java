@@ -55,7 +55,6 @@ public class ReadingService {
         }
 
         sessionStorage.syncWithBackend();
-        MessageDialog.showSuccessMessage("Ablesung wurde gespeichert");
     }
 
     public String updateReading(Ablesung reading) {
@@ -74,7 +73,7 @@ public class ReadingService {
 
         if (response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode()) {
             String errorMessage = response.readEntity(String.class);
-            throw new NotFoundException(errorMessage);
+            throw new BadRequestException(errorMessage);
         }
 
         if (response.getStatus() != Response.Status.OK.getStatusCode()) {
