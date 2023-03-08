@@ -101,12 +101,18 @@ public class AblesungenEndpoints {
                     .build();
         }
 
-        queriedReading.ifPresent(
-                ablesung -> {
-                    jsonRepository.deleteAblesung(ablesung.getId());
-                    jsonRepository.save(providedReading);
-                }
-        );
+        Ablesung reading = queriedReading.get();
+        Kunde customerOfReading = reading.getKunde();
+
+        if (customerOfReading == null || !jsonRepository.kundeExists(customerOfReading.getId())){
+            return Response
+                    .status(Response.Status.NOT_FOUND)
+                    .entity("Der Kunde der Ablesung existiert nicht!")
+                    .build();
+        }
+
+        jsonRepository.deleteAblesung(reading.getId());
+        jsonRepository.save(providedReading);
 
         return Response.ok("Ablesung wurde aktualisiert").build();
     }
