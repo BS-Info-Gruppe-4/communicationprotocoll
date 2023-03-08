@@ -24,7 +24,6 @@ import java.time.LocalDate;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -43,10 +42,10 @@ public class AllCustomersTable extends JFrame {
     private final JButton editCustomerButton = new JButton("Kunde bearbeiten");
     private final JButton deleteButton = new JButton("Löschen");
     private final JButton newCustomerButton = new JButton("Neuer Kunde");
-    private final JButton showDataButton = new JButton("Ablesungen anzeigen");
+    private final JButton resetFilter = new JButton("Filter zurücksetzen");
     private UtilDateModel datemodel_start_date, datemodel_end_date;
     private final JButton newReadingButton = new JButton("Neue Ablesung");
-    private final JButton showReadingsSelectedCustomerButton = new JButton("zeige Ablesungen");
+    private final JButton showReadingsSelectedCustomerButton = new JButton("Filter Ablesungen");
     private final JButton editReadingButton = new JButton("Ablesung bearbeiten");
     DefaultTableModel model = new DefaultTableModel();
     DefaultTableModel model_readings = new DefaultTableModel();
@@ -188,7 +187,7 @@ public class AllCustomersTable extends JFrame {
         buttonPanel.add(newReadingButton);
         buttonPanel.add(editCustomerButton);
         buttonPanel.add(deleteButton);
-        buttonPanel.add(showDataButton);
+        buttonPanel.add(resetFilter);
 
         // Datepicker
         final JPanel datumPanel = new JPanel(new GridLayout(1, 2));
@@ -280,22 +279,12 @@ public class AllCustomersTable extends JFrame {
             showReadingsForSelectedCustomer(start_date, end_date);
         });
 
-        showDataButton.addActionListener(e -> {
-            int selectedRow = table_customers.getSelectedRow();
-            boolean noRowIsSelected = selectedRow == -1;
+        resetFilter.addActionListener(e -> {
+            table_customers.clearSelection();
+            table_readings.clearSelection();
 
-            if (noRowIsSelected) {
-                MessageDialog.showErrorMessage("Bitte wähle einen Kunden aus.");
-                return;
-            }
-
-            String customerId = table_customers.getValueAt(selectedRow, USER_ID_COLUMN_INDEX).toString();
-
-            try {
-                new KundenTabelleWindow(UUID.fromString(customerId), start_date, end_date);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+            loadInitialCustomerTableData();
+            loadInitialTableDataReadings();
         });
 
         editReadingButton.addActionListener(e -> openEditReadingsWindow());
@@ -375,6 +364,8 @@ public class AllCustomersTable extends JFrame {
     }
 
     public void loadInitialCustomerTableData() {
+
+        model.setRowCount(0);
 
         var customers = sessionStorage.getKunden();
 
