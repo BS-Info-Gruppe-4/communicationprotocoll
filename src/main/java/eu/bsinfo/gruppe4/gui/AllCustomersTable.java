@@ -41,7 +41,7 @@ public class AllCustomersTable extends JFrame {
     private final JButton deleteButton = new JButton("Löschen");
     private final JButton newCustomerButton = new JButton("Neuer Kunde");
     private final JButton showDataButton = new JButton("Ablesungen anzeigen");
-    private UtilDateModel datemodel, datemodel1;
+    private UtilDateModel datemodel_start_date, datemodel_end_date;
     private final JButton newReadingButton = new JButton("Neue Ablesung");
     private final JButton showReadingsSelectedCustomerButton = new JButton("zeige Ablesungen");
     private final JButton editReadingButton = new JButton("Ablesung bearbeiten");
@@ -50,6 +50,7 @@ public class AllCustomersTable extends JFrame {
     private JMenu menu_file, menu_about, menu_settings, submenu_themes;
     private JMenuItem item_exit, item_about, item_nimbus, item_windows, item_metal, item_motif;
     private JMenuBar menubar;
+    private LocalDate start_date, end_date;
 
     public AllCustomersTable() {
         setTitle("Kundenliste");
@@ -188,21 +189,22 @@ public class AllCustomersTable extends JFrame {
 
         // Datepicker
         final JPanel datumPanel = new JPanel(new GridLayout(1, 2));
-        datemodel = new UtilDateModel();
-        JDatePanelImpl datePanel = new JDatePanelImpl(datemodel);
-        JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DatePickerFormatter());
-        datePicker.setBorder(BorderFactory.createTitledBorder("von"));
-        datumPanel.add(datePicker);
         datumPanel.setBorder(BorderFactory.createTitledBorder("Datum"));
-        datemodel1 = new UtilDateModel();
-        JDatePanelImpl datePanel1 = new JDatePanelImpl(datemodel1);
-        JDatePickerImpl datePicker1 = new JDatePickerImpl(datePanel1, new DatePickerFormatter());
-        datePicker1.setBorder(BorderFactory.createTitledBorder("bis"));
-        datumPanel.add(datePicker1);
-        datemodel.setSelected(true); // Setzt das heutige Datum in das Datumsfeld ein
-        datemodel1.setSelected(true);
-        LocalDate start_date = LocalDate.of(datemodel.getYear(), datemodel.getMonth() + 1, datemodel.getDay());
-        LocalDate end_date = LocalDate.of(datemodel1.getYear(), datemodel1.getMonth() + 1, datemodel1.getDay());
+
+        datemodel_start_date = new UtilDateModel();
+        JDatePanelImpl datePanel_start_date = new JDatePanelImpl(datemodel_start_date);
+        JDatePickerImpl datePicker_start_date = new JDatePickerImpl(datePanel_start_date, new DatePickerFormatter());
+        datePicker_start_date.setBorder(BorderFactory.createTitledBorder("von"));
+        datumPanel.add(datePicker_start_date);
+        datemodel_start_date.setSelected(true); // Setzt das heutige Datum in das Datumsfeld ein
+
+        datemodel_end_date = new UtilDateModel();
+        JDatePanelImpl datePanel_end_date = new JDatePanelImpl(datemodel_end_date);
+        JDatePickerImpl datePicker_end_date = new JDatePickerImpl(datePanel_end_date, new DatePickerFormatter());
+        datePicker_end_date.setBorder(BorderFactory.createTitledBorder("bis"));
+        datumPanel.add(datePicker_end_date);
+        datemodel_end_date.setSelected(true); // Setzt das heutige Datum in das Datumsfeld ein
+
         buttonPanel.add(showReadingsSelectedCustomerButton);
         buttonPanel.add(editReadingButton);
 
@@ -269,7 +271,11 @@ public class AllCustomersTable extends JFrame {
             new EditCustomerDataWindow(customerSelected, this);
         });
 
-        showReadingsSelectedCustomerButton.addActionListener(e -> showReadingsForSelectedCustomer());
+        showReadingsSelectedCustomerButton.addActionListener(e -> {
+            start_date = LocalDate.of(datePicker_start_date.getModel().getYear(), datePicker_start_date.getModel().getMonth() + 1, datePicker_start_date.getModel().getDay());
+            end_date = LocalDate.of(datemodel_end_date.getYear(), datemodel_end_date.getMonth() + 1, datemodel_end_date.getDay());
+            showReadingsForSelectedCustomer(start_date, end_date);
+        });
 
         showDataButton.addActionListener(e -> {
             int selectedRow = table.getSelectedRow();
@@ -358,7 +364,7 @@ public class AllCustomersTable extends JFrame {
         }
     }
 
-    public void showReadingsForSelectedCustomer() {
+    public void showReadingsForSelectedCustomer(LocalDate start, LocalDate end) {
         int selectedRow = table.getSelectedRow();
         boolean noRowIsSelected = selectedRow == -1;
 
@@ -370,7 +376,7 @@ public class AllCustomersTable extends JFrame {
         ArrayList <Ablesung> current_readings = new ArrayList<>();
         String customerId = table.getValueAt(selectedRow, USER_ID_COLUMN_INDEX).toString();
         try {
-            current_readings = readingService.getReadingsWithRestrictions(UUID.fromString(customerId), null, null);
+            current_readings = readingService.getReadingsWithRestrictions(UUID.fromString(customerId), start, end);
             refreshTableReadings(current_readings);
         }
         catch (NotFoundException | UnknownError ex) {
