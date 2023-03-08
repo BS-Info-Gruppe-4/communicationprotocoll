@@ -207,8 +207,11 @@ public class AllCustomersTable extends JFrame {
         buttonPanel.add(showReadingsSelectedCustomer);
         buttonPanel.add(editReadingButton);
 
+        final JPanel centerPanel = new JPanel(new BorderLayout());
+        add(centerPanel, BorderLayout.CENTER);
+
         final JPanel tablePanel = new JPanel(new GridLayout(1, 2));
-        add(tablePanel, BorderLayout.CENTER);
+        centerPanel.add(tablePanel, BorderLayout.CENTER);
 
         // Erzeuge die Tabellen-Header
         Object[] columns = {"ID", "Vorname", "Nachname"};
@@ -240,7 +243,7 @@ public class AllCustomersTable extends JFrame {
         tablePanel.add(scrollPane_reading);
 
         add(buttonPanel, BorderLayout.SOUTH);
-        add(datumPanel, BorderLayout.NORTH);
+        centerPanel.add(datumPanel, BorderLayout.NORTH);
 
         newCustomerButton.addActionListener(e -> new KundeErstellenDialog(this));
 
@@ -286,7 +289,7 @@ public class AllCustomersTable extends JFrame {
         });
 
         // Passe die Größe des Fensters an
-        setSize(1000, 500);
+        setSize(1300, 700);
         setVisible(true);
     }
 
