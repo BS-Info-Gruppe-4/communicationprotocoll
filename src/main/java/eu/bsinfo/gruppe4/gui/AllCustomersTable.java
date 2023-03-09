@@ -234,10 +234,15 @@ public class AllCustomersTable extends JFrame {
         sorter_readings = new TableRowSorter<>(model_readings);
         table_readings.setRowSorter(sorter_readings);
 
-        // Sortiere Tabelle nach ID aufsteigend
+        // Sortiere Kunden-Tabelle nach ID aufsteigend
         ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         sorter.setSortKeys(sortKeys);
+
+        // Sortiere Ablesung-Tabelle nach Datum absteigend
+        ArrayList<RowSorter.SortKey> readingsSortKeys = new ArrayList<>();
+        readingsSortKeys.add(new RowSorter.SortKey(1, SortOrder.DESCENDING));
+        sorter_readings.setSortKeys(readingsSortKeys);
 
         // Füge die Tabelle zum Fenster hinzu
         JScrollPane scrollPane = new JScrollPane(table_customers);
