@@ -314,18 +314,24 @@ public class AllCustomersTable extends JFrame {
 
         if (selectedReadingsRow == -1) throw new Exception("Bitte wähle zuerst eine Ablesung aus");
 
-        String dateAsString = table_readings.getValueAt(selectedReadingsRow, 1).toString();
         String customerId =  table_readings.getValueAt(selectedReadingsRow, 0).toString();
-
-        UUID readingId = UUID.fromString(table_readings.getValueAt(selectedReadingsRow, 6).toString());
         Kunde customerOfReading = customerId.equals("null") ? null : customerService.getCustomerById(UUID.fromString(customerId));
+
+        LocalDate date = (LocalDate) table_readings.getValueAt(selectedReadingsRow, 1);
         String zaehlernummer = table_readings.getValueAt(selectedReadingsRow, 2).toString();
-        LocalDate date = convertStringToDate(dateAsString);
         int zaehlerstand = Integer.parseInt(table_readings.getValueAt(selectedReadingsRow,3).toString());
         boolean wurdeNeuEingebaut = (boolean) table_readings.getValueAt(selectedReadingsRow,4);
         String kommentar = table_readings.getValueAt(selectedReadingsRow,5).toString();
+        UUID readingId = UUID.fromString(table_readings.getValueAt(selectedReadingsRow, 6).toString());
 
-        return new Ablesung(readingId, zaehlernummer, date, customerOfReading, kommentar, wurdeNeuEingebaut, zaehlerstand);
+        return new Ablesung(
+                readingId,
+                zaehlernummer,
+                date,
+                customerOfReading,
+                kommentar,
+                wurdeNeuEingebaut,
+                zaehlerstand);
     }
 
     private void openNewReadingsWindow() {
@@ -445,13 +451,6 @@ public class AllCustomersTable extends JFrame {
         }
 
         model_readings.fireTableDataChanged();
-    }
-
-    static LocalDate convertStringToDate(String dateAsString) {
-
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        return LocalDate.parse(dateAsString, dateTimeFormatter);
     }
 
     private void exit() {

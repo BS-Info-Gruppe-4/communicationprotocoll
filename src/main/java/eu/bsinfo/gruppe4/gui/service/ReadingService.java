@@ -58,6 +58,8 @@ public class ReadingService {
 
     public String updateReading(Ablesung reading) {
 
+        // It is not specified if the update action should be canceled if a reading is not plausible.
+        // Therefore, the update reading will still be updated despite the warning
         if (plausibilityService.isNotPlausible(reading)) {
             MessageDialog.showWarningMessage("Der Wert des Zählerstands liegt außerhalb des Normbereichs!\n" +
                     "Möglicherweise liegt ein Leck vor.");
@@ -123,7 +125,7 @@ public class ReadingService {
     }
 
 
-    private Optional<Ablesung> getDuplicateOf (Ablesung readingToCheck){
+    private Optional<Ablesung> getDuplicateOf(Ablesung readingToCheck) {
         return sessionStorage.getAblesungen().stream()
                 .filter(ablesung -> ablesung.isEqualsWithoutCheckingId(readingToCheck))
                 .findFirst();
