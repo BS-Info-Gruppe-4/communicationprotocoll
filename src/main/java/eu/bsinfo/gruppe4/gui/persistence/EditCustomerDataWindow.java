@@ -2,10 +2,8 @@ package eu.bsinfo.gruppe4.gui.persistence;
 
 import eu.bsinfo.gruppe4.gui.AllCustomersTable;
 import eu.bsinfo.gruppe4.gui.MessageDialog;
-import eu.bsinfo.gruppe4.gui.WebClient;
 import eu.bsinfo.gruppe4.gui.service.CustomerService;
 import eu.bsinfo.gruppe4.server.model.Kunde;
-import jakarta.ws.rs.core.Response;
 
 import javax.swing.*;
 import java.awt.*;
@@ -76,7 +74,7 @@ public class EditCustomerDataWindow extends JFrame {
             try {
                 String responseMessage = customerService.updateCustomer(customerEdited);
                 MessageDialog.showSuccessMessage(responseMessage);
-                act.refreshTable();
+                act.refreshCustomerTable();
             }
             catch (Exception e1) {
                 MessageDialog.showErrorMessage(e1.getMessage());

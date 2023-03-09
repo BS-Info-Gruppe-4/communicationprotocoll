@@ -19,12 +19,10 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -40,14 +38,14 @@ public class AllCustomersTable extends JFrame {
     private final TableRowSorter<DefaultTableModel> sorter;
     private final TableRowSorter<DefaultTableModel> sorter_readings;
     private final JButton editCustomerButton = new JButton("Kunde bearbeiten");
-    private final JButton deleteButton = new JButton("Löschen");
+    private final JButton deleteButton = new JButton("Kunde löschen");
     private final JButton newCustomerButton = new JButton("Neuer Kunde");
-    private final JButton resetFilter = new JButton("Filter zurücksetzen");
+    private final JButton resetFilterButton = new JButton("Filter zurücksetzen");
     private UtilDateModel datemodel_start_date, datemodel_end_date;
     private final JButton newReadingButton = new JButton("Neue Ablesung");
-    private final JButton showReadingsSelectedCustomerButton = new JButton("Filter Ablesungen");
+    private final JButton filterReadingsButton = new JButton("Filter Ablesungen");
     private final JButton editReadingButton = new JButton("Ablesung bearbeiten");
-    DefaultTableModel model = new DefaultTableModel();
+    DefaultTableModel customerTableModel = new DefaultTableModel();
     DefaultTableModel model_readings = new DefaultTableModel();
     private JMenu menu_file, menu_about, menu_settings, submenu_themes;
     private JMenuItem item_exit, item_about, item_nimbus, item_windows, item_metal, item_motif;
@@ -187,7 +185,7 @@ public class AllCustomersTable extends JFrame {
         buttonPanel.add(newReadingButton);
         buttonPanel.add(editCustomerButton);
         buttonPanel.add(deleteButton);
-        buttonPanel.add(resetFilter);
+        buttonPanel.add(resetFilterButton);
 
         // Datepicker
         final JPanel datumPanel = new JPanel(new GridLayout(1, 2));
@@ -207,7 +205,7 @@ public class AllCustomersTable extends JFrame {
         datumPanel.add(datePicker_end_date);
         datemodel_end_date.setSelected(true); // Setzt das heutige Datum in das Datumsfeld ein
 
-        buttonPanel.add(showReadingsSelectedCustomerButton);
+        buttonPanel.add(filterReadingsButton);
         buttonPanel.add(editReadingButton);
 
         final JPanel centerPanel = new JPanel(new BorderLayout());
@@ -220,8 +218,8 @@ public class AllCustomersTable extends JFrame {
         Object[] columns = {"ID", "Vorname", "Nachname"};
         Object[] columns_readings = {"Kundennummer", "Datum", "Zählernummer", "Zählerstand", "Neu eingebaut?","Kommentar", "Ablesung-ID"};
 
-        model.setColumnIdentifiers(columns);
-        table_customers.setModel(model);
+        customerTableModel.setColumnIdentifiers(columns);
+        table_customers.setModel(customerTableModel);
         model_readings.setColumnIdentifiers(columns_readings);
         table_readings.setModel(model_readings);
 
@@ -229,7 +227,7 @@ public class AllCustomersTable extends JFrame {
         loadInitialTableDataReadings();
 
         // Erstelle Sorter
-        sorter = new TableRowSorter<>(model);
+        sorter = new TableRowSorter<>(customerTableModel);
         table_customers.setRowSorter(sorter);
         sorter_readings = new TableRowSorter<>(model_readings);
         table_readings.setRowSorter(sorter_readings);
@@ -255,12 +253,13 @@ public class AllCustomersTable extends JFrame {
         add(buttonPanel, BorderLayout.SOUTH);
         centerPanel.add(datumPanel, BorderLayout.NORTH);
 
-        newCustomerButton.addActionListener(e -> new KundeErstellenDialog(this));
 
         newReadingButton.addActionListener(e -> openNewReadingsWindow());
-
+        editReadingButton.addActionListener(e -> openEditReadingsWindow());
         deleteButton.addActionListener(e -> attemptCustomerDeletion());
 
+        //TODO: Maybe use observer pattern for notifying table on changes
+        newCustomerButton.addActionListener(e -> new KundeErstellenDialog(this));
         editCustomerButton.addActionListener(e -> {
             int selectedRow = table_customers.getSelectedRow();
             String customerId = "";
@@ -278,13 +277,13 @@ public class AllCustomersTable extends JFrame {
             new EditCustomerDataWindow(customerSelected, this);
         });
 
-        showReadingsSelectedCustomerButton.addActionListener(e -> {
+        filterReadingsButton.addActionListener(e -> {
             start_date = LocalDate.of(datePicker_start_date.getModel().getYear(), datePicker_start_date.getModel().getMonth() + 1, datePicker_start_date.getModel().getDay());
             end_date = LocalDate.of(datemodel_end_date.getYear(), datemodel_end_date.getMonth() + 1, datemodel_end_date.getDay());
             showReadingsForSelectedCustomer(start_date, end_date);
         });
 
-        resetFilter.addActionListener(e -> {
+        resetFilterButton.addActionListener(e -> {
             table_customers.clearSelection();
             table_readings.clearSelection();
 
@@ -292,7 +291,6 @@ public class AllCustomersTable extends JFrame {
             loadInitialTableDataReadings();
         });
 
-        editReadingButton.addActionListener(e -> openEditReadingsWindow());
 
         // Passe die Größe des Fensters an
         setSize(1500, 600);
@@ -366,7 +364,7 @@ public class AllCustomersTable extends JFrame {
 
         try {
             customerService.deleteCustomerById(UUID.fromString(customerId));
-            refreshTable();
+            refreshCustomerTable();
             MessageDialog.showSuccessMessage("Kunde wurde erfolgreich gelöscht");
         }
         catch (NotFoundException | UnknownError ex) {
@@ -377,14 +375,14 @@ public class AllCustomersTable extends JFrame {
 
     public void loadInitialCustomerTableData() {
 
-        model.setRowCount(0);
+        customerTableModel.setRowCount(0);
 
         var customers = sessionStorage.getKunden();
 
         // Füge die Kunden zur Tabelle hinzu
         for (Kunde customer : customers) {
             Object[] row = {customer.getId(), customer.getVorname(), customer.getName()};
-            model.addRow(row);
+            customerTableModel.addRow(row);
         }
 
     }
@@ -415,11 +413,12 @@ public class AllCustomersTable extends JFrame {
             return;
         }
 
-        ArrayList <Ablesung> current_readings = new ArrayList<>();
+        ArrayList <Ablesung> filteredReadings;
         String customerId = table_customers.getValueAt(selectedRow, USER_ID_COLUMN_INDEX).toString();
+
         try {
-            current_readings = readingService.getReadingsWithRestrictions(UUID.fromString(customerId), start, end);
-            refreshTableReadings(current_readings);
+            filteredReadings = readingService.getReadingsWithRestrictions(UUID.fromString(customerId), start, end);
+            setReadingsTableData(filteredReadings);
         }
         catch (NotFoundException | UnknownError ex) {
             MessageDialog.showErrorMessage(ex.getMessage());
@@ -427,19 +426,19 @@ public class AllCustomersTable extends JFrame {
 
     }
 
-    public void refreshTable() {
+    public void refreshCustomerTable() {
         sessionStorage.syncWithBackend();
-        model.setRowCount(0);
+        customerTableModel.setRowCount(0);
 
         for (Kunde customer : sessionStorage.getKunden()) {
             Object[] row = {customer.getId(), customer.getVorname(), customer.getName()};
-            model.addRow(row);
+            customerTableModel.addRow(row);
         }
 
-        model.fireTableDataChanged();
+        customerTableModel.fireTableDataChanged();
     }
 
-    public void refreshTableReadings(ArrayList<Ablesung> readings) {
+    public void setReadingsTableData(ArrayList<Ablesung> readings) {
 
         model_readings.setRowCount(0);
 
