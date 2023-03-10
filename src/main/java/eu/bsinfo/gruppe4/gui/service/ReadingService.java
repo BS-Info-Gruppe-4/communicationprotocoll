@@ -11,6 +11,7 @@ import jakarta.ws.rs.core.Response;
 
 import javax.swing.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,6 +28,11 @@ public class ReadingService {
         if (plausibilityService.isNotPlausible(newReading)) {
             MessageDialog.showWarningMessage("Der Wert des Zählerstands liegt außerhalb des Normbereichs!\n" +
                     "Möglicherweise liegt ein Leck vor.");
+        }
+
+        if (!newReading.getDatum().equals(LocalDate.now())){
+
+            throw new RuntimeException("Das ausgewählte Datum ist nicht das heutige!");
         }
 
         // Checking for duplicate
