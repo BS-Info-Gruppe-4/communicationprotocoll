@@ -38,13 +38,14 @@ public class AllCustomersTable extends JFrame {
     private final TableRowSorter<DefaultTableModel> sorter;
     private final TableRowSorter<DefaultTableModel> sorter_readings;
     private final JButton editCustomerButton = new JButton("Kunde bearbeiten");
-    private final JButton deleteButton = new JButton("Kunde löschen");
+    private final JButton deleteUserButton = new JButton("Kunde löschen");
     private final JButton newCustomerButton = new JButton("Neuer Kunde");
     private final JButton resetFilterButton = new JButton("Filter zurücksetzen");
     private UtilDateModel datemodel_start_date, datemodel_end_date;
     private final JButton newReadingButton = new JButton("Neue Ablesung");
     private final JButton filterReadingsButton = new JButton("Filter Ablesungen");
     private final JButton editReadingButton = new JButton("Ablesung bearbeiten");
+    private final JButton deleteReadingButton = new JButton("Ablesung löschen");
     private final JTextField tf_filterCustomer = new JTextField();
     DefaultTableModel customerTableModel = new DefaultTableModel();
     DefaultTableModel model_readings = new DefaultTableModel();
@@ -181,11 +182,11 @@ public class AllCustomersTable extends JFrame {
         table_readings = new JTable();
 
         // Buttons
-        final JPanel buttonPanel = new JPanel(new GridLayout(1, 6));
+        final JPanel buttonPanel = new JPanel(new GridLayout(1, 7));
         buttonPanel.add(newCustomerButton);
         buttonPanel.add(newReadingButton);
         buttonPanel.add(editCustomerButton);
-        buttonPanel.add(deleteButton);
+        buttonPanel.add(deleteUserButton);
         buttonPanel.add(resetFilterButton);
 
         // Datepicker
@@ -219,6 +220,7 @@ public class AllCustomersTable extends JFrame {
 
         buttonPanel.add(filterReadingsButton);
         buttonPanel.add(editReadingButton);
+        buttonPanel.add(deleteReadingButton);
 
         final JPanel centerPanel = new JPanel(new BorderLayout());
         add(centerPanel, BorderLayout.CENTER);
@@ -267,7 +269,7 @@ public class AllCustomersTable extends JFrame {
 
         newReadingButton.addActionListener(e -> openNewReadingsWindow());
         editReadingButton.addActionListener(e -> openEditReadingsWindow());
-        deleteButton.addActionListener(e -> attemptCustomerDeletion());
+        deleteUserButton.addActionListener(e -> attemptCustomerDeletion());
 
         //TODO: Maybe use observer pattern for notifying table on changes
         newCustomerButton.addActionListener(e -> new KundeErstellenDialog(this));
@@ -288,12 +290,28 @@ public class AllCustomersTable extends JFrame {
             new EditCustomerDataWindow(customerSelected, this);
         });
 
+        deleteReadingButton.addActionListener(e -> attemptReadingDeletion());
+
         filterReadingsButton.addActionListener(e -> filterReadings());
         resetFilterButton.addActionListener(e -> resetFilter());
 
         // Passe die Größe des Fensters an
         setSize(1500, 600);
         setVisible(true);
+    }
+
+    private void attemptReadingDeletion() {
+
+        try {
+            Ablesung selectedReading = getSelectedReading();
+            readingService.deleteReading(selectedReading);
+            filterReadings();
+
+            MessageDialog.showSuccessMessage("Ablesung wurde erfolgreich gelöscht");
+        }
+        catch (Exception e) {
+            MessageDialog.showErrorMessage(e.getMessage());
+        }
     }
 
     private void filterReadings() {
