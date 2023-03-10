@@ -123,8 +123,8 @@ public abstract class BaseReadingInputWindow extends JFrame {
         try {
             Ablesung reading = getReadingOfInputFields();
             saveReading(reading);
-            allCustomersTable.refreshTable();
-            allCustomersTable.refreshTableReadings();
+            allCustomersTable.refreshCustomerTable();
+            allCustomersTable.loadInitialTableDataReadings();
             MessageDialog.showSuccessMessage("Ablesung wurde gespeichert");
         }
         catch (Exception e) {
