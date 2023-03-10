@@ -24,7 +24,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.UUID;
 
 
@@ -46,6 +45,7 @@ public class AllCustomersTable extends JFrame {
     private final JButton newReadingButton = new JButton("Neue Ablesung");
     private final JButton filterReadingsButton = new JButton("Filter Ablesungen");
     private final JButton editReadingButton = new JButton("Ablesung bearbeiten");
+    private final JTextField tf_filterCustomer = new JTextField();
     DefaultTableModel customerTableModel = new DefaultTableModel();
     DefaultTableModel model_readings = new DefaultTableModel();
     private JMenu menu_file, menu_about, menu_settings, submenu_themes;
@@ -189,14 +189,14 @@ public class AllCustomersTable extends JFrame {
         buttonPanel.add(resetFilterButton);
 
         // Datepicker
-        final JPanel datumPanel = new JPanel(new GridLayout(1, 2));
-        datumPanel.setBorder(BorderFactory.createTitledBorder("Datum"));
+        final JPanel filterPanel = new JPanel(new GridLayout(1, 3));
+        filterPanel.setBorder(BorderFactory.createTitledBorder("Filter"));
 
         datemodel_start_date = new UtilDateModel();
         JDatePanelImpl datePanel_start_date = new JDatePanelImpl(datemodel_start_date);
         JDatePickerImpl datePicker_start_date = new JDatePickerImpl(datePanel_start_date, new DatePickerFormatter());
-        datePicker_start_date.setBorder(BorderFactory.createTitledBorder("von"));
-        datumPanel.add(datePicker_start_date);
+        datePicker_start_date.setBorder(BorderFactory.createTitledBorder(" Datum von"));
+        filterPanel.add(datePicker_start_date);
         datemodel_start_date.setValue(null);
         datemodel_start_date.setSelected(false); // Setzt das heutige Datum in das Datumsfeld ein
 
@@ -204,9 +204,18 @@ public class AllCustomersTable extends JFrame {
         JDatePanelImpl datePanel_end_date = new JDatePanelImpl(datemodel_end_date);
         JDatePickerImpl datePicker_end_date = new JDatePickerImpl(datePanel_end_date, new DatePickerFormatter());
         datePicker_end_date.setBorder(BorderFactory.createTitledBorder("bis"));
-        datumPanel.add(datePicker_end_date);
+        filterPanel.add(datePicker_end_date);
         datemodel_end_date.setValue(null);
         datemodel_end_date.setSelected(false); // Setzt das heutige Datum in das Datumsfeld ein
+
+        // Kundennummer Filter
+        JPanel pn_filterCustomer = new JPanel(new GridLayout(1, 2));
+        JButton btn_filterCustomer = new JButton("nach Kundennummer filtern");
+        pn_filterCustomer.setBorder(BorderFactory.createTitledBorder("Kundennummer"));
+        pn_filterCustomer.add(tf_filterCustomer);
+        pn_filterCustomer.add(btn_filterCustomer);
+        filterPanel.add(pn_filterCustomer);
+        btn_filterCustomer.addActionListener(e -> filterByCustomerNumber(tf_filterCustomer.getText()));
 
         buttonPanel.add(filterReadingsButton);
         buttonPanel.add(editReadingButton);
@@ -254,8 +263,7 @@ public class AllCustomersTable extends JFrame {
         scrollPane_reading.setBorder(BorderFactory.createTitledBorder("Ablesungen"));
 
         add(buttonPanel, BorderLayout.SOUTH);
-        centerPanel.add(datumPanel, BorderLayout.NORTH);
-
+        centerPanel.add(filterPanel, BorderLayout.NORTH);
 
         newReadingButton.addActionListener(e -> openNewReadingsWindow());
         editReadingButton.addActionListener(e -> openEditReadingsWindow());
@@ -292,6 +300,18 @@ public class AllCustomersTable extends JFrame {
         // Passe die Größe des Fensters an
         setSize(1500, 600);
         setVisible(true);
+    }
+
+    private void filterByCustomerNumber(String customerNumber) {
+        Kunde customer;
+        try {
+            customer = customerService.getCustomerById(UUID.fromString(customerNumber));
+            customerTableModel.setRowCount(0);
+            Object[] row = {customer.getId(), customer.getVorname(), customer.getName()};
+            customerTableModel.addRow(row);
+        } catch (IllegalArgumentException ex) {
+            MessageDialog.showErrorMessage("Kundennummer existiert nicht");
+        }
     }
 
     private void resetFilter() {
