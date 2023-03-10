@@ -19,10 +19,10 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.time.LocalDate;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -196,14 +196,14 @@ public class AllCustomersTable extends JFrame {
         JDatePickerImpl datePicker_start_date = new JDatePickerImpl(datePanel_start_date, new DatePickerFormatter());
         datePicker_start_date.setBorder(BorderFactory.createTitledBorder("von"));
         datumPanel.add(datePicker_start_date);
-        datemodel_start_date.setSelected(true); // Setzt das heutige Datum in das Datumsfeld ein
+        datemodel_start_date.setSelected(false); // Setzt das heutige Datum in das Datumsfeld ein
 
         datemodel_end_date = new UtilDateModel();
         JDatePanelImpl datePanel_end_date = new JDatePanelImpl(datemodel_end_date);
         JDatePickerImpl datePicker_end_date = new JDatePickerImpl(datePanel_end_date, new DatePickerFormatter());
         datePicker_end_date.setBorder(BorderFactory.createTitledBorder("bis"));
         datumPanel.add(datePicker_end_date);
-        datemodel_end_date.setSelected(true); // Setzt das heutige Datum in das Datumsfeld ein
+        datemodel_end_date.setSelected(false); // Setzt das heutige Datum in das Datumsfeld ein
 
         buttonPanel.add(filterReadingsButton);
         buttonPanel.add(editReadingButton);
@@ -283,18 +283,23 @@ public class AllCustomersTable extends JFrame {
             showReadingsForSelectedCustomer(start_date, end_date);
         });
 
-        resetFilterButton.addActionListener(e -> {
-            table_customers.clearSelection();
-            table_readings.clearSelection();
-
-            loadInitialCustomerTableData();
-            loadInitialTableDataReadings();
-        });
+        resetFilterButton.addActionListener(e -> resetFilter());
 
 
         // Passe die Größe des Fensters an
         setSize(1500, 600);
         setVisible(true);
+    }
+
+    private void resetFilter() {
+        table_customers.clearSelection();
+        table_readings.clearSelection();
+
+        this.datemodel_start_date.setValue(null);
+        this.datemodel_end_date.setValue(null);
+
+        loadInitialCustomerTableData();
+        loadInitialTableDataReadings();
     }
 
     private void openEditReadingsWindow() {
