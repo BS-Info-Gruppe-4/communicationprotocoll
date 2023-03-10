@@ -11,7 +11,6 @@ import jakarta.ws.rs.core.Response;
 
 import javax.swing.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
@@ -105,6 +104,23 @@ public class ReadingService {
         }
             sessionStorage.syncWithBackend();
             return response.readEntity(Ablesung.class);
+    }
+
+    public Ablesung getReadingById(UUID readingId) {
+
+        Response response = webClient.getReadingById(readingId);
+
+        if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+            String errorMessage = response.readEntity(String.class);
+            throw new NotFoundException(errorMessage);
+        }
+
+        if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+            throw new UnknownError("Es ist ein unbekannter Fehler aufgetreten");
+        }
+
+        sessionStorage.syncWithBackend();
+        return response.readEntity(Ablesung.class);
     }
 
     public ArrayList<Ablesung> getReadingsWithRestrictions (UUID customerId, LocalDate startingDate, LocalDate
