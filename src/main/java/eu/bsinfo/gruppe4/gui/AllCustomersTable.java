@@ -288,18 +288,29 @@ public class AllCustomersTable extends JFrame {
             new EditCustomerDataWindow(customerSelected, this);
         });
 
-        filterReadingsButton.addActionListener(e -> {
-            start_date = LocalDate.of(datePicker_start_date.getModel().getYear(), datePicker_start_date.getModel().getMonth() + 1, datePicker_start_date.getModel().getDay());
-            end_date = LocalDate.of(datemodel_end_date.getYear(), datemodel_end_date.getMonth() + 1, datemodel_end_date.getDay());
-            showReadingsForSelectedCustomer(start_date, end_date);
-        });
-
+        filterReadingsButton.addActionListener(e -> filterReadings());
         resetFilterButton.addActionListener(e -> resetFilter());
-
 
         // Passe die Größe des Fensters an
         setSize(1500, 600);
         setVisible(true);
+    }
+
+    private void filterReadings() {
+        LocalDate startingDate = getSelectedStartingDate();
+        LocalDate endingDate = getSelectedEndingDate();
+
+        ArrayList <Ablesung> filteredReadings;
+        String customerIdAsString = tf_filterCustomer.getText();
+
+        try {
+            UUID customerId = customerIdAsString.isEmpty() ? null : UUID.fromString(customerIdAsString);
+            filteredReadings = readingService.getReadingsWithRestrictions(customerId, startingDate, endingDate);
+            setReadingsTableData(filteredReadings);
+        }
+        catch (Exception ex) {
+            MessageDialog.showErrorMessage(ex.getMessage());
+        }
     }
 
     private void filterByCustomerNumber(String customerNumber) {
@@ -453,7 +464,7 @@ public class AllCustomersTable extends JFrame {
         model_readings.fireTableDataChanged();
     }
 
-    public void showReadingsForSelectedCustomer(LocalDate start, LocalDate end) {
+    public void showFilteredReadings(LocalDate start, LocalDate end) {
         int selectedRow = table_customers.getSelectedRow();
         boolean noRowIsSelected = selectedRow == -1;
 
