@@ -24,6 +24,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
 
@@ -196,6 +197,7 @@ public class AllCustomersTable extends JFrame {
         JDatePickerImpl datePicker_start_date = new JDatePickerImpl(datePanel_start_date, new DatePickerFormatter());
         datePicker_start_date.setBorder(BorderFactory.createTitledBorder("von"));
         datumPanel.add(datePicker_start_date);
+        datemodel_start_date.setValue(null);
         datemodel_start_date.setSelected(false); // Setzt das heutige Datum in das Datumsfeld ein
 
         datemodel_end_date = new UtilDateModel();
@@ -203,6 +205,7 @@ public class AllCustomersTable extends JFrame {
         JDatePickerImpl datePicker_end_date = new JDatePickerImpl(datePanel_end_date, new DatePickerFormatter());
         datePicker_end_date.setBorder(BorderFactory.createTitledBorder("bis"));
         datumPanel.add(datePicker_end_date);
+        datemodel_end_date.setValue(null);
         datemodel_end_date.setSelected(false); // Setzt das heutige Datum in das Datumsfeld ein
 
         buttonPanel.add(filterReadingsButton);
@@ -292,6 +295,7 @@ public class AllCustomersTable extends JFrame {
     }
 
     private void resetFilter() {
+
         table_customers.clearSelection();
         table_readings.clearSelection();
 
@@ -300,6 +304,26 @@ public class AllCustomersTable extends JFrame {
 
         loadInitialCustomerTableData();
         loadInitialTableDataReadings();
+    }
+
+    private LocalDate getSelectedStartingDate() {
+
+        if (datemodel_start_date.getValue() == null) return null;
+
+        return LocalDate.of(
+                datemodel_start_date.getYear(),
+                datemodel_start_date.getMonth() + 1,
+                datemodel_start_date.getDay());
+    }
+
+    private LocalDate getSelectedEndingDate() {
+
+        if (datemodel_end_date.getValue() == null) return null;
+
+        return LocalDate.of(
+                datemodel_end_date.getYear(),
+                datemodel_end_date.getMonth() + 1,
+                datemodel_end_date.getDay());
     }
 
     private void openEditReadingsWindow() {
@@ -425,7 +449,7 @@ public class AllCustomersTable extends JFrame {
             filteredReadings = readingService.getReadingsWithRestrictions(UUID.fromString(customerId), start, end);
             setReadingsTableData(filteredReadings);
         }
-        catch (NotFoundException | UnknownError ex) {
+        catch (Exception ex) {
             MessageDialog.showErrorMessage(ex.getMessage());
         }
 
