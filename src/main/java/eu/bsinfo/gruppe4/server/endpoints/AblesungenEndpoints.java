@@ -134,6 +134,7 @@ public class AblesungenEndpoints {
         }
     }
 
+    //FIXME: Unit test fails bc start and ending date are also included instead of being excluded
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllReadingsWithRestriction(
