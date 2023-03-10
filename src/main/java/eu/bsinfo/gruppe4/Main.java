@@ -1,7 +1,6 @@
 package eu.bsinfo.gruppe4;
 
 import eu.bsinfo.gruppe4.gui.AllCustomersTable;
-import eu.bsinfo.gruppe4.gui.PropertyManagementApplication;
 import eu.bsinfo.gruppe4.server.Server;
 
 public class Main {
