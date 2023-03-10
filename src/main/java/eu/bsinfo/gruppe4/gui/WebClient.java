@@ -84,6 +84,14 @@ public class WebClient {
         return response.readEntity(new GenericType<>() {});
     }
 
+    public ArrayList<Ablesung> getAllReadings() {
+        Response response = webTarget.path(PATH_READINGS_ENDPOINTS)
+                .request(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
+        return response.readEntity(new GenericType<>() {});
+    }
+
     public static boolean entityWasCreated(Response response) {
         return response.getStatus() == 201;
     }

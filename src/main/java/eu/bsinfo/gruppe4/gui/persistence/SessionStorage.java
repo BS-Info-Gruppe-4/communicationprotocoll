@@ -21,7 +21,12 @@ public class SessionStorage {
     private ArrayList<Ablesung> ablesungen = new ArrayList<>();
 
     public SessionStorage() {
-        syncWithBackend();
+        var alleKunden = webClient.getAllCustomers();
+        setKunden(alleKunden);
+
+        var readingsOfLast2Years = webClient.getReadingsOfLast2Years();
+        setAblesungen(readingsOfLast2Years);
+
     }
 
     public void addKunde(Kunde kunde) {
@@ -32,7 +37,7 @@ public class SessionStorage {
         var alleKunden = webClient.getAllCustomers();
         setKunden(alleKunden);
 
-        var readingsOfLast2Years = webClient.getReadingsOfLast2Years();
-        setAblesungen(readingsOfLast2Years);
+        var allReadings = webClient.getAllReadings();
+        setAblesungen(allReadings);
     }
 }
