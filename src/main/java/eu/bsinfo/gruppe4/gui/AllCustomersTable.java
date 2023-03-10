@@ -329,6 +329,7 @@ public class AllCustomersTable extends JFrame {
 
         table_customers.clearSelection();
         table_readings.clearSelection();
+        tf_filterCustomer.setText(null);
 
         this.datemodel_start_date.setValue(null);
         this.datemodel_end_date.setValue(null);
