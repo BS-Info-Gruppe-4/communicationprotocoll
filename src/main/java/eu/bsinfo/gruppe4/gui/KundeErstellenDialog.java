@@ -82,7 +82,7 @@ public class KundeErstellenDialog extends JFrame {
             if (WebClient.entityWasCreated(r)) {
                 MessageDialog.showSuccessMessage("Kunde wurde erfolgreich erstellt");
 
-                act.refreshTable();
+                act.refreshCustomerTable();
             }
             else {
                 String errorMessage;

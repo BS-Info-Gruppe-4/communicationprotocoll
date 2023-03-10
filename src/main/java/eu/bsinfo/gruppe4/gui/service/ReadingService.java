@@ -21,7 +21,6 @@ public class ReadingService {
     private final PlausibilityService plausibilityService = new PlausibilityService();
     private final SessionStorage sessionStorage = SessionStorage.getInstance();
 
-
     public void createReading(Ablesung newReading) {
 
         if (plausibilityService.isNotPlausible(newReading)) {
@@ -59,6 +58,8 @@ public class ReadingService {
 
     public String updateReading(Ablesung reading) {
 
+        // It is not specified if the update action should be canceled if a reading is not plausible.
+        // Therefore, the update reading will still be updated despite the warning
         if (plausibilityService.isNotPlausible(reading)) {
             MessageDialog.showWarningMessage("Der Wert des Zählerstands liegt außerhalb des Normbereichs!\n" +
                     "Möglicherweise liegt ein Leck vor.");
@@ -96,12 +97,12 @@ public class ReadingService {
         if (response.getStatus() != Response.Status.OK.getStatusCode()) {
             throw new UnknownError("Es ist ein unbekannter Fehler aufgetreten");
         }
-
-        sessionStorage.syncWithBackend();
-        return response.readEntity(Ablesung.class);
+            sessionStorage.syncWithBackend();
+            return response.readEntity(Ablesung.class);
     }
 
-    public ArrayList<Ablesung> getReadingsWithRestrictions(UUID customerId, LocalDate startingDate, LocalDate endingDate) {
+    public ArrayList<Ablesung> getReadingsWithRestrictions (UUID customerId, LocalDate startingDate, LocalDate
+    endingDate){
         Response response = webClient.getReadingsWithRestrictions(customerId, startingDate, endingDate);
 
         if (response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode()) {
@@ -119,7 +120,8 @@ public class ReadingService {
         }
 
         sessionStorage.syncWithBackend();
-        return response.readEntity(new GenericType<>() {});
+        return response.readEntity(new GenericType<>() {
+        });
     }
 
 
@@ -129,7 +131,7 @@ public class ReadingService {
                 .findFirst();
     }
 
-    private boolean doesUserWantToKeepOldReading() {
+    private boolean doesUserWantToKeepOldReading () {
         int reply = JOptionPane.showConfirmDialog(
                 null,
                 "Ein Datensatz mit den selben Werten ist bereits vorhanden. \n" +
@@ -140,7 +142,8 @@ public class ReadingService {
         return reply == JOptionPane.NO_OPTION;
     }
 
-    private void removeDuplicate(Ablesung oldReading) {
+    private void removeDuplicate (Ablesung oldReading){
         deleteReading(oldReading);
     }
+
 }
