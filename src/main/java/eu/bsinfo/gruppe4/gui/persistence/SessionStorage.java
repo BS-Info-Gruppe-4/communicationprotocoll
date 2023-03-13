@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Optional;
+import java.util.UUID;
 
 public class SessionStorage {
 
@@ -26,6 +28,12 @@ public class SessionStorage {
 
     public void addKunde(Kunde kunde) {
         kunden.add(kunde);
+    }
+
+    public Optional<Ablesung> getReadingById(UUID readingId) {
+        return ablesungen.stream()
+                .filter(savedReading -> savedReading.getId().equals(readingId))
+                .findFirst();
     }
 
     public void syncWithBackend() {

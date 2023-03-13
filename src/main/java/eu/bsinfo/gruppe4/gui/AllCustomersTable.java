@@ -211,7 +211,7 @@ public class AllCustomersTable extends JFrame {
 
         // Kundennummer Filter
         JPanel pn_filterCustomer = new JPanel(new GridLayout(1, 2));
-        JButton btn_filterCustomer = new JButton("nach Kundennummer filtern");
+        JButton btn_filterCustomer = new JButton("Kunden filtern");
         pn_filterCustomer.setBorder(BorderFactory.createTitledBorder("Kundennummer"));
         pn_filterCustomer.add(tf_filterCustomer);
         pn_filterCustomer.add(btn_filterCustomer);

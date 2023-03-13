@@ -11,7 +11,6 @@ import jakarta.ws.rs.core.Response;
 
 import javax.swing.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
@@ -62,16 +61,21 @@ public class ReadingService {
         sessionStorage.syncWithBackend();
     }
 
-    public String updateReading(Ablesung reading) {
+    public String updateReading(Ablesung readingToUpdate) {
 
         // It is not specified if the update action should be canceled if a reading is not plausible.
         // Therefore, the update reading will still be updated despite the warning
-        if (plausibilityService.isNotPlausible(reading)) {
+        if (plausibilityService.isNotPlausible(readingToUpdate)) {
             MessageDialog.showWarningMessage("Der Wert des Zählerstands liegt außerhalb des Normbereichs!\n" +
                     "Möglicherweise liegt ein Leck vor.");
         }
 
-        Response response = webClient.updateAblesung(reading);
+
+        if (hasReadingOnServerChangedInMeantime(readingToUpdate)) {
+            if (doesUserWantToKeepReadingOnServer()) return "Ablesung wurde nicht aktualisiert.\n" + "Die Daten auf dem Server werden beibehalten.";
+        }
+
+        Response response = webClient.updateAblesung(readingToUpdate);
 
         if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
             String errorMessage = response.readEntity(String.class);
@@ -91,6 +95,25 @@ public class ReadingService {
         return response.readEntity(String.class);
     }
 
+    private boolean hasReadingOnServerChangedInMeantime(Ablesung readingToCheck) {
+        Ablesung readingOnServer = getReadingById(readingToCheck.getId());
+        Ablesung readingInSessionStorage = sessionStorage.getReadingById(readingToCheck.getId())
+                .orElseThrow(() -> new RuntimeException("Die gesuchte Ablesung existiert nicht mehr im Sitzungsspeicher"));
+
+        return !readingOnServer.equals(readingInSessionStorage);
+    }
+
+    private boolean doesUserWantToKeepReadingOnServer() {
+        int reply = JOptionPane.showConfirmDialog(
+                null,
+                "Der Datensatz hat sich in zwischenzeit auf dem Server geändert. \n" +
+                        "Möchtest du ihn mit deinen geänderten Daten überschreiben?",
+                "Datensatz hat sich geändert",
+                JOptionPane.YES_NO_OPTION);
+
+        return reply == JOptionPane.NO_OPTION;
+    }
+
     public Ablesung deleteReading(Ablesung reading) {
 
         Response response = webClient.deleteReadingById(reading.getId());
@@ -105,6 +128,23 @@ public class ReadingService {
         }
             sessionStorage.syncWithBackend();
             return response.readEntity(Ablesung.class);
+    }
+
+    public Ablesung getReadingById(UUID readingId) {
+
+        Response response = webClient.getReadingById(readingId);
+
+        if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+            String errorMessage = response.readEntity(String.class);
+            throw new NotFoundException(errorMessage);
+        }
+
+        if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+            throw new UnknownError("Es ist ein unbekannter Fehler aufgetreten");
+        }
+
+        sessionStorage.syncWithBackend();
+        return response.readEntity(Ablesung.class);
     }
 
     public ArrayList<Ablesung> getReadingsWithRestrictions (UUID customerId, LocalDate startingDate, LocalDate

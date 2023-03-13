@@ -66,6 +66,14 @@ public class WebClient {
                 .post(Entity.entity(reading, MediaType.APPLICATION_JSON));
     }
 
+    public Response getReadingById(UUID readingId) {
+        String pfad = PATH_READINGS_ENDPOINTS + "/" + readingId;
+        return webTarget.path(pfad)
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
+    }
+
     public Response getReadingsWithRestrictions(UUID customerId, LocalDate startingDate, LocalDate endingDate) {
         return  webTarget.path(PATH_READINGS_ENDPOINTS)
                 .queryParam("kunde", customerId)
