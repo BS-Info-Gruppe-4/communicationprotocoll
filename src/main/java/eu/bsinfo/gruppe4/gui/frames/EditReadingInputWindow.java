@@ -1,6 +1,7 @@
 package eu.bsinfo.gruppe4.gui.frames;
 
 import eu.bsinfo.gruppe4.gui.AllCustomersTable;
+import eu.bsinfo.gruppe4.gui.MessageDialog;
 import eu.bsinfo.gruppe4.gui.service.ReadingService;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 
@@ -31,6 +32,7 @@ public class EditReadingInputWindow extends BaseReadingInputWindow {
     @Override
     protected void saveReading(Ablesung reading) {
         reading.setId(currentEditingReading.getId());
-        readingService.updateReading(reading);
+        String responseMessage = readingService.updateReading(reading);
+        MessageDialog.showSuccessMessage(responseMessage);
     }
 }
