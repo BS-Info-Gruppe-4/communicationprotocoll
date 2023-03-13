@@ -54,7 +54,7 @@ public class AboutUsWindow extends JFrame {
         con.add(label_bild, BorderLayout.CENTER);
         con.add(panel, BorderLayout.EAST);
 
-        panel.add(new JLabel("BS Info Gruppe 4"));
+        panel.add(new JLabel("Söder Software GmbH"));
         panel.add(new JLabel("Version: 0.0.1"));
         panel.add(label_text);
 

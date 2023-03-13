@@ -53,11 +53,11 @@ public class LoadingWindow extends JFrame {
         label_starting.setHorizontalAlignment(0);
         label_starting.setFont(new Font("Serif", Font.PLAIN, 24));
 
-        label_gruppe4 = new JLabel("Hausverwaltung");
+        label_gruppe4 = new JLabel("Propertymanagement");
         label_gruppe4.setHorizontalAlignment(0);
         label_gruppe4.setFont(new Font("Serif", Font.PLAIN, 20));
 
-        panel.add(new JLabel("BS Info Gruppe 4"));
+        panel.add(new JLabel("Söder Software GmbH"));
         panel.add(label_gruppe4);
         panel.add(new JLabel(""));
         panel.add(label_starting);
@@ -79,7 +79,7 @@ public class LoadingWindow extends JFrame {
             i += 20;
         }
         dispose();
-        new PropertyManagementApplication();
+        new AllCustomersTable();
     }
 
     private void exit() {
