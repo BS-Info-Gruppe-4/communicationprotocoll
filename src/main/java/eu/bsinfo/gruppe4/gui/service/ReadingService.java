@@ -71,8 +71,8 @@ public class ReadingService {
         }
 
 
-        if (!hasReadingOnServerChangedInMeantime(readingToUpdate)) {
-            if (doesUserWantToKeepReadingOnServer()) return "Ablesung wurde nicht aktualisiert.\n" + "Die Daten auf dem Server werden beibehalten";
+        if (hasReadingOnServerChangedInMeantime(readingToUpdate)) {
+            if (doesUserWantToKeepReadingOnServer()) return "Ablesung wurde nicht aktualisiert.\n" + "Die Daten auf dem Server werden beibehalten.";
         }
 
         Response response = webClient.updateAblesung(readingToUpdate);
