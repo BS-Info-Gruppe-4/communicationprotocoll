@@ -9,6 +9,7 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonDeserialize(keyUsing = KundeMapKeyDeserializer.class)
 public class Kunde {
     @EqualsAndHashCode.Include
@@ -20,5 +21,9 @@ public class Kunde {
     public Kunde(String name, String vorname) {
         this.name = name;
         this.vorname = vorname;
+    }
+
+    public String toString() {
+        return "UUID: "+this.id+ "Name: "+this.vorname+ " "+this.name;
     }
 }

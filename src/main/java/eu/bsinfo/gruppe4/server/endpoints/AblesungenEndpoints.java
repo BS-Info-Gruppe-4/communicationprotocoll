@@ -97,23 +97,29 @@ public class AblesungenEndpoints {
         if (queriedReading.isEmpty()) {
             return Response
                     .status(Response.Status.NOT_FOUND)
-                    .entity("Die Ablesung existiert nicht!")
+                    .entity("Die übergebene Ablesung existiert nicht!")
                     .build();
         }
 
-        queriedReading.ifPresent(
-                ablesung -> {
-                    jsonRepository.deleteAblesung(ablesung.getId());
-                    jsonRepository.save(providedReading);
-                }
-        );
+        Ablesung reading = queriedReading.get();
+        Kunde customerOfReading = reading.getKunde();
+
+        if (customerOfReading == null || !jsonRepository.kundeExists(customerOfReading.getId())){
+            return Response
+                    .status(Response.Status.NOT_FOUND)
+                    .entity("Der Kunde der Ablesung existiert nicht!")
+                    .build();
+        }
+
+        jsonRepository.deleteAblesung(reading.getId());
+        jsonRepository.save(providedReading);
 
         return Response.ok("Ablesung wurde aktualisiert").build();
     }
     @DELETE
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAblesung(@PathParam(("id")) String readingID){
+    public Response deleteReading(@PathParam(("id")) String readingID){
         try{
             UUID ReadingUUID = UUID.fromString(readingID);
             Optional<Ablesung> dReading=jsonRepository.getAblesung(ReadingUUID);
@@ -128,6 +134,7 @@ public class AblesungenEndpoints {
         }
     }
 
+    //FIXME: Unit test fails bc start and ending date are also included instead of being excluded
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllReadingsWithRestriction(

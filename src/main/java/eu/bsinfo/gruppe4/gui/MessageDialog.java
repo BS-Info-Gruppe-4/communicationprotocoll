@@ -4,7 +4,7 @@ import javax.swing.*;
 
 public class MessageDialog {
 
-    static void showErrorMessage(String fehlermeldung) {
+    public static void showErrorMessage(String fehlermeldung) {
         JOptionPane.showMessageDialog(
                 null,
                 "Fehlerhafte Eingabe: " + fehlermeldung,
@@ -13,7 +13,7 @@ public class MessageDialog {
         );
     }
 
-    static void showSuccessMessage(String message) {
+    public static void showSuccessMessage(String message) {
         JOptionPane.showMessageDialog(
                 null,
                 message,
@@ -22,7 +22,7 @@ public class MessageDialog {
         );
     }
 
-    static void showWarningMessage(String message) {
+    public static void showWarningMessage(String message) {
         JOptionPane.showMessageDialog(
                 null,
                 message,
