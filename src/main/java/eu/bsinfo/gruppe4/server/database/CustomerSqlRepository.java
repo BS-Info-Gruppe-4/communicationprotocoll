@@ -11,21 +11,39 @@ public class CustomerSqlRepository implements CustomerRepository {
 
     @Override
     public void saveKunde(Kunde kunde) {
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        String query = "INSERT INTO Kunde (id, name, vorname) VALUES (?, ?, ?)";
 
+        try (Connection con = Util.getConnection("gm3")) {
+
+            statement = con.prepareStatement(query);
+            statement.setString(1, kunde.getId().toString());
+            statement.setString(2, kunde.getName());
+            statement.setString(3, kunde.getVorname());
+            statement.executeUpdate();
+        }
+
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        finally {
+            Util.close(statement);
+            Util.close(resultSet);
+        }
     }
 
     public Optional<Kunde> getKundeById(UUID kundenId) {
         Kunde kunde;
-        Connection con = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         String query = "SELECT name, vorname FROM Kunde WHERE id = ?";
 
-        try {
-            con = Util.getConnection("gm3");
+        try (Connection con = Util.getConnection("gm3")){
 
             statement = con.prepareStatement(query);
-            statement.setObject(1, kundenId);
+            statement.setString(1, kundenId.toString());
             resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
@@ -47,8 +65,6 @@ public class CustomerSqlRepository implements CustomerRepository {
         finally {
             Util.close(statement);
             Util.close(resultSet);
-            Util.close(con);
-
         }
     }
 
