@@ -21,6 +21,7 @@ public class Util {
         if (obj != null) {
             try {
                 obj.close();
+                con = null;
             } catch (final Exception e) {
                 // ignore
             }
