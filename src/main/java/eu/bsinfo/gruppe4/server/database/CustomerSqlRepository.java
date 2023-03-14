@@ -16,14 +16,17 @@ public class CustomerSqlRepository implements CustomerRepository {
 
     public Optional<Kunde> getKundeById(UUID kundenId) {
         Kunde kunde;
+        Connection con = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
         String query = "SELECT name, vorname FROM Kunde WHERE id = ?";
 
         try {
-            Connection con = Util.getConnection("gm3");
+            con = Util.getConnection("gm3");
 
-            PreparedStatement statement = con.prepareStatement(query);
+            statement = con.prepareStatement(query);
             statement.setObject(1, kundenId);
-            ResultSet resultSet = statement.executeQuery();
+            resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
                 String name = resultSet.getString("name");
@@ -36,8 +39,16 @@ public class CustomerSqlRepository implements CustomerRepository {
 
             return Optional.empty();
         }
+
         catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+
+        finally {
+            Util.close(statement);
+            Util.close(resultSet);
+            Util.close(con);
+
         }
     }
 
