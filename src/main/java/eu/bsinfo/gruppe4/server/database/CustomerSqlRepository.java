@@ -126,5 +126,18 @@ public class CustomerSqlRepository implements CustomerRepository {
     @Override
     public void deleteKunde(UUID kundenId) {
 
+        String sql = "DELETE FROM Kunde WHERE id=?";
+
+        try(PreparedStatement deleteStatement = con.prepareStatement(sql)) {
+
+            deleteStatement.setString(1, kundenId.toString());
+            int rowsUpdated = deleteStatement.executeUpdate();
+
+            if (rowsUpdated <= 0) throw new RuntimeException("Was not able to delete customer");
+
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
