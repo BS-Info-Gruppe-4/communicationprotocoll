@@ -9,13 +9,14 @@ import java.util.UUID;
 
 public class CustomerSqlRepository implements CustomerRepository {
 
+    private final Connection con = Util.getConnection("gm3");
+
     @Override
     public void saveKunde(Kunde kunde) {
         PreparedStatement statement = null;
-        ResultSet resultSet = null;
         String query = "INSERT INTO Kunde (id, name, vorname) VALUES (?, ?, ?)";
 
-        try (Connection con = Util.getConnection("gm3")) {
+        try {
 
             statement = con.prepareStatement(query);
             statement.setString(1, kunde.getId().toString());
@@ -30,7 +31,6 @@ public class CustomerSqlRepository implements CustomerRepository {
 
         finally {
             Util.close(statement);
-            Util.close(resultSet);
         }
     }
 
@@ -40,7 +40,7 @@ public class CustomerSqlRepository implements CustomerRepository {
         ResultSet resultSet = null;
         String query = "SELECT name, vorname FROM Kunde WHERE id = ?";
 
-        try (Connection con = Util.getConnection("gm3")){
+        try {
 
             statement = con.prepareStatement(query);
             statement.setString(1, kundenId.toString());
@@ -70,7 +70,28 @@ public class CustomerSqlRepository implements CustomerRepository {
 
     @Override
     public ArrayList<Kunde> getAlleKunden() {
-        return null;
+
+        ArrayList<Kunde> allCustomers = new ArrayList<>();
+        String query = "SELECT * FROM Kunde";
+
+        try (PreparedStatement statement = con.prepareStatement(query);
+             ResultSet rs = statement.executeQuery()) {
+
+            while (rs.next()) {
+                UUID id = UUID.fromString(rs.getString("id"));
+                String name = rs.getString("name");
+                String vorname = rs.getString("vorname");
+                Kunde kunde = new Kunde(id, name, vorname);
+                allCustomers.add(kunde);
+            }
+        }
+
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        return allCustomers;
     }
 
     @Override
