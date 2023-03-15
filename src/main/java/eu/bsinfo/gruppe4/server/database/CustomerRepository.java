@@ -8,10 +8,11 @@ import java.util.UUID;
 
 public interface CustomerRepository {
 
-    public void saveKunde(Kunde kunde);
-    public Optional<Kunde> getKundeById(UUID kundenId);
-    public ArrayList<Kunde> getAlleKunden();
-    public boolean doesKundeExist(UUID kundenId);
-    public void deleteKunde(UUID kundenId);
+    void saveKunde(Kunde kunde);
+    Optional<Kunde> getKundeById(UUID kundenId);
+    ArrayList<Kunde> getAlleKunden();
+    boolean doesKundeExist(UUID kundenId);
+    void updateKunde(Kunde kunde);
+    void deleteKunde(UUID kundenId);
 
 }
