@@ -1,11 +1,13 @@
 package eu.bsinfo.gruppe4.server;
 
 import com.sun.net.httpserver.HttpServer;
+import eu.bsinfo.gruppe4.server.database.Util;
 import eu.bsinfo.gruppe4.server.persistence.JsonRepository;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import java.net.URI;
+import java.sql.Connection;
 
 public class Server {
 
@@ -48,6 +50,10 @@ public class Server {
             JsonRepository jsonRepository = JsonRepository.getInstance();
             jsonRepository.persistDataInJsonFile();
         }
+
+        Connection connection = Util.getConnection("gm3");
+        Util.close(connection);
+        System.out.println("Closed connection to database");
 
         server.stop(0);
         serverIsOnline = false;
