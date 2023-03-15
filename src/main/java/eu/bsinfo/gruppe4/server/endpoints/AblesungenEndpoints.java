@@ -1,5 +1,7 @@
 package eu.bsinfo.gruppe4.server.endpoints;
 
+import eu.bsinfo.gruppe4.server.database.CustomerSqlRepository;
+import eu.bsinfo.gruppe4.server.database.ReadingSqlRepository;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 import eu.bsinfo.gruppe4.server.persistence.JsonRepository;
@@ -17,6 +19,8 @@ import java.util.UUID;
 public class AblesungenEndpoints {
 
     private final JsonRepository jsonRepository = JsonRepository.getInstance();
+    private final ReadingSqlRepository readingSqlRepository = new ReadingSqlRepository();
+    private final CustomerSqlRepository customerSqlRepository = new CustomerSqlRepository();
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -38,7 +42,7 @@ public class AblesungenEndpoints {
         }
 
         UUID customerIdOfReading = ablesung.getKunde().getId();
-        Optional<Kunde> savedCustomerOfReading = jsonRepository.getKunde(customerIdOfReading);
+        Optional<Kunde> savedCustomerOfReading = customerSqlRepository.getKundeById(customerIdOfReading);
 
         if (savedCustomerOfReading.isEmpty()) {
             return Response
@@ -48,7 +52,8 @@ public class AblesungenEndpoints {
         }
 
         ablesung.setId(UUID.randomUUID());
-        jsonRepository.save(ablesung);
+        //jsonRepository.save(ablesung);
+        readingSqlRepository.saveAblesung(ablesung);
 
         return Response.status(Response.Status.CREATED).entity(ablesung).build();
     }
