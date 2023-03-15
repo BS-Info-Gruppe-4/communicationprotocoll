@@ -2,6 +2,8 @@ package eu.bsinfo.gruppe4.server.endpoints;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.bsinfo.gruppe4.server.database.CustomerRepository;
+import eu.bsinfo.gruppe4.server.database.CustomerSqlRepository;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 import eu.bsinfo.gruppe4.server.persistence.JsonRepository;
@@ -13,6 +15,9 @@ import java.util.*;
 
 @Path("hausverwaltung/kunden")
 public class KundenEndpoints {
+
+    private final CustomerRepository customerRepository = new CustomerSqlRepository();
+
     private final JsonRepository jsonRepositoryO=JsonRepository.getInstance();
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -26,7 +31,7 @@ public class KundenEndpoints {
         }
 
         //kunde.setId(UUID.randomUUID());
-        jsonRepositoryO.save(kunde);
+        customerRepository.saveKunde(kunde);
 
         return Response
                 .status(Response.Status.CREATED)
@@ -42,18 +47,18 @@ public class KundenEndpoints {
         if (okunde==null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Fehler").build();
         }
-        if (jsonRepositoryO.kundeExists(okunde.getId())==false) {
+        if (customerRepository.doesKundeExist(okunde.getId())==false) {
             return Response.status(Response.Status.NOT_FOUND).entity("Kunde existiert nicht").build();
         }
-        jsonRepositoryO.deleteKunde(okunde.getId());
-        jsonRepositoryO.save(okunde);
+        customerRepository.updateKunde(okunde);
+
         return Response.status(Response.Status.OK).entity("Kunde wurde aktualisiert").build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAlleKunden(){
-        List<Kunde> AlleKunden=jsonRepositoryO.getAlleKunden();
+        List<Kunde> AlleKunden=customerRepository.getAlleKunden();
         return Response.status(Response.Status.OK).entity(AlleKunden).build();
     }
     @GET
@@ -62,7 +67,7 @@ public class KundenEndpoints {
     public Response getKunde(@PathParam(("id")) String kundenID){
         try{
             UUID kundenUUID = UUID.fromString(kundenID);
-            Optional<Kunde> üKunde=jsonRepositoryO.getKunde(kundenUUID);
+            Optional<Kunde> üKunde = customerRepository.getKundeById(kundenUUID);
             if (üKunde.isEmpty()){
                 return Response.status(Response.Status.NOT_FOUND).entity("Kunde existiert nicht").build();
             }
@@ -80,7 +85,7 @@ public class KundenEndpoints {
     public Response deleteKunde(@PathParam(("id")) String kundenID) {
         try {
             UUID kundenUUID = UUID.fromString(kundenID);
-            Optional<Kunde> customerOptional = jsonRepositoryO.getKunde(kundenUUID);
+            Optional<Kunde> customerOptional = customerRepository.getKundeById(kundenUUID);
 
             if (customerOptional.isEmpty()) {
                 return Response
@@ -91,8 +96,9 @@ public class KundenEndpoints {
 
             Kunde customer = customerOptional.get();
 
-            jsonRepositoryO.deleteKunde(customer.getId());
+            customerRepository.deleteKunde(customer.getId());
 
+            //TODO: Replace with readings repository
             ArrayList<Ablesung> liste = jsonRepositoryO.getAlleAblesungen();
             ArrayList<Ablesung> kundenAbl = new ArrayList<>();
 
