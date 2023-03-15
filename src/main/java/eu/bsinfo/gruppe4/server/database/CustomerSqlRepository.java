@@ -96,7 +96,31 @@ public class CustomerSqlRepository implements CustomerRepository {
 
     @Override
     public boolean doesKundeExist(UUID kundenId) {
-        return false;
+        return getKundeById(kundenId).isPresent();
+    }
+
+    @Override
+    public void updateKunde(Kunde kunde) {
+
+        PreparedStatement updateStatement = null;
+
+        try {
+            String updateSql = "UPDATE Kunde SET name=?, vorname=? WHERE id=?";
+            updateStatement = con.prepareStatement(updateSql);
+            updateStatement.setString(1, kunde.getName());
+            updateStatement.setString(2, kunde.getVorname());
+            updateStatement.setString(3, kunde.getId().toString());
+            int rowsUpdated = updateStatement.executeUpdate();
+
+            if (rowsUpdated <= 0) throw new RuntimeException("Was not able to update customer");
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        finally {
+            Util.close(updateStatement);
+        }
     }
 
     @Override
