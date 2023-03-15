@@ -65,7 +65,7 @@ public class AblesungenEndpoints {
 
         try {
             UUID readingUUID = UUID.fromString(readingId);
-            Optional<Ablesung> queriedReading = jsonRepository.getAblesung(readingUUID);
+            Optional<Ablesung> queriedReading = readingSqlRepository.getAblesungById(readingUUID);
 
             if (queriedReading.isEmpty()) {
                 return Response
@@ -97,7 +97,7 @@ public class AblesungenEndpoints {
                     .build();
         }
 
-        Optional<Ablesung> queriedReading = jsonRepository.getAblesung(providedReading.getId());
+        Optional<Ablesung> queriedReading = readingSqlRepository.getAblesungById(providedReading.getId());
 
         if (queriedReading.isEmpty()) {
             return Response
@@ -109,15 +109,15 @@ public class AblesungenEndpoints {
         Ablesung reading = queriedReading.get();
         Kunde customerOfReading = reading.getKunde();
 
-        if (customerOfReading == null || !jsonRepository.kundeExists(customerOfReading.getId())){
+        if (customerOfReading == null || !customerSqlRepository.doesKundeExist(customerOfReading.getId())){
             return Response
                     .status(Response.Status.NOT_FOUND)
                     .entity("Der Kunde der Ablesung existiert nicht!")
                     .build();
         }
 
-        jsonRepository.deleteAblesung(reading.getId());
-        jsonRepository.save(providedReading);
+        readingSqlRepository.deleteAblesung(reading.getId());
+        readingSqlRepository.saveAblesung(providedReading);
 
         return Response.ok("Ablesung wurde aktualisiert").build();
     }
@@ -127,11 +127,11 @@ public class AblesungenEndpoints {
     public Response deleteReading(@PathParam(("id")) String readingID){
         try{
             UUID ReadingUUID = UUID.fromString(readingID);
-            Optional<Ablesung> dReading=jsonRepository.getAblesung(ReadingUUID);
+            Optional<Ablesung> dReading=readingSqlRepository.getAblesungById(ReadingUUID);
             if (dReading.isEmpty()){
                 return Response.status(Response.Status.NOT_FOUND).entity("Reading existiert nicht").build();
             }
-            jsonRepository.deleteAblesung(ReadingUUID);
+            readingSqlRepository.deleteAblesung(ReadingUUID);
             return Response.status(Response.Status.OK).entity(dReading.get()).build();
         }
         catch (IllegalArgumentException E){

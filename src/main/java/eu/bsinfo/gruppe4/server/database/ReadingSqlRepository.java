@@ -3,10 +3,7 @@ package eu.bsinfo.gruppe4.server.database;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -15,6 +12,7 @@ import java.util.UUID;
 public class ReadingSqlRepository implements ReadingRepository{
 
     private final Connection con = Util.getConnection("gm3");
+    CustomerSqlRepository customerSqlRepository = new CustomerSqlRepository();
 
     @Override
     public void saveAblesung(Ablesung ablesung) {
@@ -27,7 +25,7 @@ public class ReadingSqlRepository implements ReadingRepository{
             statement.setString(1, ablesung.getId().toString());
             statement.setString(2, ablesung.getZaehlernummer());
             statement.setString(3, ablesung.getDatum().toString());
-            statement.setString(4, ablesung.getKunde().toString());
+            statement.setString(4, ablesung.getKunde().getId().toString());
             statement.setString(5, ablesung.getKommentar());
             statement.setBoolean(6, ablesung.isNeuEingebaut());
             statement.setInt(7, ablesung.getZaehlerstand());
@@ -94,11 +92,12 @@ public class ReadingSqlRepository implements ReadingRepository{
                 UUID id = UUID.fromString(rs.getString("id"));
                 String zaehlernummer = rs.getString("zaehlernummer");
                 LocalDate datum = LocalDate.parse(rs.getString("datum"));
-                Kunde kunde = (Kunde) rs.getObject("kunde");
+                UUID kundeId = UUID.fromString(rs.getString("kunde"));
                 String kommentar = rs.getString("kommentar");
                 Boolean neuEingebaut = rs.getBoolean("neu eingebaut");
                 int zaehlerstand = rs.getInt("zaehlerstand");
-                Ablesung ablesung = new Ablesung(id, zaehlernummer, datum, kunde, kommentar, neuEingebaut, zaehlerstand);
+                Optional<Kunde> kunde = customerSqlRepository.getKundeById(kundeId);
+                Ablesung ablesung = new Ablesung(id, zaehlernummer, datum, kunde.get(), kommentar, neuEingebaut, zaehlerstand);
 
                 allReadings.add(ablesung);
             }
@@ -111,6 +110,49 @@ public class ReadingSqlRepository implements ReadingRepository{
 
         return allReadings;
     }
+    @Override
+    public boolean doesAblesungExist(UUID ablesungId) {
+        return getAblesungById(ablesungId).isPresent();
+    }
+    @Override
+    public void updateAblesung(Ablesung ablesung) {
+        PreparedStatement updateStatement = null;
 
+        try {
+            String updateSql = "UPDATE Ablesung SET zaehlernummer=?, datum=?, kunde=?, kommentar=?, neuEingebaut=?, zaehlerstand=? WHERE id=?";
+            updateStatement = con.prepareStatement(updateSql);
+            updateStatement.setString(1, ablesung.getZaehlernummer());
+            updateStatement.setDate(2, Date.valueOf(ablesung.getDatum()));
+            updateStatement.setObject(3, ablesung.getKunde().getId());
+            updateStatement.setString(4, ablesung.getKommentar());
+            updateStatement.setBoolean(5, ablesung.isNeuEingebaut());
+            updateStatement.setInt(6, ablesung.getZaehlerstand());
+            int rowsUpdated = updateStatement.executeUpdate();
 
+            if (rowsUpdated <= 0) throw new RuntimeException("Was not able to update reading");
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        finally {
+            Util.close(updateStatement);
+        }
+    }
+    @Override
+    public void deleteAblesung(UUID ablesungId) {
+        String sql = "DELETE FROM Ablesung WHERE id=?";
+
+        try(PreparedStatement deleteStatement = con.prepareStatement(sql)) {
+
+            deleteStatement.setString(1, ablesungId.toString());
+            int rowsUpdated = deleteStatement.executeUpdate();
+
+            if (rowsUpdated <= 0) throw new RuntimeException("Was not able to delete reading");
+
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
