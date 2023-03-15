@@ -94,7 +94,7 @@ public class ReadingSqlRepository implements ReadingRepository{
                 LocalDate datum = LocalDate.parse(rs.getString("datum"));
                 UUID kundeId = UUID.fromString(rs.getString("kunde"));
                 String kommentar = rs.getString("kommentar");
-                Boolean neuEingebaut = rs.getBoolean("neu eingebaut");
+                boolean neuEingebaut = rs.getBoolean("neuEingebaut");
                 int zaehlerstand = rs.getInt("zaehlerstand");
                 Optional<Kunde> kunde = customerSqlRepository.getKundeById(kundeId);
                 Ablesung ablesung = new Ablesung(id, zaehlernummer, datum, kunde.get(), kommentar, neuEingebaut, zaehlerstand);

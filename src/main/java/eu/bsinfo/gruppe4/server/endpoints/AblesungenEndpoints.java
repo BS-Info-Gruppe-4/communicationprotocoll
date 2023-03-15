@@ -9,11 +9,13 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Path("hausverwaltung/ablesungen")
 public class AblesungenEndpoints {
@@ -175,8 +177,20 @@ public class AblesungenEndpoints {
             }
         }
 
-        ArrayList<Ablesung> queriedAblesungen = jsonRepository.getCustomerAblesungenInDateRange(customerUUID, startingDate, endingDate);
+        ArrayList<Ablesung> alleAblesungen = readingSqlRepository.getAlleAblesungen();
+        ArrayList filteredReadings = filterReadings(customerUUID, startingDate, endingDate, alleAblesungen);
 
-        return Response.ok(queriedAblesungen).build();
+        return Response.ok(filteredReadings).build();
     }
+
+    public ArrayList<Ablesung> filterReadings(UUID customerId, LocalDate startDate, LocalDate endDate, ArrayList<Ablesung> readings) {
+        return readings.stream()
+                .filter(reading -> customerId == null || (reading.getKunde() != null && reading.getKunde().getId().equals(customerId)))
+                .filter(reading -> startDate == null || reading.getDatum().isAfter(startDate) || reading.getDatum().equals(startDate))
+                .filter(reading -> endDate == null || reading.getDatum().isBefore(endDate) || reading.getDatum().equals(endDate))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+
 }
+

@@ -2,6 +2,7 @@ package eu.bsinfo.gruppe4.server.database;
 
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
