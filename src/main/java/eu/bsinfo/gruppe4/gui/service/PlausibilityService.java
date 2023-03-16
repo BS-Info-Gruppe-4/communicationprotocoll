@@ -19,7 +19,7 @@ public class PlausibilityService implements Serializable {
         double minPlausibleValue = getAverageZaehlerstand() * 0.5;
         double maxPlausibleValue = getAverageZaehlerstand() * 1.5;
 
-        return zaehlerstand < minPlausibleValue || zaehlerstand > maxPlausibleValue;
+        return zaehlerstand < minPlausibleValue || zaehlerstand > maxPlausibleValue || zaehlerstand < 0;
     }
 
     private double getAverageZaehlerstand() {
