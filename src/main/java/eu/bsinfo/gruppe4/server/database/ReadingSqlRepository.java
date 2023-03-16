@@ -46,7 +46,7 @@ public class ReadingSqlRepository implements ReadingRepository{
         Ablesung ablesung;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
-        String query = "SELECT zaehlernummer, datum, kunde, kommentar, neuEingebaut, zaehlerstand FROM Ablesung WHERE id = ?";
+        String query = "SELECT * FROM Ablesung WHERE id = ?";
 
         try {
 
@@ -55,16 +55,20 @@ public class ReadingSqlRepository implements ReadingRepository{
             resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
+                Kunde kunde = null;
+
                 String zaehlernummer = resultSet.getString("zaehlernummer");
                 LocalDate datum = LocalDate.parse(resultSet.getString("datum"));
-                UUID customerId = UUID.fromString(resultSet.getString("kunde"));
                 String kommentar = resultSet.getString("kommentar");
                 boolean neuEingebaut = resultSet.getBoolean("neuEingebaut");
                 int zaehlerstand = resultSet.getInt("zaehlerstand");
 
-                Kunde kunde = customerSqlRepository.getKundeById(customerId)
-                        .orElseThrow(() -> new RuntimeException("Kunde der Ablesung konnte nicht gefunden werden"));
+                String customerIdAsString = resultSet.getString("kunde");
 
+                if (customerIdAsString != null) {
+                    UUID kundeId = UUID.fromString(resultSet.getString("kunde"));
+                    kunde = customerSqlRepository.getKundeById(kundeId).orElse(null);
+                }
                 ablesung = new Ablesung(zaehlernummer, datum, kunde, kommentar, neuEingebaut, zaehlerstand);
                 ablesung.setId(ablesungId);
 
