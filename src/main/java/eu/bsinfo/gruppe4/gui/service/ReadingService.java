@@ -61,6 +61,7 @@ public class ReadingService {
         sessionStorage.syncWithBackend();
     }
 
+    //FIXME: Readings wont be updated in gui
     public String updateReading(Ablesung readingToUpdate) {
 
         // It is not specified if the update action should be canceled if a reading is not plausible.

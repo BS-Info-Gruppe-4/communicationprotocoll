@@ -118,8 +118,7 @@ public class AblesungenEndpoints {
                     .build();
         }
 
-        readingSqlRepository.deleteAblesung(reading.getId());
-        readingSqlRepository.saveAblesung(providedReading);
+        readingSqlRepository.updateAblesung(reading);
 
         return Response.ok("Ablesung wurde aktualisiert").build();
     }

@@ -46,7 +46,7 @@ public class ReadingSqlRepository implements ReadingRepository{
         Ablesung ablesung;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
-        String query = "SELECT zaehlernummer, datum, kunde, kommentar, neuEingebaut, zaehlerstand FROM Kunde WHERE id = ?";
+        String query = "SELECT zaehlernummer, datum, kunde, kommentar, neuEingebaut, zaehlerstand FROM Ablesung WHERE id = ?";
 
         try {
 
@@ -57,10 +57,14 @@ public class ReadingSqlRepository implements ReadingRepository{
             if (resultSet.next()) {
                 String zaehlernummer = resultSet.getString("zaehlernummer");
                 LocalDate datum = LocalDate.parse(resultSet.getString("datum"));
-                Kunde kunde = (Kunde) resultSet.getObject("kunde");
+                UUID customerId = UUID.fromString(resultSet.getString("kunde"));
                 String kommentar = resultSet.getString("kommentar");
-                Boolean neuEingebaut = resultSet.getBoolean("neu eingebaut");
+                boolean neuEingebaut = resultSet.getBoolean("neuEingebaut");
                 int zaehlerstand = resultSet.getInt("zaehlerstand");
+
+                Kunde kunde = customerSqlRepository.getKundeById(customerId)
+                        .orElseThrow(() -> new RuntimeException("Kunde der Ablesung konnte nicht gefunden werden"));
+
                 ablesung = new Ablesung(zaehlernummer, datum, kunde, kommentar, neuEingebaut, zaehlerstand);
                 ablesung.setId(ablesungId);
 
@@ -123,10 +127,11 @@ public class ReadingSqlRepository implements ReadingRepository{
             updateStatement = con.prepareStatement(updateSql);
             updateStatement.setString(1, ablesung.getZaehlernummer());
             updateStatement.setDate(2, Date.valueOf(ablesung.getDatum()));
-            updateStatement.setObject(3, ablesung.getKunde().getId());
+            updateStatement.setString(3, ablesung.getKunde().getId().toString());
             updateStatement.setString(4, ablesung.getKommentar());
             updateStatement.setBoolean(5, ablesung.isNeuEingebaut());
             updateStatement.setInt(6, ablesung.getZaehlerstand());
+            updateStatement.setString(7, ablesung.getId().toString());
             int rowsUpdated = updateStatement.executeUpdate();
 
             if (rowsUpdated <= 0) throw new RuntimeException("Was not able to update reading");
