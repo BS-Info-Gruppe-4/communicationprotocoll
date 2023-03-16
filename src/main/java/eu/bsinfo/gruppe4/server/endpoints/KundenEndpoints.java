@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.bsinfo.gruppe4.server.database.CustomerRepository;
 import eu.bsinfo.gruppe4.server.database.CustomerSqlRepository;
+import eu.bsinfo.gruppe4.server.database.ReadingRepository;
+import eu.bsinfo.gruppe4.server.database.ReadingSqlRepository;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 import eu.bsinfo.gruppe4.server.persistence.JsonRepository;
@@ -12,13 +14,14 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Path("hausverwaltung/kunden")
 public class KundenEndpoints {
 
     private final CustomerRepository customerRepository = new CustomerSqlRepository();
+    private final ReadingRepository readingRepository = new ReadingSqlRepository();
 
-    private final JsonRepository jsonRepositoryO=JsonRepository.getInstance();
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -96,17 +99,12 @@ public class KundenEndpoints {
 
             Kunde customer = customerOptional.get();
 
+            List<Ablesung> kundenAbl = readingRepository.getAlleAblesungen().stream()
+                    .filter(ablesung -> ablesung.getKunde() != null)
+                    .filter(ablesung -> ablesung.getKunde().getId().equals(customer.getId()))
+                    .collect(Collectors.toList());
+
             customerRepository.deleteKunde(customer.getId());
-
-            //TODO: Replace with readings repository
-            ArrayList<Ablesung> liste = jsonRepositoryO.getAlleAblesungen();
-            ArrayList<Ablesung> kundenAbl = new ArrayList<>();
-
-            for(int i = 0; i < liste.size(); i++) {
-                if (liste.get(i).getKunde() != null && liste.get(i).getKunde().getId().equals(kundenUUID)) {
-                    kundenAbl.add(liste.get(i));
-                }
-            }
 
             // I had to parse the customer object to a json string manually,
             // because jackson somehow wasn't able to perform it.
@@ -118,11 +116,7 @@ public class KundenEndpoints {
             Map<String, List<Ablesung>> customerWithItsReadings = new HashMap<>();
             customerWithItsReadings.put(customerAsJsonString, kundenAbl);
 
-            for(int i = 0; i < kundenAbl.size(); i++) {
-                kundenAbl.get(i).setKunde(null);
-                jsonRepositoryO.deleteAblesung(kundenAbl.get(i).getId());
-                jsonRepositoryO.save(kundenAbl.get(i));
-            }
+
 
             return Response.status(Response.Status.OK).entity(customerWithItsReadings).build();
 
