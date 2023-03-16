@@ -93,15 +93,24 @@ public class ReadingSqlRepository implements ReadingRepository{
              ResultSet rs = statement.executeQuery()) {
 
             while (rs.next()) {
+                Kunde kunde = null;
+
                 UUID id = UUID.fromString(rs.getString("id"));
                 String zaehlernummer = rs.getString("zaehlernummer");
                 LocalDate datum = LocalDate.parse(rs.getString("datum"));
-                UUID kundeId = UUID.fromString(rs.getString("kunde"));
+
+                String customerIdAsString = rs.getString("kunde");
+
+                if (customerIdAsString != null) {
+                    UUID kundeId = UUID.fromString(rs.getString("kunde"));
+                    kunde = customerSqlRepository.getKundeById(kundeId).orElse(null);
+                }
+
                 String kommentar = rs.getString("kommentar");
                 boolean neuEingebaut = rs.getBoolean("neuEingebaut");
                 int zaehlerstand = rs.getInt("zaehlerstand");
-                Optional<Kunde> kunde = customerSqlRepository.getKundeById(kundeId);
-                Ablesung ablesung = new Ablesung(id, zaehlernummer, datum, kunde.get(), kommentar, neuEingebaut, zaehlerstand);
+
+                Ablesung ablesung = new Ablesung(id, zaehlernummer, datum, kunde, kommentar, neuEingebaut, zaehlerstand);
 
                 allReadings.add(ablesung);
             }

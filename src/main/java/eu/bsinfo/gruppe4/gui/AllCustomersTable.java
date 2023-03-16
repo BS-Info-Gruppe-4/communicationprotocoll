@@ -444,6 +444,7 @@ public class AllCustomersTable extends JFrame {
         try {
             customerService.deleteCustomerById(UUID.fromString(customerId));
             refreshCustomerTable();
+            filterReadings();
             MessageDialog.showSuccessMessage("Kunde wurde erfolgreich gelöscht");
         }
         catch (NotFoundException | UnknownError ex) {
