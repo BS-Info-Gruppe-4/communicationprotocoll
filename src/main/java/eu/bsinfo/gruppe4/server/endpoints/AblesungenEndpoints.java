@@ -4,12 +4,10 @@ import eu.bsinfo.gruppe4.server.database.CustomerSqlRepository;
 import eu.bsinfo.gruppe4.server.database.ReadingSqlRepository;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import eu.bsinfo.gruppe4.server.model.Kunde;
-import eu.bsinfo.gruppe4.server.persistence.JsonRepository;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -20,7 +18,6 @@ import java.util.stream.Collectors;
 @Path("hausverwaltung/ablesungen")
 public class AblesungenEndpoints {
 
-    private final JsonRepository jsonRepository = JsonRepository.getInstance();
     private final ReadingSqlRepository readingSqlRepository = new ReadingSqlRepository();
     private final CustomerSqlRepository customerSqlRepository = new CustomerSqlRepository();
 
@@ -96,6 +93,13 @@ public class AblesungenEndpoints {
             return Response
                     .status(Response.Status.BAD_REQUEST)
                     .entity("Der Request Body enthält keine Ablesung")
+                    .build();
+        }
+
+        if (providedReading.getId() == null) {
+            return Response
+                    .status(Response.Status.NOT_FOUND)
+                    .entity("Die ID der Ablesung ist null!")
                     .build();
         }
 
@@ -177,7 +181,7 @@ public class AblesungenEndpoints {
         }
 
         ArrayList<Ablesung> alleAblesungen = readingSqlRepository.getAlleAblesungen();
-        ArrayList filteredReadings = filterReadings(customerUUID, startingDate, endingDate, alleAblesungen);
+        ArrayList<Ablesung> filteredReadings = filterReadings(customerUUID, startingDate, endingDate, alleAblesungen);
 
         return Response.ok(filteredReadings).build();
     }
