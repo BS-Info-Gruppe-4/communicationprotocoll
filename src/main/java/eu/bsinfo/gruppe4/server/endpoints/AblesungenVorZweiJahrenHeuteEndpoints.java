@@ -1,5 +1,7 @@
 package eu.bsinfo.gruppe4.server.endpoints;
 
+import eu.bsinfo.gruppe4.server.database.ReadingRepository;
+import eu.bsinfo.gruppe4.server.database.ReadingSqlRepository;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import eu.bsinfo.gruppe4.server.persistence.JsonRepository;
 import jakarta.ws.rs.GET;
@@ -13,13 +15,14 @@ import java.util.ArrayList;
 
 @Path("hausverwaltung/ablesungenVorZweiJahrenHeute")
 public class AblesungenVorZweiJahrenHeuteEndpoints {
-    private final JsonRepository jsonRepository = JsonRepository.getInstance();
+    private final ReadingRepository readingRepository = new ReadingSqlRepository();
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response ablesungenVor2JahrenHeute() {
 
-        ArrayList<Ablesung> alleAblesungen = jsonRepository.getAlleAblesungen();
+        //TODO: Should the data of the json file be loaded into the database first?
+        ArrayList<Ablesung> alleAblesungen = readingRepository.getAlleAblesungen();
         ArrayList<Ablesung> datumAblesungen = new ArrayList<>();
 
         int jahr = LocalDate.now().minusYears(2).getYear();
