@@ -118,7 +118,7 @@ public class AblesungenEndpoints {
                     .build();
         }
 
-        readingSqlRepository.updateAblesung(reading);
+        readingSqlRepository.updateAblesung(providedReading);
 
         return Response.ok("Ablesung wurde aktualisiert").build();
     }
