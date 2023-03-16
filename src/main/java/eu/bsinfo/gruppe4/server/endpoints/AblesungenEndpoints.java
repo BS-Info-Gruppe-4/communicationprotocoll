@@ -189,8 +189,8 @@ public class AblesungenEndpoints {
     public ArrayList<Ablesung> filterReadings(UUID customerId, LocalDate startDate, LocalDate endDate, ArrayList<Ablesung> readings) {
         return readings.stream()
                 .filter(reading -> customerId == null || (reading.getKunde() != null && reading.getKunde().getId().equals(customerId)))
-                .filter(reading -> startDate == null || reading.getDatum().isAfter(startDate) || reading.getDatum().equals(startDate))
-                .filter(reading -> endDate == null || reading.getDatum().isBefore(endDate) || reading.getDatum().equals(endDate))
+                .filter(reading -> startDate == null || reading.getDatum().isAfter(startDate))
+                .filter(reading -> endDate == null || reading.getDatum().isBefore(endDate))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
