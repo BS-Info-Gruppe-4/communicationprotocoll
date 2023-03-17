@@ -3,19 +3,18 @@ package eu.bsinfo.gruppe4.server.persistence;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import eu.bsinfo.gruppe4.server.database.CustomerSqlRepository;
+import eu.bsinfo.gruppe4.server.database.ReadingSqlRepository;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class JsonRepository {
-
+    private final ReadingSqlRepository readingSqlRepository = new ReadingSqlRepository();
+    private final CustomerSqlRepository customerSqlRepository = new CustomerSqlRepository();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final JsonRepository instance = new JsonRepository();
     private final String CUSTOMERS_FILEPATH = "target/kunden.json";
@@ -34,13 +33,6 @@ public class JsonRepository {
         return instance;
     }
 
-    public void save(Kunde kunde) {
-        alleKunden.add(kunde);
-    }
-
-    public void save(Ablesung ablesung) {
-        alleAblesungen.add(ablesung);
-    }
 
     public void persistDataInJsonFile() {
 
@@ -55,15 +47,16 @@ public class JsonRepository {
     }
 
     private void persistCustomerData() throws IOException {
+
             objectMapper
                     .writerWithDefaultPrettyPrinter()
-                    .writeValue(new File(CUSTOMERS_FILEPATH), alleKunden);
+                    .writeValue(new File(CUSTOMERS_FILEPATH), customerSqlRepository.getAlleKunden());
     }
 
     private void persistReadingsData() throws IOException {
             objectMapper
                     .writerWithDefaultPrettyPrinter()
-                    .writeValue(new File(READINGS_FILEPATH), alleAblesungen);
+                    .writeValue(new File(READINGS_FILEPATH), readingSqlRepository.getAlleAblesungen());
     }
 
     public void loadDataFromJsonFiles() {
@@ -97,43 +90,4 @@ public class JsonRepository {
         return new ArrayList<>();
     }
 
-    public Optional<Kunde> getKunde(UUID kundenId) {
-        return alleKunden.stream()
-                .filter(kunde -> kunde.getId().equals(kundenId))
-                .findFirst();
-    }
-
-    public Optional<Ablesung> getAblesung(UUID ablesungId) {
-        return alleAblesungen.stream()
-                .filter(kunde -> kunde.getId().equals(ablesungId))
-                .findFirst();
-    }
-
-    public boolean kundeExists(UUID searchedKundenId) {
-        return alleKunden.stream().anyMatch(kunde -> kunde.getId().equals(searchedKundenId));
-    }
-
-    public void deleteAblesung(UUID ablesungId) {
-        alleAblesungen.removeIf(ablesung -> ablesung.getId().equals(ablesungId));
-    }
-
-    public void deleteKunde(UUID kundenId) {
-        alleKunden.removeIf(kunden -> kunden.getId().equals(kundenId));
-    }
-
-    public ArrayList<Kunde> getAlleKunden() {
-        return alleKunden;
-    }
-
-    public ArrayList<Ablesung> getAlleAblesungen() {
-        return alleAblesungen;
-    }
-
-    public ArrayList<Ablesung> getCustomerAblesungenInDateRange(UUID customerId, LocalDate startDate, LocalDate endDate) {
-        return getAlleAblesungen().stream()
-                .filter(reading -> customerId == null || (reading.getKunde() != null && reading.getKunde().getId().equals(customerId)))
-                .filter(reading -> startDate == null || reading.getDatum().isAfter(startDate) || reading.getDatum().equals(startDate))
-                .filter(reading -> endDate == null || reading.getDatum().isBefore(endDate) || reading.getDatum().equals(endDate))
-                .collect(Collectors.toCollection(ArrayList::new));
-    }
 }

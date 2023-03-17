@@ -2,6 +2,10 @@ package eu.bsinfo.gruppe4.server.endpoints;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.bsinfo.gruppe4.server.database.CustomerRepository;
+import eu.bsinfo.gruppe4.server.database.CustomerSqlRepository;
+import eu.bsinfo.gruppe4.server.database.ReadingRepository;
+import eu.bsinfo.gruppe4.server.database.ReadingSqlRepository;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 import eu.bsinfo.gruppe4.server.persistence.JsonRepository;
@@ -10,10 +14,14 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Path("hausverwaltung/kunden")
 public class KundenEndpoints {
-    private final JsonRepository jsonRepositoryO=JsonRepository.getInstance();
+
+    private final CustomerRepository customerRepository = new CustomerSqlRepository();
+    private final ReadingRepository readingRepository = new ReadingSqlRepository();
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -26,7 +34,7 @@ public class KundenEndpoints {
         }
 
         //kunde.setId(UUID.randomUUID());
-        jsonRepositoryO.save(kunde);
+        customerRepository.saveKunde(kunde);
 
         return Response
                 .status(Response.Status.CREATED)
@@ -42,18 +50,18 @@ public class KundenEndpoints {
         if (okunde==null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Fehler").build();
         }
-        if (jsonRepositoryO.kundeExists(okunde.getId())==false) {
+        if (customerRepository.doesKundeExist(okunde.getId())==false) {
             return Response.status(Response.Status.NOT_FOUND).entity("Kunde existiert nicht").build();
         }
-        jsonRepositoryO.deleteKunde(okunde.getId());
-        jsonRepositoryO.save(okunde);
+        customerRepository.updateKunde(okunde);
+
         return Response.status(Response.Status.OK).entity("Kunde wurde aktualisiert").build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAlleKunden(){
-        List<Kunde> AlleKunden=jsonRepositoryO.getAlleKunden();
+        List<Kunde> AlleKunden=customerRepository.getAlleKunden();
         return Response.status(Response.Status.OK).entity(AlleKunden).build();
     }
     @GET
@@ -62,7 +70,7 @@ public class KundenEndpoints {
     public Response getKunde(@PathParam(("id")) String kundenID){
         try{
             UUID kundenUUID = UUID.fromString(kundenID);
-            Optional<Kunde> üKunde=jsonRepositoryO.getKunde(kundenUUID);
+            Optional<Kunde> üKunde = customerRepository.getKundeById(kundenUUID);
             if (üKunde.isEmpty()){
                 return Response.status(Response.Status.NOT_FOUND).entity("Kunde existiert nicht").build();
             }
@@ -80,7 +88,7 @@ public class KundenEndpoints {
     public Response deleteKunde(@PathParam(("id")) String kundenID) {
         try {
             UUID kundenUUID = UUID.fromString(kundenID);
-            Optional<Kunde> customerOptional = jsonRepositoryO.getKunde(kundenUUID);
+            Optional<Kunde> customerOptional = customerRepository.getKundeById(kundenUUID);
 
             if (customerOptional.isEmpty()) {
                 return Response
@@ -91,16 +99,12 @@ public class KundenEndpoints {
 
             Kunde customer = customerOptional.get();
 
-            jsonRepositoryO.deleteKunde(customer.getId());
+            List<Ablesung> kundenAbl = readingRepository.getAlleAblesungen().stream()
+                    .filter(ablesung -> ablesung.getKunde() != null)
+                    .filter(ablesung -> ablesung.getKunde().getId().equals(customer.getId()))
+                    .collect(Collectors.toList());
 
-            ArrayList<Ablesung> liste = jsonRepositoryO.getAlleAblesungen();
-            ArrayList<Ablesung> kundenAbl = new ArrayList<>();
-
-            for(int i = 0; i < liste.size(); i++) {
-                if (liste.get(i).getKunde() != null && liste.get(i).getKunde().getId().equals(kundenUUID)) {
-                    kundenAbl.add(liste.get(i));
-                }
-            }
+            customerRepository.deleteKunde(customer.getId());
 
             // I had to parse the customer object to a json string manually,
             // because jackson somehow wasn't able to perform it.
@@ -112,11 +116,7 @@ public class KundenEndpoints {
             Map<String, List<Ablesung>> customerWithItsReadings = new HashMap<>();
             customerWithItsReadings.put(customerAsJsonString, kundenAbl);
 
-            for(int i = 0; i < kundenAbl.size(); i++) {
-                kundenAbl.get(i).setKunde(null);
-                jsonRepositoryO.deleteAblesung(kundenAbl.get(i).getId());
-                jsonRepositoryO.save(kundenAbl.get(i));
-            }
+
 
             return Response.status(Response.Status.OK).entity(customerWithItsReadings).build();
 

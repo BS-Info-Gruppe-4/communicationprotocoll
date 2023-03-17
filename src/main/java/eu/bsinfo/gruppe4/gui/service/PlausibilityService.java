@@ -1,11 +1,9 @@
 package eu.bsinfo.gruppe4.gui.service;
 
-import eu.bsinfo.gruppe4.gui.ZaehlerDatensatz;
 import eu.bsinfo.gruppe4.gui.persistence.SessionStorage;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class PlausibilityService implements Serializable {
     private final SessionStorage sessionStorage = SessionStorage.getInstance();
@@ -14,12 +12,12 @@ public class PlausibilityService implements Serializable {
     public boolean isNotPlausible(Ablesung reading) {
         int zaehlerstand = reading.getZaehlerstand();
 
-        if (getAverageZaehlerstand() == 0) return true;
+        if (getAverageZaehlerstand() == 0) return false;
 
         double minPlausibleValue = getAverageZaehlerstand() * 0.5;
         double maxPlausibleValue = getAverageZaehlerstand() * 1.5;
 
-        return zaehlerstand < minPlausibleValue || zaehlerstand > maxPlausibleValue;
+        return zaehlerstand < minPlausibleValue || zaehlerstand > maxPlausibleValue || zaehlerstand < 0;
     }
 
     private double getAverageZaehlerstand() {
