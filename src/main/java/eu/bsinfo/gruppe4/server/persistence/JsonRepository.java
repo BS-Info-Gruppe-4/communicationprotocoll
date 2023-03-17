@@ -3,17 +3,18 @@ package eu.bsinfo.gruppe4.server.persistence;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import eu.bsinfo.gruppe4.gui.persistence.SessionStorage;
+import eu.bsinfo.gruppe4.server.database.CustomerSqlRepository;
+import eu.bsinfo.gruppe4.server.database.ReadingSqlRepository;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.UUID;
 
 public class JsonRepository {
-
+    private final ReadingSqlRepository readingSqlRepository = new ReadingSqlRepository();
+    private final CustomerSqlRepository customerSqlRepository = new CustomerSqlRepository();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final JsonRepository instance = new JsonRepository();
     private final String CUSTOMERS_FILEPATH = "target/kunden.json";
@@ -32,9 +33,6 @@ public class JsonRepository {
         return instance;
     }
 
-    public void save(Ablesung ablesung) {
-        alleAblesungen.add(ablesung);
-    }
 
     public void persistDataInJsonFile() {
 
@@ -52,13 +50,13 @@ public class JsonRepository {
 
             objectMapper
                     .writerWithDefaultPrettyPrinter()
-                    .writeValue(new File(CUSTOMERS_FILEPATH), SessionStorage.getInstance().getKunden());
+                    .writeValue(new File(CUSTOMERS_FILEPATH), customerSqlRepository.getAlleKunden());
     }
 
     private void persistReadingsData() throws IOException {
             objectMapper
                     .writerWithDefaultPrettyPrinter()
-                    .writeValue(new File(READINGS_FILEPATH), SessionStorage.getInstance().getAblesungen());
+                    .writeValue(new File(READINGS_FILEPATH), readingSqlRepository.getAlleAblesungen());
     }
 
     public void loadDataFromJsonFiles() {
@@ -90,15 +88,6 @@ public class JsonRepository {
         }
 
         return new ArrayList<>();
-    }
-
-
-    public void deleteAblesung(UUID ablesungId) {
-        alleAblesungen.removeIf(ablesung -> ablesung.getId().equals(ablesungId));
-    }
-
-    public ArrayList<Ablesung> getAlleAblesungen() {
-        return alleAblesungen;
     }
 
 }
