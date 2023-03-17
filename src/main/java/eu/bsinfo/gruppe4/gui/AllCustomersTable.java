@@ -22,6 +22,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -46,6 +47,7 @@ public class AllCustomersTable extends JFrame {
     private final JButton filterReadingsButton = new JButton("Filter Ablesungen");
     private final JButton editReadingButton = new JButton("Ablesung bearbeiten");
     private final JButton deleteReadingButton = new JButton("Ablesung löschen");
+    private final JButton exportDataButton = new JButton("gefilterte Daten exportieren");
     private final JTextField tf_filterCustomer = new JTextField();
     DefaultTableModel customerTableModel = new DefaultTableModel();
     DefaultTableModel model_readings = new DefaultTableModel();
@@ -182,12 +184,13 @@ public class AllCustomersTable extends JFrame {
         table_readings = new JTable();
 
         // Buttons
-        final JPanel buttonPanel = new JPanel(new GridLayout(1, 7));
+        final JPanel buttonPanel = new JPanel(new GridLayout(1, 8));
         buttonPanel.add(newCustomerButton);
         buttonPanel.add(newReadingButton);
         buttonPanel.add(editCustomerButton);
         buttonPanel.add(deleteUserButton);
         buttonPanel.add(resetFilterButton);
+        buttonPanel.add(exportDataButton);
 
         // Datepicker
         final JPanel filterPanel = new JPanel(new GridLayout(1, 3));
@@ -294,6 +297,16 @@ public class AllCustomersTable extends JFrame {
 
         filterReadingsButton.addActionListener(e -> filterReadings());
         resetFilterButton.addActionListener(e -> resetFilter());
+
+        exportDataButton.addActionListener(e -> {
+
+            File f = new File("");
+
+            SaveFileDialog fd = new SaveFileDialog();
+            fd.addExtension("Json (*.json)", "json");
+            String filepath = fd.showDialog(null,"C:\\");
+            System.out.println(filepath);
+        });
 
         // Passe die Größe des Fensters an
         setSize(1500, 600);
