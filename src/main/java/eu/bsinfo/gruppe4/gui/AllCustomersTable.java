@@ -9,6 +9,7 @@ import eu.bsinfo.gruppe4.gui.service.ReadingService;
 import eu.bsinfo.gruppe4.server.Server;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import eu.bsinfo.gruppe4.server.model.Kunde;
+import eu.bsinfo.gruppe4.server.persistence.JsonRepository;
 import jakarta.ws.rs.NotFoundException;
 import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
 import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
@@ -24,8 +25,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.UUID;
+import java.util.*;
 
 
 public class AllCustomersTable extends JFrame {
@@ -54,7 +54,9 @@ public class AllCustomersTable extends JFrame {
     private JMenu menu_file, menu_about, menu_settings, submenu_themes;
     private JMenuItem item_exit, item_about, item_nimbus, item_windows, item_metal, item_motif;
     private JMenuBar menubar;
-    private LocalDate start_date, end_date;
+    ArrayList<Kunde> filteredCustomers = SessionStorage.getInstance().getKunden();
+    ArrayList<Ablesung> filteredReadings = SessionStorage.getInstance().getAblesungen();
+    JsonRepository jsonRepository = new JsonRepository();
 
     public AllCustomersTable() {
         setTitle("Kundenliste");
@@ -299,13 +301,13 @@ public class AllCustomersTable extends JFrame {
         resetFilterButton.addActionListener(e -> resetFilter());
 
         exportDataButton.addActionListener(e -> {
-
-            File f = new File("");
-
-            SaveFileDialog fd = new SaveFileDialog();
-            fd.addExtension("Json (*.json)", "json");
-            String filepath = fd.showDialog(null,"C:\\");
-            System.out.println(filepath);
+            try {
+                jsonRepository.exportFilteredData(filteredCustomers, filteredReadings);
+                MessageDialog.showSuccessMessage("Gefilterte Daten wurden exportiert");
+            }
+            catch (Exception e1) {
+                MessageDialog.showErrorMessage(e1.getMessage());
+            }
         });
 
         // Passe die Größe des Fensters an
@@ -331,7 +333,6 @@ public class AllCustomersTable extends JFrame {
         LocalDate startingDate = getSelectedStartingDate();
         LocalDate endingDate = getSelectedEndingDate();
 
-        ArrayList <Ablesung> filteredReadings;
         String customerIdAsString = tf_filterCustomer.getText();
 
         try {
@@ -348,6 +349,7 @@ public class AllCustomersTable extends JFrame {
         Kunde customer;
         try {
             customer = customerService.getCustomerById(UUID.fromString(customerNumber));
+            filteredCustomers = new ArrayList<>(Arrays.asList(customer));
             customerTableModel.setRowCount(0);
             Object[] row = {customer.getId(), customer.getVorname(), customer.getName()};
             customerTableModel.addRow(row);
@@ -364,6 +366,9 @@ public class AllCustomersTable extends JFrame {
 
         this.datemodel_start_date.setValue(null);
         this.datemodel_end_date.setValue(null);
+
+        filteredCustomers = sessionStorage.getKunden();
+        filteredReadings = sessionStorage.getAblesungen();
 
         loadInitialCustomerTableData();
         loadInitialTableDataReadings();
