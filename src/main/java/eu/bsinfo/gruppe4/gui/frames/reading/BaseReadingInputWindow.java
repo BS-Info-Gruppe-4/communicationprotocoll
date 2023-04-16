@@ -123,7 +123,7 @@ public abstract class BaseReadingInputWindow extends JFrame {
             Ablesung reading = getReadingOfInputFields();
             saveReading(reading);
             allCustomersTable.refreshCustomerTable();
-            allCustomersTable.loadInitialTableDataReadings();
+            allCustomersTable.loadInitialReadingsTableData();
         }
         catch (Exception e) {
             MessageDialog.showWarningMessage(e.getMessage());

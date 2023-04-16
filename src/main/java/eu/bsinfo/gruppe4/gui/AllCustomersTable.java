@@ -245,7 +245,7 @@ public class AllCustomersTable extends JFrame {
         table_readings.setModel(model_readings);
 
         loadInitialCustomerTableData();
-        loadInitialTableDataReadings();
+        loadInitialReadingsTableData();
 
         // Erstelle Sorter
         sorter = new TableRowSorter<>(customerTableModel);
@@ -338,6 +338,8 @@ public class AllCustomersTable extends JFrame {
         String customerIdAsString = tf_filterCustomer.getText();
 
         try {
+            // The method in the backend will only ignore the customer id if it is set to null
+            // It won't work if the customer id is an empty string, so it has to be replaced here with null
             UUID customerId = customerIdAsString.isEmpty() ? null : UUID.fromString(customerIdAsString);
             filteredReadings = readingService.getReadingsWithRestrictions(customerId, startingDate, endingDate);
             setReadingsTableData(filteredReadings);
@@ -373,7 +375,7 @@ public class AllCustomersTable extends JFrame {
         filteredReadings = sessionStorage.getAblesungen();
 
         loadInitialCustomerTableData();
-        loadInitialTableDataReadings();
+        loadInitialReadingsTableData();
     }
 
     private LocalDate getSelectedStartingDate() {
@@ -487,7 +489,7 @@ public class AllCustomersTable extends JFrame {
 
     }
 
-    public void loadInitialTableDataReadings() {
+    public void loadInitialReadingsTableData() {
 
         var readings = sessionStorage.getAblesungen();
 
