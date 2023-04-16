@@ -107,16 +107,12 @@ public class KundenEndpoints {
             customerRepository.deleteKunde(customer.getId());
 
             // I had to parse the customer object to a json string manually,
-            // because jackson somehow wasn't able to perform it.
-            // Instead of mapping it to json, it used the output of the toString()
-            // method of the customer class
+            // because jackson somehow wasn't able to do it.
             ObjectMapper mapper = new ObjectMapper();
             String customerAsJsonString = mapper.writeValueAsString(customer);
 
             Map<String, List<Ablesung>> customerWithItsReadings = new HashMap<>();
             customerWithItsReadings.put(customerAsJsonString, kundenAbl);
-
-
 
             return Response.status(Response.Status.OK).entity(customerWithItsReadings).build();
 

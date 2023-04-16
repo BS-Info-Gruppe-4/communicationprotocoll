@@ -276,7 +276,7 @@ public class AllCustomersTable extends JFrame {
         editReadingButton.addActionListener(e -> openEditReadingsWindow());
         deleteUserButton.addActionListener(e -> attemptCustomerDeletion());
 
-        //TODO: Maybe use observer pattern for notifying table on changes
+        //TODO: Maybe use observer pattern for notifying table that the state has changed
         newCustomerButton.addActionListener(e -> new KundeErstellenDialog(this));
         editCustomerButton.addActionListener(e -> {
             int selectedRow = table_customers.getSelectedRow();

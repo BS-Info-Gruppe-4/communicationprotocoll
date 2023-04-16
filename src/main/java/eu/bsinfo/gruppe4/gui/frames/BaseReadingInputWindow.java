@@ -118,7 +118,6 @@ public abstract class BaseReadingInputWindow extends JFrame {
 
 
 
-    //FIXME: Will only be written to file if the window of PropertyManagementApplication class is closed
     private void save() {
         try {
             Ablesung reading = getReadingOfInputFields();

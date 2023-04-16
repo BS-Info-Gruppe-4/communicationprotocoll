@@ -21,7 +21,6 @@ public class AblesungenVorZweiJahrenHeuteEndpoints {
     @Produces(MediaType.APPLICATION_JSON)
     public Response ablesungenVor2JahrenHeute() {
 
-        //TODO: Should the data of the json file be loaded into the database first?
         ArrayList<Ablesung> alleAblesungen = readingRepository.getAlleAblesungen();
         ArrayList<Ablesung> datumAblesungen = new ArrayList<>();
 
