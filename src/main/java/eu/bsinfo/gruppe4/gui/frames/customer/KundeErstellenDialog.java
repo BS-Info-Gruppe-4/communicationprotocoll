@@ -1,5 +1,8 @@
-package eu.bsinfo.gruppe4.gui;
+package eu.bsinfo.gruppe4.gui.frames.customer;
 
+import eu.bsinfo.gruppe4.gui.AllCustomersTable;
+import eu.bsinfo.gruppe4.gui.util.MessageDialog;
+import eu.bsinfo.gruppe4.gui.WebClient;
 import eu.bsinfo.gruppe4.gui.persistence.SessionStorage;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 import jakarta.ws.rs.core.Response;

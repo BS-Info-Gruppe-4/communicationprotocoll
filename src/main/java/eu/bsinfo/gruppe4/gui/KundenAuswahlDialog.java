@@ -1,10 +1,10 @@
 package eu.bsinfo.gruppe4.gui;
 
+import eu.bsinfo.gruppe4.gui.util.MessageDialog;
 import jakarta.ws.rs.core.Response;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 

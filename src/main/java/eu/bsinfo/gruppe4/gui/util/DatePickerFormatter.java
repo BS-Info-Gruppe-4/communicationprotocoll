@@ -1,4 +1,4 @@
-package eu.bsinfo.gruppe4.gui;
+package eu.bsinfo.gruppe4.gui.util;
 
 import javax.swing.*;
 import java.text.ParseException;

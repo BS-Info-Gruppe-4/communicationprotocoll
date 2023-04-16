@@ -1,6 +1,6 @@
 package eu.bsinfo.gruppe4.gui.service;
 
-import eu.bsinfo.gruppe4.gui.MessageDialog;
+import eu.bsinfo.gruppe4.gui.util.MessageDialog;
 import eu.bsinfo.gruppe4.gui.WebClient;
 import eu.bsinfo.gruppe4.gui.persistence.SessionStorage;
 import eu.bsinfo.gruppe4.server.model.Ablesung;

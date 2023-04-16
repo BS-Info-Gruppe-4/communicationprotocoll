@@ -1,5 +1,7 @@
 package eu.bsinfo.gruppe4.gui;
 
+import eu.bsinfo.gruppe4.gui.util.MessageDialog;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;

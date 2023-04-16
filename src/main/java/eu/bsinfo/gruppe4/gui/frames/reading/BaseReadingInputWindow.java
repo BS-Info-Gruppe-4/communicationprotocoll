@@ -1,8 +1,8 @@
-package eu.bsinfo.gruppe4.gui.frames;
+package eu.bsinfo.gruppe4.gui.frames.reading;
 
 import eu.bsinfo.gruppe4.gui.AllCustomersTable;
-import eu.bsinfo.gruppe4.gui.DatePickerFormatter;
-import eu.bsinfo.gruppe4.gui.MessageDialog;
+import eu.bsinfo.gruppe4.gui.util.DatePickerFormatter;
+import eu.bsinfo.gruppe4.gui.util.MessageDialog;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 import net.sourceforge.jdatepicker.impl.JDatePanelImpl;

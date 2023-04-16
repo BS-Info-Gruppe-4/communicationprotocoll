@@ -1,5 +1,7 @@
 package eu.bsinfo.gruppe4.gui;
 
+import eu.bsinfo.gruppe4.gui.util.MessageDialog;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.regex.Matcher;

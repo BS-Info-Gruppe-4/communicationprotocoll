@@ -1,5 +1,6 @@
 package eu.bsinfo.gruppe4.gui;
 
+import eu.bsinfo.gruppe4.gui.util.MessageDialog;
 import eu.bsinfo.gruppe4.server.Server;
 import lombok.Getter;
 import lombok.Setter;
