@@ -23,7 +23,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -500,28 +499,6 @@ public class AllCustomersTable extends JFrame {
         }
 
         model_readings.fireTableDataChanged();
-    }
-
-    public void showFilteredReadings(LocalDate start, LocalDate end) {
-        int selectedRow = table_customers.getSelectedRow();
-        boolean noRowIsSelected = selectedRow == -1;
-
-        if (noRowIsSelected) {
-            MessageDialog.showErrorMessage("Bitte wähle einen Kunden aus.");
-            return;
-        }
-
-        ArrayList <Ablesung> filteredReadings;
-        String customerId = table_customers.getValueAt(selectedRow, USER_ID_COLUMN_INDEX).toString();
-
-        try {
-            filteredReadings = readingService.getReadingsWithRestrictions(UUID.fromString(customerId), start, end);
-            setReadingsTableData(filteredReadings);
-        }
-        catch (Exception ex) {
-            MessageDialog.showErrorMessage(ex.getMessage());
-        }
-
     }
 
     public void refreshCustomerTable() {

@@ -8,7 +8,6 @@ import eu.bsinfo.gruppe4.server.database.ReadingRepository;
 import eu.bsinfo.gruppe4.server.database.ReadingSqlRepository;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import eu.bsinfo.gruppe4.server.model.Kunde;
-import eu.bsinfo.gruppe4.server.persistence.JsonRepository;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
