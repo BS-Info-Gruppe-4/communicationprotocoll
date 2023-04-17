@@ -49,7 +49,7 @@ public class LoadingWindow extends JFrame {
         con.add(panel, BorderLayout.NORTH);
         con.add(progressBar, BorderLayout.SOUTH);
 
-        label_starting = new JLabel("Starting server...");
+        label_starting = new JLabel("Loading...");
         label_starting.setHorizontalAlignment(0);
         label_starting.setFont(new Font("Serif", Font.PLAIN, 24));
 
@@ -62,7 +62,8 @@ public class LoadingWindow extends JFrame {
         panel.add(new JLabel(""));
         panel.add(label_starting);
 
-        setLocationRelativeTo(null);
+        //setLocationRelativeTo(null);
+        setLocation(100, 100);
         setVisible(true);
         setSize(500, 400);
 
