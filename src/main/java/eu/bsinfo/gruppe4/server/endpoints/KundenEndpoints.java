@@ -8,7 +8,6 @@ import eu.bsinfo.gruppe4.server.database.ReadingRepository;
 import eu.bsinfo.gruppe4.server.database.ReadingSqlRepository;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import eu.bsinfo.gruppe4.server.model.Kunde;
-import eu.bsinfo.gruppe4.server.persistence.JsonRepository;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -107,24 +106,23 @@ public class KundenEndpoints {
             customerRepository.deleteKunde(customer.getId());
 
             // I had to parse the customer object to a json string manually,
-            // because jackson somehow wasn't able to perform it.
-            // Instead of mapping it to json, it used the output of the toString()
-            // method of the customer class
+            // because jackson somehow wasn't able to do it.
             ObjectMapper mapper = new ObjectMapper();
             String customerAsJsonString = mapper.writeValueAsString(customer);
 
             Map<String, List<Ablesung>> customerWithItsReadings = new HashMap<>();
             customerWithItsReadings.put(customerAsJsonString, kundenAbl);
 
-
-
             return Response.status(Response.Status.OK).entity(customerWithItsReadings).build();
 
         } catch(IllegalArgumentException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity("ID fehlerhaft").build();
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("ID fehlerhaft")
+                    .build();
         } catch (JsonProcessingException e) {
-            //TODO: Return as response
-            throw new RuntimeException(e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Konnte Kunden-Objekt nicht in JSON konvertieren ")
+                    .build();
         }
 
     }

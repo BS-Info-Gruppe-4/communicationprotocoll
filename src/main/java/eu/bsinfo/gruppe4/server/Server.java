@@ -23,10 +23,7 @@ public class Server {
             return;
         }
 
-        if (loadFromFile) {
-            JsonRepository jsonRepository = JsonRepository.getInstance();
-            jsonRepository.loadDataFromJsonFiles();
-        }
+        // Daten sollen nicht aus einer Datei importiert werden, wenn bereits eine Datenbank vorhanden ist
 
         System.out.println("Trying to start server");
         System.out.println(url);

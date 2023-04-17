@@ -1,14 +1,18 @@
 package eu.bsinfo.gruppe4.gui;
 
-import eu.bsinfo.gruppe4.gui.frames.EditReadingInputWindow;
-import eu.bsinfo.gruppe4.gui.frames.NewReadingInputWindow;
-import eu.bsinfo.gruppe4.gui.persistence.EditCustomerDataWindow;
+import eu.bsinfo.gruppe4.gui.frames.customer.KundeErstellenDialog;
+import eu.bsinfo.gruppe4.gui.frames.reading.EditReadingInputWindow;
+import eu.bsinfo.gruppe4.gui.frames.reading.NewReadingInputWindow;
+import eu.bsinfo.gruppe4.gui.frames.customer.EditCustomerDataWindow;
 import eu.bsinfo.gruppe4.gui.persistence.SessionStorage;
 import eu.bsinfo.gruppe4.gui.service.CustomerService;
 import eu.bsinfo.gruppe4.gui.service.ReadingService;
+import eu.bsinfo.gruppe4.gui.util.DatePickerFormatter;
+import eu.bsinfo.gruppe4.gui.util.MessageDialog;
 import eu.bsinfo.gruppe4.server.Server;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
 import eu.bsinfo.gruppe4.server.model.Kunde;
+import eu.bsinfo.gruppe4.server.persistence.JsonRepository;
 import jakarta.ws.rs.NotFoundException;
 import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
 import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
@@ -23,8 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.UUID;
+import java.util.*;
 
 
 public class AllCustomersTable extends JFrame {
@@ -46,13 +49,16 @@ public class AllCustomersTable extends JFrame {
     private final JButton filterReadingsButton = new JButton("Filter Ablesungen");
     private final JButton editReadingButton = new JButton("Ablesung bearbeiten");
     private final JButton deleteReadingButton = new JButton("Ablesung löschen");
+    private final JButton exportDataButton = new JButton("gefilterte Daten exportieren");
     private final JTextField tf_filterCustomer = new JTextField();
     DefaultTableModel customerTableModel = new DefaultTableModel();
     DefaultTableModel model_readings = new DefaultTableModel();
     private JMenu menu_file, menu_about, menu_settings, submenu_themes;
     private JMenuItem item_exit, item_about, item_nimbus, item_windows, item_metal, item_motif;
     private JMenuBar menubar;
-    private LocalDate start_date, end_date;
+    ArrayList<Kunde> filteredCustomers = SessionStorage.getInstance().getKunden();
+    ArrayList<Ablesung> filteredReadings = SessionStorage.getInstance().getAblesungen();
+    JsonRepository jsonRepository = new JsonRepository();
 
     public AllCustomersTable() {
         setTitle("Kundenliste");
@@ -182,12 +188,13 @@ public class AllCustomersTable extends JFrame {
         table_readings = new JTable();
 
         // Buttons
-        final JPanel buttonPanel = new JPanel(new GridLayout(1, 7));
+        final JPanel buttonPanel = new JPanel(new GridLayout(1, 8));
         buttonPanel.add(newCustomerButton);
         buttonPanel.add(newReadingButton);
         buttonPanel.add(editCustomerButton);
         buttonPanel.add(deleteUserButton);
         buttonPanel.add(resetFilterButton);
+        buttonPanel.add(exportDataButton);
 
         // Datepicker
         final JPanel filterPanel = new JPanel(new GridLayout(1, 3));
@@ -238,7 +245,7 @@ public class AllCustomersTable extends JFrame {
         table_readings.setModel(model_readings);
 
         loadInitialCustomerTableData();
-        loadInitialTableDataReadings();
+        loadInitialReadingsTableData();
 
         // Erstelle Sorter
         sorter = new TableRowSorter<>(customerTableModel);
@@ -271,7 +278,7 @@ public class AllCustomersTable extends JFrame {
         editReadingButton.addActionListener(e -> openEditReadingsWindow());
         deleteUserButton.addActionListener(e -> attemptCustomerDeletion());
 
-        //TODO: Maybe use observer pattern for notifying table on changes
+        //TODO: Maybe use observer pattern for notifying table that the state has changed
         newCustomerButton.addActionListener(e -> new KundeErstellenDialog(this));
         editCustomerButton.addActionListener(e -> {
             int selectedRow = table_customers.getSelectedRow();
@@ -294,6 +301,16 @@ public class AllCustomersTable extends JFrame {
 
         filterReadingsButton.addActionListener(e -> filterReadings());
         resetFilterButton.addActionListener(e -> resetFilter());
+
+        exportDataButton.addActionListener(e -> {
+            try {
+                jsonRepository.exportFilteredData(filteredCustomers, filteredReadings);
+                MessageDialog.showSuccessMessage("Gefilterte Daten wurden exportiert");
+            }
+            catch (Exception e1) {
+                MessageDialog.showErrorMessage(e1.getMessage());
+            }
+        });
 
         // Passe die Größe des Fensters an
         setSize(1500, 600);
@@ -318,10 +335,11 @@ public class AllCustomersTable extends JFrame {
         LocalDate startingDate = getSelectedStartingDate();
         LocalDate endingDate = getSelectedEndingDate();
 
-        ArrayList <Ablesung> filteredReadings;
         String customerIdAsString = tf_filterCustomer.getText();
 
         try {
+            // The method in the backend will only ignore the customer id if it is set to null
+            // It won't work if the customer id is an empty string, so it has to be replaced here with null
             UUID customerId = customerIdAsString.isEmpty() ? null : UUID.fromString(customerIdAsString);
             filteredReadings = readingService.getReadingsWithRestrictions(customerId, startingDate, endingDate);
             setReadingsTableData(filteredReadings);
@@ -335,6 +353,7 @@ public class AllCustomersTable extends JFrame {
         Kunde customer;
         try {
             customer = customerService.getCustomerById(UUID.fromString(customerNumber));
+            filteredCustomers = new ArrayList<>(Arrays.asList(customer));
             customerTableModel.setRowCount(0);
             Object[] row = {customer.getId(), customer.getVorname(), customer.getName()};
             customerTableModel.addRow(row);
@@ -352,8 +371,11 @@ public class AllCustomersTable extends JFrame {
         this.datemodel_start_date.setValue(null);
         this.datemodel_end_date.setValue(null);
 
+        filteredCustomers = sessionStorage.getKunden();
+        filteredReadings = sessionStorage.getAblesungen();
+
         loadInitialCustomerTableData();
-        loadInitialTableDataReadings();
+        loadInitialReadingsTableData();
     }
 
     private LocalDate getSelectedStartingDate() {
@@ -467,7 +489,7 @@ public class AllCustomersTable extends JFrame {
 
     }
 
-    public void loadInitialTableDataReadings() {
+    public void loadInitialReadingsTableData() {
 
         var readings = sessionStorage.getAblesungen();
 
@@ -482,28 +504,6 @@ public class AllCustomersTable extends JFrame {
         }
 
         model_readings.fireTableDataChanged();
-    }
-
-    public void showFilteredReadings(LocalDate start, LocalDate end) {
-        int selectedRow = table_customers.getSelectedRow();
-        boolean noRowIsSelected = selectedRow == -1;
-
-        if (noRowIsSelected) {
-            MessageDialog.showErrorMessage("Bitte wähle einen Kunden aus.");
-            return;
-        }
-
-        ArrayList <Ablesung> filteredReadings;
-        String customerId = table_customers.getValueAt(selectedRow, USER_ID_COLUMN_INDEX).toString();
-
-        try {
-            filteredReadings = readingService.getReadingsWithRestrictions(UUID.fromString(customerId), start, end);
-            setReadingsTableData(filteredReadings);
-        }
-        catch (Exception ex) {
-            MessageDialog.showErrorMessage(ex.getMessage());
-        }
-
     }
 
     public void refreshCustomerTable() {

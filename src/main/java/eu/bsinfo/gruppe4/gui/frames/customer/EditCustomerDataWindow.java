@@ -1,7 +1,7 @@
-package eu.bsinfo.gruppe4.gui.persistence;
+package eu.bsinfo.gruppe4.gui.frames.customer;
 
 import eu.bsinfo.gruppe4.gui.AllCustomersTable;
-import eu.bsinfo.gruppe4.gui.MessageDialog;
+import eu.bsinfo.gruppe4.gui.util.MessageDialog;
 import eu.bsinfo.gruppe4.gui.service.CustomerService;
 import eu.bsinfo.gruppe4.server.model.Kunde;
 

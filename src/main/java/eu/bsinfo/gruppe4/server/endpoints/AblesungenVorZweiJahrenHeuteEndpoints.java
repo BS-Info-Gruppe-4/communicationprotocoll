@@ -3,7 +3,6 @@ package eu.bsinfo.gruppe4.server.endpoints;
 import eu.bsinfo.gruppe4.server.database.ReadingRepository;
 import eu.bsinfo.gruppe4.server.database.ReadingSqlRepository;
 import eu.bsinfo.gruppe4.server.model.Ablesung;
-import eu.bsinfo.gruppe4.server.persistence.JsonRepository;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -21,7 +20,6 @@ public class AblesungenVorZweiJahrenHeuteEndpoints {
     @Produces(MediaType.APPLICATION_JSON)
     public Response ablesungenVor2JahrenHeute() {
 
-        //TODO: Should the data of the json file be loaded into the database first?
         ArrayList<Ablesung> alleAblesungen = readingRepository.getAlleAblesungen();
         ArrayList<Ablesung> datumAblesungen = new ArrayList<>();
 
