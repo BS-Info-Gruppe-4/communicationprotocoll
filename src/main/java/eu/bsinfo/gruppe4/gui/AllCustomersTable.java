@@ -14,6 +14,7 @@ import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
 import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
 import net.sourceforge.jdatepicker.impl.UtilDateModel;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import javax.swing.table.DefaultTableModel;
@@ -22,6 +23,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -176,6 +180,22 @@ public class AllCustomersTable extends JFrame {
         submenu_themes.add(item_motif);
 
         add(menubar, BorderLayout.NORTH);
+
+        JPanel pn_ad = new JPanel();
+        add(pn_ad, BorderLayout.EAST);
+        final String IMG_PATH = "src/images/ad4.jpg";
+        JLabel label_bild = new JLabel();
+        label_bild.setHorizontalAlignment(SwingConstants.CENTER);
+        label_bild.setBounds(628, 28, 250, 500);
+        try {
+            BufferedImage img = ImageIO.read(new File(IMG_PATH));
+            Image dimg = img.getScaledInstance(label_bild.getWidth(), label_bild.getHeight(), Image.SCALE_SMOOTH);
+            ImageIcon icon = new ImageIcon(dimg);
+            label_bild = new JLabel(icon);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        pn_ad.add(label_bild);
 
         // Erzeuge die Tabelle
         table_customers = new JTable();

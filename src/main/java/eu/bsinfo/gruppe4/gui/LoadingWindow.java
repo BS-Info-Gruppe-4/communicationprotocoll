@@ -75,7 +75,7 @@ public class LoadingWindow extends JFrame {
             progressBar.setValue(i);
 
             // delay the thread
-            Thread.sleep(500);
+            Thread.sleep(1000);
             i += 20;
         }
         dispose();
